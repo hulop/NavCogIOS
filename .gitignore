@@ -1,0 +1,7 @@
+xcuserdata
+Pods/
+.DS_Store
+build
+NavCog.xcworkspace
+Podfile.lock
+/.project
