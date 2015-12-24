@@ -1,0 +1,48 @@
+/* Class = "UIButton"; normalTitle = "Stop"; ObjectID = "2BL-eb-Cgu"; */
+"2BL-eb-Cgu.normalTitle" = "Stop";
+
+/* Class = "UITextField"; placeholder = "MajorID"; ObjectID = "2j4-Ob-ybk"; */
+"2j4-Ob-ybk.placeholder" = "MajorID";
+
+/* Class = "UILabel"; text = "0"; ObjectID = "ARS-9q-Gdl"; */
+"ARS-9q-Gdl.text" = "0";
+
+/* Class = "UIButton"; normalTitle = "< Back"; ObjectID = "G85-tc-Fq7"; */
+"G85-tc-Fq7.normalTitle" = "< Back";
+
+/* Class = "UILabel"; text = "Number Lock"; ObjectID = "K1F-Wf-5LV"; */
+"K1F-Wf-5LV.text" = "Number Lock";
+
+/* Class = "UISegmentedControl"; M5Y-3Z-zhR.segmentTitles[0] = "Auto -"; ObjectID = "M5Y-3Z-zhR"; */
+"M5Y-3Z-zhR.segmentTitles[0]" = "Auto -";
+
+/* Class = "UISegmentedControl"; M5Y-3Z-zhR.segmentTitles[1] = "Auto +"; ObjectID = "M5Y-3Z-zhR"; */
+"M5Y-3Z-zhR.segmentTitles[1]" = "Auto +";
+
+/* Class = "UILabel"; text = "Y:"; ObjectID = "WNR-zY-0Jl"; */
+"WNR-zY-0Jl.text" = "Y:";
+
+/* Class = "UILabel"; text = "Beacon Filter (e.g : 1-5,8,11,15-20)"; ObjectID = "XqX-IO-jZK"; */
+"XqX-IO-jZK.text" = "Beacon Filter (e.g : 1-5,8,11,15-20)";
+
+/* Class = "UISegmentedControl"; Yv2-Tx-WMM.segmentTitles[0] = "Auto -"; ObjectID = "Yv2-Tx-WMM"; */
+"Yv2-Tx-WMM.segmentTitles[0]" = "Auto -";
+
+/* Class = "UISegmentedControl"; Yv2-Tx-WMM.segmentTitles[1] = "Auto +"; ObjectID = "Yv2-Tx-WMM"; */
+"Yv2-Tx-WMM.segmentTitles[1]" = "Auto +";
+
+/* Class = "UIButton"; normalTitle = "Start"; ObjectID = "cQ2-QR-R2y"; */
+"cQ2-QR-R2y.normalTitle" = "Start";
+
+/* Class = "UITextField"; placeholder = "UUID"; ObjectID = "exu-5g-HM5"; */
+"exu-5g-HM5.placeholder" = "UUID";
+
+/* Class = "UILabel"; text = "Edge ID:"; ObjectID = "kt8-Bo-U9i"; */
+"kt8-Bo-U9i.text" = "Edge ID:";
+
+/* Class = "UILabel"; text = "Count Down"; ObjectID = "kva-oj-fF7"; */
+"kva-oj-fF7.text" = "Count Down";
+
+/* Class = "UILabel"; text = "X:"; ObjectID = "ziq-Dm-qFL"; */
+"ziq-Dm-qFL.text" = "X:";
+

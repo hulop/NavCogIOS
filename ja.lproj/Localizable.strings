@@ -1,0 +1,180 @@
+/*******************************************************************************
+ * Copyright (c) 2014, 2015  IBM Corporation, Carnegie Mellon University and others
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *******************************************************************************/
+
+/* Alert that an accessibility notification is available */
+"accessNotif" = "アクセシビリティ通知";
+
+/* HTML Label for accessibility instruction button in view */
+"accessibilityInstructionButton" = "アクセシビリティ
+指示";
+
+/* Simple and used to join two nodes. */
+"and" = "。。つづいて";
+
+/* Used to join two instructions */
+"andFormat" = "%@ 、 %@";
+
+/* Spoken when approaching specific nodes */
+"approaching" = "そろそろです";
+
+/* Format string to tell the user they are approaching a turn */
+"approachingToTurnFormat" = "そろそろ%@";
+
+/* Spoken when you arrive at a destination */
+"arrived" = "到着しました";
+
+/* Format string describes the floor you are currently on */
+"currentlyOnFormat" = "。。 現在は%@にいます";
+
+/* Current Location */
+"currentLocation" = "現在地";
+
+/* Destination alert */
+"destination" = "そこが目的地です。。 ";
+
+/* Format string for destination alert */
+"destinationFormat" = "%@。。 ここが目的地です。。 ";
+
+/* Label shown when map list is downloading */
+"downloadingMapList" = "地図リストを読込中";
+
+/* Spoken when entering a location */
+"enteringFormat" = "。。 %@に入りました。。";
+
+/* A unit of distance in feet */
+"feet" = "フィート";
+
+/* Use to express a distance in feet */
+"feetFormat" = "%d フィート";
+
+/* Use to express a distance in feet with a pause */
+"feetPauseFormat" = "%d フィート。。";
+
+/* format string describing the number of feet left to a named location */
+"feetToNameFormat" = "%2$@まで%1$dフィート。。";
+
+/* (No Commment) */
+"feetWithPauseFormat" = "%d フィート。。";
+
+/* A unit of distance in meter */
+"meter" = "メートル";
+
+/* Use to express a distance in meter */
+"meterFormat" = "%d メートル";
+
+/* Use to express a distance in meter with a pause */
+"meterPauseFormat" = "%d メートル。。";
+
+/* format string describing the number of meter left to a named location */
+"meterToNameFormat" = "%2$@まで%1$dメートル。。";
+
+/* Format string for a floor that takes an ordinal number */
+"floorFormat" = "%@階。。 ";
+
+/* Label for the source location picker */
+"fromLabel" = "出発地:";
+
+/* Short command telling the user to go downstairs */
+"goDownstairs" = "下の階へ。。";
+
+/* Command telling the user to go downstairs using the elevator */
+"goDownstairsElevator" = "エレベータで下の階へ";
+
+/* Command telling the user to go down the stairs using the stair case */
+"goDownstairsStairCase" = "階段で下の階へ。。 ";
+
+/* Short command telling the user to go upstairs */
+"goUpstairs" = "上の階へ。。";
+
+/* Command telling the user to go upstairs using the elevator */
+"goUpstairsElevator" = "エレベータで上の階へ";
+
+/* Command telling the user to go up the stairs using the stair case */
+"goUpstairsStairCase" = "階段を使って上の階へ。。 ";
+
+/* Button to initialize orientation */
+"initOrientationButton" = "方角の調整";
+
+/* Instruction to keep straight */
+"keepStraight" = "直進。。 ";
+
+/* Indicator text shown while a map is loading */
+"loadingMap" = "地図を読込中...";
+
+/* Format string for map downloading progress indicator */
+"mapProgressFormat" = "%.0f%% 完了";
+
+/* Spoken when no information is available */
+"noInformation" = "情報なし";
+
+/* HTML Label for previous instruction button in view */
+"previousInstructionButton" = "前回の
+指示";
+
+/* Indication text shown while a map is being processed */
+"processingMap" = "地図を処理中...";
+
+/* Instruction to turn slightly left */
+"slightLeft" = "少し左。。 ";
+
+/* Instruction to turn slightly right */
+"slightRight" = "少し右。。 ";
+
+/* Button to start navigation */
+"startNavigationButton" = "ナビ開始";
+
+/* HTML Label for stop navigation button in view */
+"stopNavigationButton" = "ナビ
+終了";
+
+/* HTML Label for surrounding information button in view */
+"surroundingInformationButton" = "周辺情報";
+
+/* Command telling the user take the elevator downstairs */
+"takeDownstairsElevator" = "エレベータに乗って下の階へ。。 ";
+
+/* Format string for taking the elevator */
+"takeElevatorFormat" = "。。 エレベータに乗って%@へ";
+
+/* Format string for taking the stairs */
+"takeStairsFormat" = "。。 階段で%@へ";
+
+/* Command telling the user take the elevator upstairs */
+"takeUpstairsElevator" = "エレベータに乗って上の階へ。。 ";
+
+/* Label for the destination location picker */
+"toLabel" = "目的地:";
+
+/* Instruction to turn left */
+"turnLeft" = "左に曲がる。。 ";
+
+/* Format string to turn left in degrees */
+"turnLeftDegreeFormat" = "左に%d度曲がる。。 ";
+
+/* Instruction to turn right */
+"turnRight" = "右に曲がる。。 ";
+
+/* Format string to turn right in degrees */
+"turnRightDegreeFormat" = "右に%d度曲がる。。 ";
+
+/* URL of help page */
+"helpPageURL" = "https://navcog.mybluemix.net/help/ja/index.html";

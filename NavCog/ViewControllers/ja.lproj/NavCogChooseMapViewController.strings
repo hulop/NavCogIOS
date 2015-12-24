@@ -1,0 +1,8 @@
+/* Class = "UIButton"; normalTitle = "Update"; ObjectID = "voB-hm-9eX"; */
+"voB-hm-9eX.normalTitle" = "更新";
+
+/* Class = "UIButton"; normalTitle = "< Back"; ObjectID = "w7N-it-OS5"; */
+"w7N-it-OS5.normalTitle" = "< 戻る";
+
+/* Class = "UILabel"; text = "Select Map"; ObjectID = "Apo-iS-Vta"; */
+"Apo-iS-Vta.text" = "地図の選択";

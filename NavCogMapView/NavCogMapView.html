@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta name="copyright" content="Copyright (c) IBM Corporation, Carnegie Mellon University and others 2014, 2015. This page is made available under MIT license.">
+<!--
+ The MIT License (MIT)
+ 
+ Copyright (c) 2014, 2015 IBM Corporation, Carnegie Mellon University and others
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ 
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+ 
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ 
+ 
+ Contributors:
+   Chengxiong Ruan (CMU) - initial API and implementation
+ -->
+     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+     <title>NavCogMapView</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+  </head>
+  <body onload="loaded()">
+    <div id="google-map-view" style="height:100%; margin:0px; padding:0px">
+    </div>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="./src/NavCogMapView.js"></script>
+    <script src="./src/FloorPlanOverlay.js"></script>
+  </body>
+</html>
