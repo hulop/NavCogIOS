@@ -262,7 +262,7 @@
             }
         }
     } else if (_type == STATE_TYPE_TRANSITION) {
-        //pos.knndist = (pos.knndist - _targetEdge.minKnnDist) / (_targetEdge.maxKnnDist - _targetEdge.minKnnDist);
+        pos.knndist = (pos.knndist - _targetEdge.minKnnDist) / (_targetEdge.maxKnnDist - _targetEdge.minKnnDist);
 /*        if (_prevState != nil && _prevState.type == STATE_TYPE_WALKING) {
             float nextKnndist = pos.knndist;
             // compare knn distance to previous and next edge
