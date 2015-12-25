@@ -226,11 +226,11 @@ using namespace std;
         }
     }
     
-    for (int i = 0; i < _beaconNum; i++) {
-        if (_preFeatVec[i] > -90) {
-            _featVec[i] = (_featVec[i] < -99 ? _preFeatVec[i] : _featVec[i]);
-        }
-    }
+//    for (int i = 0; i < _beaconNum; i++) {
+//        if (_preFeatVec[i] > -90) {
+//            _featVec[i] = (_featVec[i] < -99 ? _preFeatVec[i] : _featVec[i]);
+//        }
+//    }
     
     if (_bStart) {
         for (int i = 0; i < _beaconNum; i++) {
