@@ -77,9 +77,9 @@ static const float GyroDriftLimit = 3;
         NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:uuidStr];
         _beaconRegion = [[CLBeaconRegion alloc] initWithProximityUUID:uuid identifier:@"navcog"];
 
-        [self startMotionSensor];
-        [self startAccSensor];
-        [self startBeaconSensor];
+        //[self startMotionSensor];
+        //[self startAccSensor];
+        //[self startBeaconSensor];
         
         
         _dateFormatter = [[NSDateFormatter alloc] init];
@@ -138,10 +138,24 @@ static const float GyroDriftLimit = 3;
 
 - (void)stopAllSensors
 {
-    [_motionManager stopAccelerometerUpdates];
+    [self stopBeaconSensor];
+    [self stopAccSensor];
+    [self stopMotionSensor];
+}
+
+- (void)stopMotionSensor
+{
     [_motionManager stopDeviceMotionUpdates];
+}
+
+- (void) stopAccSensor
+{
+    [_motionManager stopAccelerometerUpdates];
+}
+
+- (void)stopBeaconSensor
+{
     [_beaconManager stopRangingBeaconsInRegion:_beaconRegion];
-    [self reset];
 }
 
 - (void) setCurrentState: (NavState*) currentState
@@ -184,6 +198,7 @@ static const float GyroDriftLimit = 3;
 //    [[NSNotificationCenter defaultCenter]
 //     postNotificationName:@LOCATION_UPDATED_NOTIFICATION_NAME
 //     object:self userInfo:nil];
+    
 
     NavLocation *location = [[NavLocation alloc] initWithMap:_topoMap];
     if (_currentLocation == nil) {
@@ -277,6 +292,7 @@ static const float GyroDriftLimit = 3;
     location.edgeID = edge.edgeID;
     location.xInEdge = pos.x;
     location.yInEdge = pos.y;
+    location.knndist = pos.knndist;
     
     return location;
 }

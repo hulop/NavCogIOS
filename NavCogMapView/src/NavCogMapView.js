@@ -46,6 +46,7 @@ function setMapData(newData) { // newData is layers object
 
 function setStartNode(lat, lng) {
     _startNode = newNodeWithLatLng(lat, lng);
+    updateBlueDot(_startNode);
 }
 
 function startNavigation(pathNodeIds) {

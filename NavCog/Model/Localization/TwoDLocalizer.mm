@@ -37,9 +37,7 @@
 
 #include <bleloc/PoseRandomWalker.hpp>
 
-#include <bleloc/ObservationModelStub.hpp>
 #include <bleloc/GridResampler.hpp>
-#include <bleloc/StatusInitializerStub.hpp>
 #include <bleloc/StatusInitializerImpl.hpp>
 
 #include <bleloc/DataStore.hpp>
@@ -285,11 +283,14 @@ using namespace loc;
         distanceSum += distance;
     }
     double distanceMean = distanceSum/states->size();
-    return distanceMean / 3 * sqrt(pow(stdloc.x(),2) + pow(stdloc.y(),2));
+    double v = fmax(distanceMean, sqrt(pow(stdloc.x(),2) + pow(stdloc.y(),2)))/6.0;
+    
+    NSLog(@"2D knnDist: %@, %.2f, %.2f, %.2f, %.2f", edgeID, v, distanceMean, stdloc.x(), stdloc.y());
+    return v;
 }
 
 - (double) computeDistanceBetweenState: (State) state AndEdge:(NavLightEdge*) edge{
-    static double distanceByFloorDiff = 100;
+    static double distanceByFloorDiff = 10;
     static double floorDifferenceTolerance = 0.1;
     
     double distance = 0;
@@ -462,8 +463,8 @@ void calledWhenUpdated(Status * pStatus){
     // Instantiate sensor data processors
     // Orientation
     OrientationMeterAverageParameters orientationMeterAverageParameters;
-    orientationMeterAverageParameters.setInterval(0.1);
-    orientationMeterAverageParameters.setWindowAveraging(0.1);
+    orientationMeterAverageParameters.interval(0.1);
+    orientationMeterAverageParameters.windowAveraging(0.1);
     std::shared_ptr<OrientationMeter> orientationMeter(new OrientationMeterAverage(orientationMeterAverageParameters));
     
     self.orientationMeter = orientationMeter;
@@ -471,7 +472,7 @@ void calledWhenUpdated(Status * pStatus){
     // Pedometer
     PedometerWalkingStateParameters pedometerWSParams;
     // TODO
-    pedometerWSParams.updatePeriod = 0.1;
+    pedometerWSParams.updatePeriod(0.1);
     // END TODO
     std::shared_ptr<Pedometer> pedometer(new PedometerWalkingState(pedometerWSParams));
     
@@ -483,26 +484,25 @@ void calledWhenUpdated(Status * pStatus){
     // TODO (PoseProperty and StateProperty)
     PoseProperty poseProperty;
     StateProperty stateProperty;
-    poseProperty.meanVelocity = 1.0;
-    poseProperty.stdVelocity = 0.3;
-    poseProperty.driftVelocity = 0.1;
-    poseProperty.minVelocity = 0.1;
-    poseProperty.maxVelocity = 1.5;
-    poseProperty.stdOrientation = 3.0/180.0*M_PI;
+    poseProperty.meanVelocity(1.0);
+    poseProperty.stdVelocity(0.3);
+    poseProperty.diffusionVelocity(0.1);
+    poseProperty.minVelocity(0.1);
+    poseProperty.maxVelocity(1.5);
+    poseProperty.stdOrientation(3.0/180.0*M_PI);
     
-    //stateProperty.meanRssiBias = -4.0;
-    stateProperty.meanRssiBias = 0.0;
-    stateProperty.stdRssiBias = 0.2;
-    stateProperty.driftRssiBias = 0.2;
-    stateProperty.driftOrientationBias = 1.0/180*M_PI;
+    stateProperty.meanRssiBias(0.0);
+    stateProperty.stdRssiBias(0.2);
+    stateProperty.diffusionRssiBias(0.2);
+    stateProperty.diffusionOrientationBias(1.0/180*M_PI);
     // END TODO
     
     // Build poseRandomWalker
     PoseRandomWalkerProperty poseRandomWalkerProperty;
     std::shared_ptr<PoseRandomWalker>poseRandomWalker(new PoseRandomWalker());
-    poseRandomWalkerProperty.pOrientationMeter = orientationMeter.get();
-    poseRandomWalkerProperty.pPedomter = pedometer.get();
-    poseRandomWalkerProperty.angularVelocityLimit = 30.0/180.0*M_PI;
+    poseRandomWalkerProperty.orientationMeter(orientationMeter.get());
+    poseRandomWalkerProperty.pedometer(pedometer.get());
+    poseRandomWalkerProperty.angularVelocityLimit(30.0/180.0*M_PI);
     poseRandomWalker->setProperty(poseRandomWalkerProperty);
     poseRandomWalker->setPoseProperty(poseProperty);
     poseRandomWalker->setStateProperty(stateProperty);
@@ -510,8 +510,8 @@ void calledWhenUpdated(Status * pStatus){
     // Combine poseRandomWalker and building
     PoseRandomWalkerInBuildingProperty prwBuildingProperty;
     // TODO
-    prwBuildingProperty.maxIncidenceAngle = 45.0/180.0*M_PI;
-    prwBuildingProperty.weightDecayRate = 0.9;
+    prwBuildingProperty.maxIncidenceAngle(45.0/180.0*M_PI);
+    prwBuildingProperty.weightDecayRate(0.9);
     // END TODO
     Building building = dataStore->getBuilding();
     std::shared_ptr<PoseRandomWalkerInBuilding> poseRandomWalkerInBuilding(new PoseRandomWalkerInBuilding());

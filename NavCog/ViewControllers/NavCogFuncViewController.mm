@@ -179,6 +179,7 @@
     [self updateRedDotWithLocation: notification.userInfo[@"location"]];
 }
 - (void)updateRedDotWithLocation:(NavLocation *)location {
+    if (true) return; // TODO: remove this after current position fixed
     if (![NavLog isLogging]) {
         return;
     }

@@ -74,6 +74,10 @@
 - (void) startBeaconSensor;
 - (void) stopAllSensors;
 - (void) stopSimulation;
+- (void) stopMotionSensor;
+- (void) stopAccSensor;
+- (void) stopBeaconSensor;
+- (void) reset;
 
 - (void) initLocalizationOnEdge:(NSString*) edgeID withOptions:(NSDictionary*) options;
 - (NavLocation *)getCurrentLocationWithInit:(BOOL) init;

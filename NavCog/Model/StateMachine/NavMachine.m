@@ -437,7 +437,9 @@
 
 - (void)stopNavigation {
     [self stopAudio];
-    //[_currentLocationManager stopAllSensors];
+    [_currentLocationManager stopBeaconSensor];
+    [_currentLocationManager stopAccSensor];
+    [_currentLocationManager reset];
     [_currentLocationManager stopSimulation];
     [_topoMap cleanTmpNodeAndEdges];
     _navState = NAV_STATE_IDLE;
@@ -496,7 +498,7 @@
             [_currentLocationManager getCurrentLocationWithInit:NO];
             //[_topoMap getCurrentLocationOnMapUsingBeacons:beacons withInit:NO];
         }
-        if (_navState == NAV_STATE_TURNING) {
+        if (_navState == NAV_STATE_TURNING && _currentState != _initialState) {
             // check if user keep moving to destination without turn
             NavLocation *pos = [_currentLocationManager getLocationOnEdge:_currentState.walkingEdge.edgeID];
             float startDist = [_currentState getStartDistance:pos];
@@ -517,7 +519,10 @@
                 if (_currentState == nil) {
                     [_delegate navigationFinished];
                     [NavNotificationSpeaker speakWithCustomizedSpeed:NSLocalizedString(@"arrived", @"Spoken when you arrive at a destination")];
-                    [_currentLocationManager stopAllSensors];
+                    //[_currentLocationManager stopAllSensors];
+                    [_currentLocationManager stopBeaconSensor];
+                    [_currentLocationManager stopAccSensor];
+                    [_currentLocationManager reset];
                     [_topoMap cleanTmpNodeAndEdges];
                 } else if (_currentState.type == STATE_TYPE_WALKING) {
                     // Attempt to do gyro drift updates only while moving. however the localization is not reliable enough to use it

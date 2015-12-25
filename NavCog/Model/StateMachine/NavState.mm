@@ -188,13 +188,13 @@
         }
         
         _closestDist = MIN(dist, _closestDist);
-        if(dist > 0 && _closestDist < 20 && _nextState != nil && _nextState.type == STATE_TYPE_WALKING) {
+        if(dist > 0 && _didApproaching && _nextState != nil && _nextState.type == STATE_TYPE_WALKING) {
             // check if we already on the next edge
             NavLocation *nextPos = [man getLocationOnEdge:_nextState.walkingEdge.edgeID];
 
             float nextStartDist = [_nextState getStartDistance:nextPos];
             float nextStartRatio = [_nextState getStartRatio:nextPos];
-            if (nextStartDist > 20 || (nextStartDist > 10 && nextStartRatio > 0.25)) {
+            if (nextStartDist > 25 || (nextStartDist > 10 && nextStartRatio > 0.25)) {
                 NSLog(@"ForceNextState,%f,%f,%f,%f",_closestDist, pos.knndist, nextStartDist, nextPos.knndist);
                 dist = 0;
             }
