@@ -21,6 +21,7 @@
  *
  * Contributors:
  *  Chengxiong Ruan (CMU) - initial API and implementation
+ *  Cole Gleason (CMU) - initial API and implementation
  *  IBM Corporation - initial API and implementation
  *******************************************************************************/
 

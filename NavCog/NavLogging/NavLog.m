@@ -20,7 +20,6 @@
  * THE SOFTWARE.
  *
  * Contributors:
- *  Chengxiong Ruan (CMU) - initial API and implementation
  *  IBM Corporation - initial API and implementation
  *******************************************************************************/
 

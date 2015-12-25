@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  *
  * Contributors:
- *  Chengxiong Ruan (CMU) - initial API and implementation
+ *  Dragan Ahmetovic (CMU) - initial API and implementation
  *******************************************************************************/
 
 #import <UIKit/UIKit.h>
