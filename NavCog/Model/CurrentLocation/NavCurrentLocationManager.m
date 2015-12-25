@@ -314,6 +314,9 @@ static const float GyroDriftLimit = 3;
     for (NavEdgeLocalizer *nel in localizers) {
         
         NavEdge *edge = [_topoMap getEdgeById:nel.edgeInfo.edgeID];
+        if (edge == nil) {
+            continue;
+        }
         if (init) {
             [nel initializeState:nil];
         }
