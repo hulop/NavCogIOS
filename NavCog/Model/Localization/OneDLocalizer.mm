@@ -44,6 +44,10 @@
 
 using namespace loc;
 
+typedef struct LocalizerData {
+    OneDLocalizer* localizer;
+} LocalizerData;
+
 @interface OneDLocalizer ()
 @property NSArray *beaconIDs;
 @property std::shared_ptr<OrientationMeter> orientationMeter;
@@ -55,8 +59,13 @@ using namespace loc;
 @property loc::Pose stdevPose;
 @property NSArray *previousBeaconInput;
 @property NavLocalizeResult *result;
+@property long previousAttTimestamp;
+@property long previousAccTimestamp;
+@property LocalizerData userData;
 
-@property BOOL inactive;
+@property std::shared_ptr<Location> d1meanLoc;
+@property std::shared_ptr<Pose> d1meanPose;
+@property std::shared_ptr<States> d1states;
 
 @end
 
@@ -78,27 +87,28 @@ using namespace loc;
     return self;
 }
 
-std::shared_ptr<Location> d1meanLoc;
-std::shared_ptr<Pose> d1meanPose;
-std::shared_ptr<States> d1states;
-void d1calledWhenUpdated(Status * pStatus){
+void d1calledWhenUpdated(void *userData, Status * pStatus){
+    
+    LocalizerData *localizerData = (LocalizerData*)userData;
+    OneDLocalizer *loc = localizerData->localizer;
+    
     //NSLog(@"location updated");
-    d1meanLoc = pStatus->meanLocation();
-    d1meanPose = pStatus->meanPose();
-    d1states = pStatus->states();
+    loc.d1meanLoc = pStatus->meanLocation();
+    loc.d1meanPose = pStatus->meanPose();
+    loc.d1states = pStatus->states();
     
     NSDictionary *data = @{
-                           @"x": @(d1meanLoc->x()),
-                           @"y": @(d1meanLoc->y()),
-                           @"z": @(d1meanLoc->z()),
-                           @"floor": @(d1meanLoc->floor()),
-                           @"orientation": @(d1meanPose->orientation()),
-                           @"velocity":@(d1meanPose->velocity())
+                           @"x": @(loc.d1meanLoc->x()),
+                           @"y": @(loc.d1meanLoc->y()),
+                           @"z": @(loc.d1meanLoc->z()),
+                           @"floor": @(loc.d1meanLoc->floor()),
+                           @"orientation": @(loc.d1meanPose->orientation()),
+                           @"velocity":@(loc.d1meanPose->velocity())
                            };
     
     //[[P2PManager sharedInstance] send:data withType:@"2d-position" ];
     
-    // printf("2D %f, %f, %f, %f, %f\n", meanLoc->x(), meanLoc->y(), meanLoc->floor(), meanPose->orientation(), meanPose->velocity());
+    printf("1D %f, %f, %f, %f, %f\n", loc.d1meanLoc->x(), loc.d1meanLoc->y(), loc.d1meanLoc->floor(), loc.d1meanPose->orientation(), loc.d1meanPose->velocity());
     //std::cout << meanLoc->toString() << std::endl;
 }
 
@@ -116,8 +126,8 @@ void d1calledWhenUpdated(Status * pStatus){
     
     
     _localizer = new StreamParticleFilter();
-    
-    _localizer->updateHandler(d1calledWhenUpdated);
+    _userData.localizer = self;
+    _localizer->updateHandler(d1calledWhenUpdated, &_userData);
     _localizer->numStates(1000);
     _localizer->alphaWeaken(0.3);
     
@@ -268,7 +278,7 @@ void d1calledWhenUpdated(Status * pStatus){
         return;
     }
     if (options[@"allreset"]) {
-        NSLog(@"2D localizer is all reset");
+        NSLog(@"1D localizer is all reset");
         self.localizer->resetStatus();
         return;
     }
@@ -326,9 +336,9 @@ void d1calledWhenUpdated(Status * pStatus){
     
     // for run test
     if ([beacons count] == 1 && [[beacons objectAtIndex:0] isKindOfClass:[NSString class]]) {
-        if (d1meanLoc) {
-            r.x = Meter2Feet(d1meanLoc->x());
-            r.y = Meter2Feet(d1meanLoc->y());
+        if (_d1meanLoc) {
+            r.x = Meter2Feet(_d1meanLoc->x());
+            r.y = Meter2Feet(_d1meanLoc->y());
             r.knndist = 0.25;
         }
         _result = r;
@@ -336,9 +346,9 @@ void d1calledWhenUpdated(Status * pStatus){
     }
     
     if ([beacons count] == 0) {
-        if (d1meanLoc) {
-            r.x = Meter2Feet(d1meanLoc->x());
-            r.y = Meter2Feet(d1meanLoc->y());
+        if (_d1meanLoc) {
+            r.x = Meter2Feet(_d1meanLoc->x());
+            r.y = Meter2Feet(_d1meanLoc->y());
             r.knndist = 0.25;
         }
         _result = r;
@@ -347,7 +357,6 @@ void d1calledWhenUpdated(Status * pStatus){
     
     Beacons cbeacons;
     
-    _inactive = true;
     for(int i = 0; i < [beacons count]; i++) {
         CLBeacon *b = [beacons objectAtIndex: i];
         int rssi = -100;
@@ -357,22 +366,15 @@ void d1calledWhenUpdated(Status * pStatus){
         NSString *key = [NSString stringWithFormat:@"%d", b.minor.intValue];
         Beacon cb(b.major.intValue, b.minor.intValue, rssi);
         cbeacons.push_back(cb);
-        if ([_beaconIDs containsObject:key]) {
-            _inactive = false;
-        }
-    }
-    
-    if (_inactive) {
-        return;
     }
 
     cbeacons.timestamp([[NSDate date] timeIntervalSince1970]*1000);
     _localizer->putBeacons(cbeacons);
     
     
-    if (d1meanLoc) {
-        r.x = Meter2Feet(d1meanLoc->x());
-        r.y = Meter2Feet(d1meanLoc->y());
+    if (_d1meanLoc) {
+        r.x = Meter2Feet(_d1meanLoc->x());
+        r.y = Meter2Feet(_d1meanLoc->y());
         r.knndist = 0.25;
         //NSLog(@"%f, %f, %f", r.x, r.y, r.knndist);
     } else {
@@ -380,7 +382,7 @@ void d1calledWhenUpdated(Status * pStatus){
         r.y = 0;
     }
     
-    std::cout << "meanPose=" << *d1meanPose << std::endl;
+    //std::cout << "meanPose=" << *_d1meanPose << std::endl;
     
     [self sendStatusByP2P: *_localizer->getStatus()];
     
@@ -412,13 +414,9 @@ void d1calledWhenUpdated(Status * pStatus){
 
 - (void)inputAcceleration:(NSDictionary *)data
 {
-    if (_inactive) {
-        return;
-    }
-    static long previousTimestamp = -1;
     long timestamp = [data[@"timestamp"] doubleValue]*1000;
     
-    if(timestamp!=previousTimestamp){
+    if(timestamp!=_previousAccTimestamp){
         
         Acceleration acc = Acceleration([data[@"timestamp"] doubleValue]*1000,
                                         [data[@"x"] doubleValue ],
@@ -428,18 +426,14 @@ void d1calledWhenUpdated(Status * pStatus){
         //NSLog(@"input acc");
         _localizer->putAcceleration(acc);
     }
-    previousTimestamp = timestamp;
+    _previousAccTimestamp = timestamp;
 }
 
 - (void) inputMotion: (NSDictionary*) data
 {
-    if (_inactive) {
-        return;
-    }
-    static long previousTimestamp = -1;
     long timestamp = [data[@"timestamp"] doubleValue]*1000;
     
-    if(timestamp!=previousTimestamp){
+    if(timestamp!=_previousAttTimestamp){
         Attitude att = Attitude([data[@"timestamp"] doubleValue]*1000,
                                 [data[@"pitch"] doubleValue ],
                                 [data[@"roll"] doubleValue ],
@@ -448,30 +442,29 @@ void d1calledWhenUpdated(Status * pStatus){
         //NSLog(@"input att");
         _localizer->putAttitude(att);
     }
-    previousTimestamp = timestamp;
+    _previousAttTimestamp = timestamp;
 }
 
 
-//- (double) computeDistanceScoreWithOptions: (NSDictionary*) options{
-//    NSString* edgeID = options[@"edgeID"];
-//    NavLightEdgeHolder* holder = [NavLightEdgeHolder sharedInstance];
-//    NavLightEdge* edge = [holder getNavLightEdgeByEdgeID:edgeID];
-//    
-//    double distanceSum = 0;
-//    assert(d1states);
-//    
-//    loc::Location stdloc = loc::Location::standardDeviation(*d1states);
-//    
-//    for(State state: *d1states){
-//        double distance = [self computeDistanceBetweenState:state AndEdge:edge];
-//        distanceSum += distance;
-//    }
-//    double distanceMean = distanceSum/d1states->size();
-//    return distanceMean * sqrt(pow(stdloc.x(),2) + pow(stdloc.y(),2));
-//}
-
 - (double) computeDistanceScoreWithOptions: (NSDictionary*) options{
-    return [self computeAverageNegativeLogLikelihood];
+    NSString* edgeID = options[@"edgeID"];
+    NavLightEdgeHolder* holder = [NavLightEdgeHolder sharedInstance];
+    NavLightEdge* edge = [holder getNavLightEdgeByEdgeID:edgeID];
+    
+    double distanceSum = 0;
+    assert(_d1states);
+    
+    loc::Location stdloc = loc::Location::standardDeviation(*_d1states);
+    
+    for(State state: *_d1states){
+        double distance = [self computeDistanceBetweenState:state AndEdge:edge];
+        distanceSum += distance;
+    }
+    double distanceMean = distanceSum/_d1states->size();
+    double v = fmax(distanceMean, sqrt(pow(stdloc.x(),2) + pow(stdloc.y(),2)))/6.0;
+    
+    NSLog(@"2D knnDist: %@, %.2f, %.2f, %.2f, %.2f", edgeID, v, distanceMean, stdloc.x(), stdloc.y());
+    return v;
 }
 
 
@@ -494,12 +487,17 @@ void d1calledWhenUpdated(Status * pStatus){
     return distance;
 }
 
+//- (double) computeDistanceScoreWithOptions: (NSDictionary*) options{
+//    return [self computeAverageNegativeLogLikelihood];
+//}
+
+
 - (double) computeAverageNegativeLogLikelihood{
     double sum = 0;
-    for(State s: *d1states){
+    for(State s: *_d1states){
         sum += s.negativeLogLikelihood();
     }
-    return sum/d1states->size();
+    return sum/_d1states->size();
 }
 
 - (void)setBeacons:(NSDictionary *)beacons

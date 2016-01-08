@@ -77,8 +77,6 @@ enum StateType {STATE_TYPE_WALKING, STATE_TYPE_TRANSITION};
 - (NSString*)getSurroundInfo;
 - (NSString*)getAccessibilityInfo;
 
-- (void)inputAcceleration:(NSDictionary*)data;
-- (void)inputMotion:(NSDictionary*)data;
 
 - (BOOL)isMeter;
 - (int)toMeter:(int) feet;

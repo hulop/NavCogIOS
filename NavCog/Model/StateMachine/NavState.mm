@@ -190,11 +190,14 @@
         _closestDist = MIN(dist, _closestDist);
         if(dist > 0 && _didApproaching && _nextState != nil && _nextState.type == STATE_TYPE_WALKING) {
             // check if we already on the next edge
-            NavLocation *nextPos = [man getLocationOnEdge:_nextState.walkingEdge.edgeID];
+            NavEdge *nextEdge = _nextState.walkingEdge;
+            NavLocation *nextPos = [man getLocationOnEdge:nextEdge.edgeID];
 
+            double dist = (nextPos.knndist - nextEdge.minKnnDist) / (nextEdge.maxKnnDist - nextEdge.minKnnDist);
+            
             float nextStartDist = [_nextState getStartDistance:nextPos];
             float nextStartRatio = [_nextState getStartRatio:nextPos];
-            if (nextStartDist > 25 || (nextStartDist > 10 && nextStartRatio > 0.25)) {
+            if (dist <= 1 && (nextStartDist > 25 || (nextStartDist > 10 && nextStartRatio > 0.25))) {
                 NSLog(@"ForceNextState,%f,%f,%f,%f",_closestDist, pos.knndist, nextStartDist, nextPos.knndist);
                 dist = 0;
             }
@@ -361,24 +364,6 @@
 - (void)speakInstructionImmediately:(NSString *)str {
     _previousInstruction = str;
     [NavNotificationSpeaker speakWithCustomizedSpeedImmediately:str];
-}
-
-- (void)inputAcceleration:(NSDictionary *)data
-{
-    if (_type == STATE_TYPE_WALKING) {
-        [_walkingEdge inputAcceleration:data];
-    } else {
-        [_targetEdge inputAcceleration:data];
-    }
-}
-
-- (void)inputMotion:(NSDictionary *)data
-{
-    if (_type == STATE_TYPE_WALKING) {
-        [_walkingEdge inputMotion:data];
-    } else {
-        [_targetEdge inputMotion:data];
-    }
 }
 
 @end

@@ -421,20 +421,23 @@
     _topoMap = topoMap;
     _pathNodes = nil;
     _navState = NAV_STATE_INIT;
-    if (![logFile.fromNodeName isEqualToString:NSLocalizedString(@"currentLocation", @"Current Location")]) {
-        _pathNodes = [_topoMap findShortestPathFromNodeWithName:logFile.fromNodeName toNodeWithName:logFile.toNodeName];
-        [self initializeWithPathNodes:_pathNodes];
-        _isStartFromCurrentLocation = false;
-        _isNavigationStarted = true;
-        [_delegate navigationReadyToGo];
-    } else {
-        _destNodeName = logFile.toNodeName;
-        _isStartFromCurrentLocation = true;
-        _isNavigationStarted = false;
-    }
     
-    [_currentLocationManager setCurrentState:_currentState];
     [_currentLocationManager simulateSensorFromLogFile:logFile];
+    
+    // wait a short period for motion sensor data (initial _curOri should be updated from log)
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (![logFile.fromNodeName isEqualToString:NSLocalizedString(@"currentLocation", @"Current Location")]) {
+            _pathNodes = [_topoMap findShortestPathFromNodeWithName:logFile.fromNodeName toNodeWithName:logFile.toNodeName];
+            [self initializeWithPathNodes:_pathNodes];
+            _isStartFromCurrentLocation = false;
+            _isNavigationStarted = true;
+            [_delegate navigationReadyToGo];
+        } else {
+            _destNodeName = logFile.toNodeName;
+            _isStartFromCurrentLocation = true;
+            _isNavigationStarted = false;
+        }
+    });
 }
 
 - (void)stopNavigation {
@@ -503,9 +506,14 @@
         if (_navState == NAV_STATE_TURNING && _currentState != _initialState) {
             // check if user keep moving to destination without turn
             NavLocation *pos = [_currentLocationManager getLocationOnEdge:_currentState.walkingEdge.edgeID];
+            
+            NavEdge *edge = _currentState.walkingEdge;
+            
+            double dist = (pos.knndist - edge.minKnnDist) / (edge.maxKnnDist - edge.minKnnDist);
+            
             float startDist = [_currentState getStartDistance:pos];
             float startRatio = [_currentState getStartRatio:pos];
-            if (startDist > 20 || (startDist > 10 && startRatio > 0.25)) {
+            if (dist <= 1 && (startDist > 20 || (startDist > 10 && startRatio > 0.25))) {
                 NSLog(@"ForceTurn,%f,%f",startDist, startRatio);
                 [NavSoundEffects playSuccessSound];
                 _navState = NAV_STATE_WALKING;

@@ -91,6 +91,11 @@ static int stderrSave = 0;
     if(stderrSave == 0) {
         return;
     }
+    NSDictionary* env = [[NSProcessInfo processInfo] environment];
+    if ([[env valueForKey:@"preventSensorLog"] isEqual:@"true"]) {
+        return;
+    }
+
     NSLog(@"Motion,%f,%f,%f",data.attitude.pitch,data.attitude.roll,data.attitude.yaw);
 }
 
@@ -98,11 +103,19 @@ static int stderrSave = 0;
     if(stderrSave == 0) {
         return;
     }
+    NSDictionary* env = [[NSProcessInfo processInfo] environment];
+    if ([[env valueForKey:@"preventSensorLog"] isEqual:@"true"]) {
+        return;
+    }
     NSLog(@"Acc,%@,%@,%@",data[@"x"],data[@"y"],data[@"z"]);
 }
 
 +(void)logMotion:(NSDictionary *)data {
     if(stderrSave == 0) {
+        return;
+    }
+    NSDictionary* env = [[NSProcessInfo processInfo] environment];
+    if ([[env valueForKey:@"preventSensorLog"] isEqual:@"true"]) {
         return;
     }
     

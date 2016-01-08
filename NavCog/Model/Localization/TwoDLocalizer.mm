@@ -68,6 +68,8 @@ using namespace loc;
 @property NSArray *previousBeaconInput;
 @property NavLocalizeResult *result;
 
+@property long previousTimestamp;
+
 @end
 
 @implementation TwoDLocalizer
@@ -234,10 +236,10 @@ using namespace loc;
 
 - (void)inputAcceleration:(NSDictionary *)data
 {
-    static long previousTimestamp = -1;
+    
     long timestamp = [data[@"timestamp"] doubleValue]*1000;
     
-    if(timestamp!=previousTimestamp){
+    if(timestamp!=_previousTimestamp){
     
     Acceleration acc = Acceleration([data[@"timestamp"] doubleValue]*1000,
                                     [data[@"x"] doubleValue ],
@@ -247,7 +249,7 @@ using namespace loc;
     //NSLog(@"input acc");
     _localizer->putAcceleration(acc);
     }
-    previousTimestamp = timestamp;
+    _previousTimestamp = timestamp;
 }
 
 - (void) inputMotion: (NSDictionary*) data
