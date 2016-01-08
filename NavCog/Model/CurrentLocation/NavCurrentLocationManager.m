@@ -18,6 +18,11 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ *
+ * Contributors:
+ *  Cole Gleason (CMU) - initial API and implementation
+ *  Dragan Ahmetovic (CMU) - initial API and implementation
+ *  IBM Corporation - initial API and implementation
  *******************************************************************************/
 
 #import "NavCurrentLocationManager.h"
@@ -77,9 +82,9 @@ static const float GyroDriftLimit = 3;
         NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:uuidStr];
         _beaconRegion = [[CLBeaconRegion alloc] initWithProximityUUID:uuid identifier:@"navcog"];
 
-        [self startMotionSensor];
-        [self startAccSensor];
-        [self startBeaconSensor];
+        //[self startMotionSensor];
+        //[self startAccSensor];
+        //[self startBeaconSensor];
         
         
         _dateFormatter = [[NSDateFormatter alloc] init];
@@ -138,10 +143,24 @@ static const float GyroDriftLimit = 3;
 
 - (void)stopAllSensors
 {
-    [_motionManager stopAccelerometerUpdates];
+    [self stopBeaconSensor];
+    [self stopAccSensor];
+    [self stopMotionSensor];
+}
+
+- (void)stopMotionSensor
+{
     [_motionManager stopDeviceMotionUpdates];
+}
+
+- (void) stopAccSensor
+{
+    [_motionManager stopAccelerometerUpdates];
+}
+
+- (void)stopBeaconSensor
+{
     [_beaconManager stopRangingBeaconsInRegion:_beaconRegion];
-    [self reset];
 }
 
 - (void) setCurrentState: (NavState*) currentState
@@ -184,6 +203,7 @@ static const float GyroDriftLimit = 3;
 //    [[NSNotificationCenter defaultCenter]
 //     postNotificationName:@LOCATION_UPDATED_NOTIFICATION_NAME
 //     object:self userInfo:nil];
+    
 
     NavLocation *location = [[NavLocation alloc] initWithMap:_topoMap];
     if (_currentLocation == nil) {
@@ -277,6 +297,7 @@ static const float GyroDriftLimit = 3;
     location.edgeID = edge.edgeID;
     location.xInEdge = pos.x;
     location.yInEdge = pos.y;
+    location.knndist = pos.knndist;
     
     return location;
 }
@@ -298,6 +319,9 @@ static const float GyroDriftLimit = 3;
     for (NavEdgeLocalizer *nel in localizers) {
         
         NavEdge *edge = [_topoMap getEdgeById:nel.edgeInfo.edgeID];
+        if (edge == nil) {
+            continue;
+        }
         if (init) {
             [nel initializeState:nil];
         }
@@ -401,6 +425,7 @@ static const float GyroDriftLimit = 3;
 
 - (void)simulateSensorFromLogFile:(NavLogFile*) logFile
 {
+    _gyroDrift = 0;
     double timeMultiplier = 1;
     NSDictionary* env = [[NSProcessInfo processInfo] environment];
     if ([env valueForKey:@"simspeed"]) {
@@ -416,7 +441,6 @@ static const float GyroDriftLimit = 3;
     
     //if started kill motionmanager
     [self stopAllSensors];
-    _gyroDrift = 0;
     
     dispatch_queue_t queue = dispatch_queue_create("com.navcog.logsimulatorqueue", NULL);
     
@@ -473,8 +497,8 @@ static const float GyroDriftLimit = 3;
         }
         
         dispatch_sync(dispatch_get_main_queue(), ^{
-            //[self stopNavigation];
-            //[_delegate navigationFinished];
+            [_currentMachine stopNavigation];
+            [_currentMachine.delegate navigationFinished];
         });
         
     });

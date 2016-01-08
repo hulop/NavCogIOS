@@ -18,6 +18,10 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ *
+ * Contributors:
+ *  Chengxiong Ruan (CMU) - initial API and implementation
+ *  IBM Corporation - initial API and implementation
  *******************************************************************************/
 
 #import "KDTreeLocalization.h"
@@ -222,11 +226,11 @@ using namespace std;
         }
     }
     
-    for (int i = 0; i < _beaconNum; i++) {
-        if (_preFeatVec[i] > -90) {
-            _featVec[i] = (_featVec[i] < -99 ? _preFeatVec[i] : _featVec[i]);
-        }
-    }
+//    for (int i = 0; i < _beaconNum; i++) {
+//        if (_preFeatVec[i] > -90) {
+//            _featVec[i] = (_featVec[i] < -99 ? _preFeatVec[i] : _featVec[i]);
+//        }
+//    }
     
     if (_bStart) {
         for (int i = 0; i < _beaconNum; i++) {

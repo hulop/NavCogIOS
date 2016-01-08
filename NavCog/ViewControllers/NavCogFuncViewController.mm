@@ -18,6 +18,10 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ *
+ * Contributors:
+ *  Chengxiong Ruan (CMU) - initial API and implementation
+ *  IBM Corporation - initial API and implementation
  *******************************************************************************/
 
 #import "NavCogFuncViewController.h"
@@ -147,7 +151,7 @@
 - (void)setupCurrentLocationObserver {
 
     // cole
-    //[[[self.delegate getNavMachine] getCurrentLocationManager] addObserver:self forKeyPath:@"debugCurrentLocation" options:NSKeyValueObservingOptionNew context:nil];
+    [[[self.delegate getNavMachine] getCurrentLocationManager] addObserver:self forKeyPath:@"debugCurrentLocation" options:NSKeyValueObservingOptionNew context:nil];
     // itoh
     //[[[self.delegate getNavMachine] getCurrentLocationManager] addObserver:self forKeyPath:@"debugCurrentLocation2" options:NSKeyValueObservingOptionNew context:nil];
 //    [[NSNotificationCenter defaultCenter]
@@ -175,6 +179,7 @@
     [self updateRedDotWithLocation: notification.userInfo[@"location"]];
 }
 - (void)updateRedDotWithLocation:(NavLocation *)location {
+    if (true) return; // TODO: remove this after current position fixed
     if (![NavLog isLogging]) {
         return;
     }

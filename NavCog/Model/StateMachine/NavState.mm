@@ -18,6 +18,10 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ *
+ * Contributors:
+ *  Chengxiong Ruan (CMU) - initial API and implementation
+ *  IBM Corporation - initial API and implementation
  *******************************************************************************/
 
 
@@ -184,13 +188,13 @@
         }
         
         _closestDist = MIN(dist, _closestDist);
-        if(dist > 0 && _closestDist < 20 && _nextState != nil && _nextState.type == STATE_TYPE_WALKING) {
+        if(dist > 0 && _didApproaching && _nextState != nil && _nextState.type == STATE_TYPE_WALKING) {
             // check if we already on the next edge
             NavLocation *nextPos = [man getLocationOnEdge:_nextState.walkingEdge.edgeID];
 
             float nextStartDist = [_nextState getStartDistance:nextPos];
             float nextStartRatio = [_nextState getStartRatio:nextPos];
-            if (nextStartDist > 20 || (nextStartDist > 10 && nextStartRatio > 0.25)) {
+            if (nextStartDist > 25 || (nextStartDist > 10 && nextStartRatio > 0.25)) {
                 NSLog(@"ForceNextState,%f,%f,%f,%f",_closestDist, pos.knndist, nextStartDist, nextPos.knndist);
                 dist = 0;
             }
@@ -221,7 +225,7 @@
                 _preAnnounceDist = 40;
                 _did40feet = true;
                 return false;
-            } else if (!_didApproaching && dist <= 20 + threshold) {
+            } else if (!_didApproaching && dist <= MIN(20 + threshold, _walkingEdge.len / 2)) {
                 if (isClickEnabled) {
                     [self stopAudios];
                     _audioTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(playClickSound) userInfo:nil repeats:YES];
@@ -258,7 +262,7 @@
             }
         }
     } else if (_type == STATE_TYPE_TRANSITION) {
-        //pos.knndist = (pos.knndist - _targetEdge.minKnnDist) / (_targetEdge.maxKnnDist - _targetEdge.minKnnDist);
+        pos.knndist = (pos.knndist - _targetEdge.minKnnDist) / (_targetEdge.maxKnnDist - _targetEdge.minKnnDist);
 /*        if (_prevState != nil && _prevState.type == STATE_TYPE_WALKING) {
             float nextKnndist = pos.knndist;
             // compare knn distance to previous and next edge

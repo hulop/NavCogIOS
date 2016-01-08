@@ -4,3 +4,5 @@ Pods/
 build
 NavCog.xcworkspace
 Podfile.lock
+/.project
+/.settings/

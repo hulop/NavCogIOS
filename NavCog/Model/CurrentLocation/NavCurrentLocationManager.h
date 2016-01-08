@@ -18,6 +18,11 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ *
+ * Contributors:
+ *  Cole Gleason (CMU) - initial API and implementation
+ *  Dragan Ahmetovic (CMU) - initial API and implementation
+ *  IBM Corporation - initial API and implementation
  *******************************************************************************/
 
 #ifndef NavCurrentLocationManager_h
@@ -74,6 +79,10 @@
 - (void) startBeaconSensor;
 - (void) stopAllSensors;
 - (void) stopSimulation;
+- (void) stopMotionSensor;
+- (void) stopAccSensor;
+- (void) stopBeaconSensor;
+- (void) reset;
 
 - (void) initLocalizationOnEdge:(NSString*) edgeID withOptions:(NSDictionary*) options;
 - (NavLocation *)getCurrentLocationWithInit:(BOOL) init;

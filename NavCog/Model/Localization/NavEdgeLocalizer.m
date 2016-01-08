@@ -69,7 +69,7 @@
     r2.y = p2.y;
     r2.knndist = r.knndist;
     
-    //NSLog(@"%@ %f %f %f %f %f", _edgeInfo.edgeID, r.x, r.y, r2.x, r2.y, r2.knndist);
+    NSLog(@"%@ %f %f %f %f %f", _edgeInfo.edgeID, r.x, r.y, r2.x, r2.y, r2.knndist);
     
     return r2;
 }
