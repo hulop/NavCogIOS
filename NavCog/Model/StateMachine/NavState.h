@@ -66,6 +66,11 @@ enum StateType {STATE_TYPE_WALKING, STATE_TYPE_TRANSITION};
 @property (nonatomic) float ty; // y of target node
 @property (nonatomic) float floor;
 @property (nonatomic) BOOL isFirst;
+@property (nonatomic) BOOL isCombined;      // state is connected from previous state
+@property (nonatomic) int extraEdgeLength;  // extra edge length to target
+@property (copy, nonatomic) NSString *distMsg; // msg: distance to target
+@property (copy, nonatomic) NSString *plusMsg; // msg: direction or transition
+@property (copy, nonatomic) NSString *infoMsg; // msg: surrounding info
 
 
 - (Boolean)checkStateStatusUsingLocationManager:(NavCurrentLocationManager *)man withSpeechOn:(Boolean)isSpeechEnabled withClickOn:(Boolean)isClickEnabled;

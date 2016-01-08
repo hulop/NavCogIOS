@@ -84,15 +84,18 @@
         _didTrickyNotification = false;
         _isFirst = NO;
         _closestDist = INT_MAX;
+        _isCombined = NO;
+        _extraEdgeLength = 0;
+        _distMsg = _plusMsg = _infoMsg = @"";
     }
     return self;
 }
 
 - (void)setWalkingEdge:(NavEdge *)walkingEdge {
     _walkingEdge = walkingEdge;
-    _preAnnounceDist = walkingEdge.len;
+    _preAnnounceDist = walkingEdge.len + _extraEdgeLength;
     _longDistAnnounceCount = _preAnnounceDist / 30;
-    if (ABS(walkingEdge.len - _longDistAnnounceCount * 30) <= 10) {
+    if (ABS(_preAnnounceDist - _longDistAnnounceCount * 30) <= 10) {
         _longDistAnnounceCount --;
     }
     _targetLongDistAnnounceCount = _longDistAnnounceCount;
@@ -101,13 +104,15 @@
 - (Boolean)checkStateStatusUsingLocationManager:(NavCurrentLocationManager *)man withSpeechOn:(Boolean)isSpeechEnabled withClickOn:(Boolean)isClickEnabled {
     if (!_bstarted) {
         _bstarted = true;
-        if (_type == STATE_TYPE_WALKING && _walkingEdge.len < 40) {
-            _did40feet = true;
-        }
-        
-        // if the distance is less than 30, then it's not necessary to announce 20
-        if (_type == STATE_TYPE_WALKING && _walkingEdge.len <= 20) {
-            _didApproaching = true;
+        if (!_isCombined) { // do not re-init for combined state
+            if (_type == STATE_TYPE_WALKING && (_walkingEdge.len + _extraEdgeLength) < 40) {
+                _did40feet = true;
+            }
+            
+            // if the distance is less than 30, then it's not necessary to announce 20
+            if (_type == STATE_TYPE_WALKING && (_walkingEdge.len + _extraEdgeLength) <= 20) {
+                _didApproaching = true;
+            }
         }
 
         NSDictionary *options = @{@"sx": @(_sx), @"sy": @(_sy), @"tx": @(_tx), @"ty": @(_ty), @"first": @(_isFirst)};
@@ -117,7 +122,9 @@
             [man initLocalizationOnEdge:_walkingEdge.edgeID withOptions:options];
         }
         
-        [self speakInstructionImmediately:_stateStartInfo];
+        if ([_stateStartInfo length] > 0) {
+            [self speakInstructionImmediately:_stateStartInfo];
+        }
         if (_type == STATE_TYPE_TRANSITION || isClickEnabled) {
             _audioTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(playClickSound) userInfo:nil repeats:YES];
             [_audioTimer fire];
@@ -200,7 +207,9 @@
             }
         }
         
+        dist += _extraEdgeLength;
         NSString *distFormat = NSLocalizedString([self isMeter]?@"meterFormat":@"feetFormat", @"Use to express a distance in feet");
+        dist += _extraEdgeLength; // dist is distance to the target node
         // if you're walking, check distance to target node
         if (dist < _preAnnounceDist) {
             if (dist > 40.0) { // announce every 30 feet
@@ -225,7 +234,7 @@
                 _preAnnounceDist = 40;
                 _did40feet = true;
                 return false;
-            } else if (!_didApproaching && dist <= MIN(20 + threshold, _walkingEdge.len / 2)) {
+            } else if (!_didApproaching && dist <= MIN(20 + threshold, (_walkingEdge.len + _extraEdgeLength) / 2)) {
                 if (isClickEnabled) {
                     [self stopAudios];
                     _audioTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(playClickSound) userInfo:nil repeats:YES];
@@ -247,7 +256,15 @@
                 }
                 _didApproaching = true;
                 return false;
-            } else if (dist <= 2 + threshold) {
+            } else if ((dist - _extraEdgeLength) <= 2 + threshold) {
+                if (_nextState != nil && _nextState.isCombined) {
+                    // combined edge: copy current navigation status to next state
+                    _nextState.preAnnounceDist = _preAnnounceDist;
+                    _nextState.longDistAnnounceCount = _longDistAnnounceCount;
+                    _nextState.targetLongDistAnnounceCount = _targetLongDistAnnounceCount;
+                    _nextState.did40feet = _did40feet;
+                    _nextState.didApproaching = _didApproaching;
+                }
                 _bstarted = false;
                 _longDistAnnounceCount = _targetLongDistAnnounceCount;
                 _did40feet = _walkingEdge.len < 40 ? true : false;

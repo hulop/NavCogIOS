@@ -143,13 +143,7 @@
             newState.surroundInfo = [node2.preEdgeInPath getInfoFromNode:node1];
             newState.isTricky = [node2 isTrickyComingFromEdgeWithID:node2.preEdgeInPath.edgeID];
             newState.trickyInfo = newState.isTricky ? [node2 getTrickyInfoComingFromEdgeWithID:node2.preEdgeInPath.edgeID] : nil;
-            int edgeLen = [newState isMeter] ? [newState toMeter:node2.preEdgeInPath.len]:node2.preEdgeInPath.len;
-            if (![node2.name isEqualToString:@""]) {
-                [startInfo appendFormat:NSLocalizedString([newState isMeter]?@"meterToNameFormat":@"feetToNameFormat", @"format string describing the number of feet left to a named location"), edgeLen, node2.name];
-            } else {
-                [startInfo appendFormat:NSLocalizedString([newState isMeter]?@"meterPauseFormat":@"feetPauseFormat", @"Use to express a distance in feet with a pause"), edgeLen];
-            }
-
+            newState.distMsg = [self getDistMessage:newState withLen:node2.preEdgeInPath.len withName:node2.name];
             float curOri = [node2.preEdgeInPath getOriFromNode:node1];
             newState.ori = curOri;
             newState.sx = [node1 getXInEdgeWithID:node2.preEdgeInPath.edgeID];
@@ -205,7 +199,7 @@
                 [startInfo appendString:[node2 getInfoComingFromEdgeWithID:node2.preEdgeInPath.edgeID]];
                 [startInfo appendString:NSLocalizedString(@"destination", @"Destination alert")];
             }
-            
+            newState.plusMsg = startInfo; [startInfo setString:@""];
             [startInfo appendString:newState.surroundInfo];
         }
 
@@ -213,15 +207,18 @@
             [startInfo appendString:[NSString stringWithFormat:NSLocalizedString(@"enteringFormat", @"Spoken when entering a location"), node2.buildingName]];
         }
 
-        newState.stateStartInfo = startInfo;
+        newState.infoMsg = startInfo;
+        newState.stateStartInfo = [NSString stringWithFormat:@"%@%@%@", newState.distMsg, newState.plusMsg, newState.infoMsg];
         if (i == (int)[pathNodes count] - 1) {
             _initialState = newState;
             newState.isFirst = YES;
         } else {
             _currentState.nextState = newState;
+            newState.prevState = _currentState;
         }
         _currentState = newState;
     }
+    [self combineEdges:_initialState];
 
     _currentState = _initialState;
     // check if we need a initial turning
@@ -515,9 +512,7 @@
             
             if ([_currentState checkStateStatusUsingLocationManager:_currentLocationManager withSpeechOn:_speechEnabled withClickOn:_clickEnabled]) {
                 
-                NavState *prev = _currentState;
                 _currentState = _currentState.nextState;
-                _currentState.prevState = prev;
                 if (_currentState == nil) {
                     [_delegate navigationFinished];
                     [NavNotificationSpeaker speakWithCustomizedSpeed:NSLocalizedString(@"arrived", @"Spoken when you arrive at a destination")];
@@ -551,6 +546,9 @@
                     
                     //                        if (ABS(_curOri - _currentState.ori) > 15) {
                     float diff = clipAngle2(clipAngle2(_curOri) - clipAngle2(_currentState.ori));
+                    if (_currentState.isCombined) {
+                        diff = 0; // Do not wait for turn on combined edges
+                    }
                     if (ABS(diff) > 15) {
                         _currentState.previousInstruction = [self getTurnStringFromOri:clipAngle(_curOri) toOri:_currentState.ori];
                         [NavNotificationSpeaker speakWithCustomizedSpeed:_currentState.previousInstruction];
@@ -643,5 +641,69 @@
 - (NavCurrentLocationManager *)getCurrentLocationManager
 {
     return _currentLocationManager;
+}
+
+// message distance to target
+- (NSString*)getDistMessage:(NavState*) state withLen:(int)len withName:(NSString*)name {
+    int edgeLen = [state isMeter] ? [state toMeter:len] : len;
+    if ([name length] > 0) {
+        return [NSString stringWithFormat:NSLocalizedString([state isMeter]?@"meterToNameFormat":@"feetToNameFormat", @"format string describing the number of feet left to a named location"), edgeLen, name];
+    } else {
+        return [NSString stringWithFormat:NSLocalizedString([state isMeter]?@"meterPauseFormat":@"feetPauseFormat", @"Use to express a distance in feet with a pause"), edgeLen];
+    }
+}
+
+// Combine straight edges
+- (void)combineEdges:(NavState*)begin {
+    while (begin != nil) {
+        NavState *end = begin;
+        int totalLen = begin.walkingEdge.len;
+        while (end != nil &&
+               end.type == STATE_TYPE_WALKING &&
+               end.nextState != nil &&
+               end.nextState.type == STATE_TYPE_WALKING) {
+//            if (end.targetNode.type == NODE_TYPE_DESTINATION) {
+//                break;
+//            }
+//            if ([end.targetNode.name length] > 0) {
+//                break;
+//            }
+            if (ABS([NavUtil clipAngle2:(end.ori - end.nextState.ori)]) > 15) {
+                break;
+            }
+            totalLen += (end = end.nextState).walkingEdge.len;
+        }
+        for (NavState *state = begin; end != begin; state = state.nextState) {
+            if (state == begin) {
+                state.distMsg = [self getDistMessage:state withLen:totalLen withName:end.targetNode.name];
+                state.plusMsg = end.plusMsg;
+            } else {
+                state.isCombined = YES;
+                state.distMsg = state.plusMsg = @"";
+            }
+            NSString * startInfo = [NSString stringWithFormat:@"%@%@%@", state.distMsg, state.plusMsg, state.infoMsg];
+            NSLog(@"++++ %@", startInfo);
+            NSLog(@"---- %@", state.stateStartInfo);
+            state.stateStartInfo = startInfo;
+            if (state != end) {
+                NSLog(@"---- %@", state.approachingInfo);
+                state.approachingInfo = NULL;
+            }
+            if (state == end) {
+                break;
+            }
+        }
+        begin = end.nextState;
+    }
+    for (NavState *state = _initialState; state != nil; ) {
+        state.extraEdgeLength = 0;
+        for (NavState *next = state.nextState; next != nil && next.isCombined; next = next.nextState) {
+            state.extraEdgeLength += next.walkingEdge.len;
+        }
+        if (state.extraEdgeLength > 0) {
+            state.walkingEdge = state.walkingEdge; // re-init
+        }
+        state = state.nextState;
+    }
 }
 @end
