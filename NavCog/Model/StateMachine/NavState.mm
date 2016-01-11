@@ -193,11 +193,11 @@
             NavEdge *nextEdge = _nextState.walkingEdge;
             NavLocation *nextPos = [man getLocationOnEdge:nextEdge.edgeID];
 
-            double dist = (nextPos.knndist - nextEdge.minKnnDist) / (nextEdge.maxKnnDist - nextEdge.minKnnDist);
+            double norm_dist = (nextPos.knndist - nextEdge.minKnnDist) / (nextEdge.maxKnnDist - nextEdge.minKnnDist);
             
             float nextStartDist = [_nextState getStartDistance:nextPos];
             float nextStartRatio = [_nextState getStartRatio:nextPos];
-            if (dist <= 1 && (nextStartDist > 25 || (nextStartDist > 10 && nextStartRatio > 0.25))) {
+            if (norm_dist <= 1 && (nextStartDist > 25 || (nextStartDist > 10 && nextStartRatio > 0.25))) {
                 NSLog(@"ForceNextState,%f,%f,%f,%f",_closestDist, pos.knndist, nextStartDist, nextPos.knndist);
                 dist = 0;
             }
