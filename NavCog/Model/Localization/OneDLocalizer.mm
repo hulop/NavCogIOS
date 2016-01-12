@@ -156,8 +156,8 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
 //    double originx = 400;
 //    double originy = 20;
 //    double originz = 0;
-    double ppmx = 10;
-    double ppmy = -10;
+    double ppmx = 8;
+    double ppmy = -8;
     double ppmz = 1;
     double originx = 1000;
     double originy = 1000;
