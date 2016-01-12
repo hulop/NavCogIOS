@@ -17,6 +17,7 @@
 
 @property loc::StreamParticleFilter *localizer;
 
+- (instancetype) initWithID: (NSString*) idStr;
 - (void) initializeWithFile:(NSString*) path;
 - (void) setBeacons:(NSDictionary*) beacons;
 

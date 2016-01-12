@@ -82,12 +82,23 @@ using namespace loc;
 - (id) init
 {
     self = [super init];
+    [self initDebug];
+    return self;
+}
+
+- (instancetype) initWithID: (NSString*) idStr
+{
+    self = [super initWithID: idStr];
+    [self initDebug];
+    return self;
+}
+
+- (void) initDebug {
     NSDictionary* env = [[NSProcessInfo processInfo] environment];
     self.p2pDebug = false;
     if ([[env valueForKey:@"p2pdebug"] isEqual:@"true"]) {
         self.p2pDebug = true;
     }
-    return self;
 }
 
 - (void)initializeState:(NSDictionary *)options;

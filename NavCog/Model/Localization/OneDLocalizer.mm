@@ -70,21 +70,34 @@ typedef struct LocalizerData {
 @end
 
 @implementation OneDLocalizer
+static OneDLocalizer *activeLocalizer;
 
 - (void)dealloc
 {
     delete _localizer;
 }
 
+
 - (id) init
 {
     self = [super init];
+    [self initDebug];
+    return self;
+}
+
+- (instancetype) initWithID: (NSString*) idStr
+{
+    self = [super initWithID: idStr];
+    [self initDebug];
+    return self;
+}
+
+- (void) initDebug {
     NSDictionary* env = [[NSProcessInfo processInfo] environment];
     self.p2pDebug = false;
     if ([[env valueForKey:@"p2pdebug"] isEqual:@"true"]) {
         self.p2pDebug = true;
     }
-    return self;
 }
 
 void d1calledWhenUpdated(void *userData, Status * pStatus){
@@ -106,7 +119,9 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
                            @"velocity":@(loc.d1meanPose->velocity())
                            };
     
-    //[[P2PManager sharedInstance] send:data withType:@"2d-position" ];
+    if (loc == activeLocalizer) {
+        [[P2PManager sharedInstance] send:data withType:@"2d-position" ];
+    }
     
     printf("1D %f, %f, %f, %f, %f\n", loc.d1meanLoc->x(), loc.d1meanLoc->y(), loc.d1meanLoc->floor(), loc.d1meanPose->orientation(), loc.d1meanPose->velocity());
     //std::cout << meanLoc->toString() << std::endl;
@@ -141,20 +156,42 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
 //    double originx = 400;
 //    double originy = 20;
 //    double originz = 0;
-    double ppmx = 1;
-    double ppmy = -1;
+    double ppmx = 10;
+    double ppmy = -10;
     double ppmz = 1;
-    double originx = 400;
-    double originy = 400;
+    double originx = 1000;
+    double originy = 1000;
     double originz = 0;
 
     CoordinateSystemParameters coordSysParams(ppmx, ppmy, ppmz, originx, originy, originz);
 
     //NSString *imgpath = [[NSBundle mainBundle] pathForResource:@"corridor" ofType:@"png"];
     NSString *imgpath = [[NSBundle mainBundle] pathForResource:@"white" ofType:@"png"];
+    
+    if (![[NSFileManager defaultManager] fileExistsAtPath:imgpath]) {
+        NSLog(@"white.png file is not found, %@", imgpath);
+        return;
+    }
+    
     std::string cppPath = [imgpath UTF8String];
     buildingBuilder.addFloorCoordinateSystemParametersAndImagePath(0, coordSysParams, cppPath);
     _dataStore->building(buildingBuilder.build());
+    
+    NSMutableArray *buildingJSON = [@[] mutableCopy];
+    [buildingJSON addObject:[@{} mutableCopy]];
+    NSDictionary *param = @{
+                            @"ppmx":@(ppmx),
+                            @"ppmy":@(ppmy),
+                            @"ppmz":@(ppmz),
+                            @"originx":@(originx),
+                            @"originy":@(originy),
+                            @"originz":@(originz)
+        };
+    buildingJSON[0][@"param"] = param;
+    buildingJSON[0][@"data"] = nil;
+    buildingJSON[0][@"image"] = @"white";
+    [[P2PManager sharedInstance] addFilePath:imgpath withKey:@"white"];
+    [[P2PManager sharedInstance] addJSON:buildingJSON withKey:@"building"];
     
     Samples samples;
     
@@ -405,7 +442,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
 }
 
 - (void) sendStatusByP2P: (Status) status{
-    if (!_p2pDebug) {
+    if (!_p2pDebug || self != activeLocalizer) {
         return;
     }
     NSDictionary* data = [self statusToNSData: status];
@@ -414,6 +451,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
 
 - (void)inputAcceleration:(NSDictionary *)data
 {
+    activeLocalizer = self;
     long timestamp = [data[@"timestamp"] doubleValue]*1000;
     
     if(timestamp!=_previousAccTimestamp){
