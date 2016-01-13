@@ -56,7 +56,6 @@ typedef struct LocalizerData {
 @property NSDictionary *currentOptions;
 @property bool p2pDebug;
 
-@property loc::Pose stdevPose;
 @property NSArray *previousBeaconInput;
 @property NavLocalizeResult *result;
 @property long previousAttTimestamp;
@@ -246,6 +245,8 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     poseProperty.minVelocity(0.1);
     poseProperty.maxVelocity(1.5);
     poseProperty.stdOrientation(3.0/180.0*M_PI);
+    poseProperty.stdX(2);
+    poseProperty.stdY(2);
     
     //stateProperty.meanRssiBias(-4.0);
     stateProperty.meanRssiBias(0.0);
@@ -300,12 +301,6 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     _localizer->beaconFilter(beaconFilter);
     
     
-    // Set standard deviation of Pose
-    double stdevX = 0.25;
-    double stdevY = 0.25;
-    _stdevPose.x(stdevX).y(stdevY);
-    
-
 }
 
 - (void)initializeState:(NSDictionary *)options;
@@ -314,8 +309,10 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     if (options == nil) {
         return;
     }
-    if (options[@"allreset"]) {
+    if (options[@"allreset"] || [options[@"type"] isEqualToString:@"transition"]) {
         NSLog(@"1D localizer is all reset");
+        
+        
         self.localizer->resetStatus();
         return;
     }
@@ -351,11 +348,19 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
         loc::Pose pose;
         pose.x(x).y(y).z(z).floor(floor).orientation(orientation);
         
+        // pose.normalVelocity(0.1~1.5) // TODO
+        
         std::cout << "Sending reset request to the localizer.";
         std::cout << ", resetPose = " << pose << std::endl;
         self.localizer->resetStatus();
-        //        self.localizer->resetStatus(pose);
-        self.localizer->resetStatus(pose, _stdevPose);
+        // self.localizer->resetStatus(pose);
+
+        // Set standard deviation of Pose
+        loc::Pose stdevPose;
+        stdevPose.x(0.25).y(0.25);
+        // stdevPose.normalVelocity(0.2); // TODO
+
+        self.localizer->resetStatus(pose, stdevPose);
         NSLog(@"Reset %f %f %f %f", pose.x(), pose.y(), pose.floor(), pose.orientation());
         
         [timer invalidate];
@@ -451,6 +456,9 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
 
 - (void)inputAcceleration:(NSDictionary *)data
 {
+    if (activeLocalizer != nil && activeLocalizer != self) {
+        activeLocalizer.localizer->resetStatus();
+    }
     activeLocalizer = self;
     long timestamp = [data[@"timestamp"] doubleValue]*1000;
     
@@ -469,13 +477,18 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
 
 - (void) inputMotion: (NSDictionary*) data
 {
+    if (activeLocalizer != nil && activeLocalizer != self) {
+        activeLocalizer.localizer->resetStatus();
+    }
+    activeLocalizer = self;
     long timestamp = [data[@"timestamp"] doubleValue]*1000;
     
     if(timestamp!=_previousAttTimestamp){
-        Attitude att = Attitude([data[@"timestamp"] doubleValue]*1000,
-                                [data[@"pitch"] doubleValue ],
-                                [data[@"roll"] doubleValue ],
-                                [data[@"yaw"] doubleValue ]);
+//        Attitude att = Attitude([data[@"timestamp"] doubleValue]*1000,
+//                                [data[@"pitch"] doubleValue ],
+//                                [data[@"roll"] doubleValue ],
+//                                [data[@"yaw"] doubleValue ]);
+        Attitude att = Attitude([data[@"timestamp"] doubleValue]*1000, 0, 0, 0);
         
         //NSLog(@"input att");
         _localizer->putAttitude(att);
@@ -498,10 +511,14 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
         double distance = [self computeDistanceBetweenState:state AndEdge:edge];
         distanceSum += distance;
     }
-    double distanceMean = distanceSum/_d1states->size();
-    double v = fmax(distanceMean, sqrt(pow(stdloc.x(),2) + pow(stdloc.y(),2)))/6.0;
+    double edgeLength = [edge.lineSegment length];
     
-    NSLog(@"2D knnDist: %@, %.2f, %.2f, %.2f, %.2f", edgeID, v, distanceMean, stdloc.x(), stdloc.y());
+    double distanceMean = distanceSum/_d1states->size();
+    double stdx = stdloc.x()*3;
+    double stdy = stdloc.y()*3;
+    double v = fmax(distanceMean, sqrt(pow(stdx,2) + pow(stdy,2)))/3.0;
+    
+    NSLog(@"2D knnDist: %@, %.2f, %.2f, %.2f, %.2f, %.2f", edgeID, v, distanceMean, stdx, stdy, edgeLength);
     return v;
 }
 
@@ -513,10 +530,11 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     double distance = 0;
     double x = Meter2Feet(state.x());
     double y = Meter2Feet(state.y());
-    double floor = state.floor() + 1;
+    //double floor = state.floor() + 1;
     Nav2DPoint* point = [[Nav2DPoint alloc] initWithX:x Y:y];
     
-    double floorDifference = fabs(floor-edge.floor);
+    //double floorDifference = fabs(floor-edge.floor);
+    double floorDifference = 0; // assume on same floor
     if(floorDifference>floorDifferenceTolerance){
         distance += floorDifference*distanceByFloorDiff;
     }

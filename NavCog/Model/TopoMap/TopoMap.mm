@@ -101,6 +101,11 @@ static const float FEET_IN_METER = 0.3048;
         TopoMapUnit = 1.0/0.3048;
     } // otherwise 1.0
     
+    BOOL advanced = false;
+    if (mapDataJson[@"isAdvanced"]) {
+        advanced = [mapDataJson[@"isAdvanced"] boolValue];
+    }
+    
     NSString *language = [NavI18nUtil getPreferredLanguage:[mapDataJson objectForKey:@"languages"]];
     NSLog(@"%@ is selected", language);
     self.language = language;
@@ -137,6 +142,9 @@ static const float FEET_IN_METER = 0.3048;
             [node.infoFromEdges addEntriesFromDictionary:[nodeJson objectForKey:@"infoFromEdges"]];
             node.transitInfo = [nodeJson objectForKey:@"transitInfo"];
             node.transitKnnDistThres = ((NSNumber *)[nodeJson objectForKey:@"knnDistThres"]).floatValue;
+            if (advanced) {
+                node.transitKnnDistThres = 1.0;
+            }
             node.transitPosThres = ((NSNumber *)[nodeJson objectForKey:@"posDistThres"]).floatValue;
 //            node.transitKnnDistThres = MAX(1.0, node.transitKnnDistThres);
 //            node.transitPosThres = MAX(10, node.transitPosThres);
@@ -172,7 +180,7 @@ static const float FEET_IN_METER = 0.3048;
             
             NSMutableDictionary *temp = [edgeJson mutableCopy];
             temp[@"beacons"] = layerJson[@"beacons"]; // for 1D PDR
-            if (!idStr) {
+            if (!idStr || !advanced) {
                 NSString *path = [NavUtil createTempFile:[edgeJson objectForKey:@"dataFile"] forID:&idStr];
                 [NavLocalizerFactory create1D_KNN_LocalizerForID:idStr FromFile:path];
             } else { // for localizers with PDR

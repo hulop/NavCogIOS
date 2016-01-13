@@ -31,6 +31,9 @@
 #import "NavCogMainViewController.h"
 #import "NavNotificationSpeaker.h"
 #import "NavLog.h"
+#import "NavUtil.h"
+
+#define clipAngle2(angle) [NavUtil clipAngle2:(angle)]
 
 @interface NavState ()
 
@@ -110,8 +113,11 @@
             _didApproaching = true;
         }
 
-        NSDictionary *options = @{@"sx": @(_sx), @"sy": @(_sy), @"tx": @(_tx), @"ty": @(_ty), @"first": @(_isFirst)};
+        
+        float oridiff = clipAngle2(_ori - man.currentOrientation);
+        NSMutableDictionary *options = [@{@"sx": @(_sx), @"sy": @(_sy), @"tx": @(_tx), @"ty": @(_ty), @"first": @(_isFirst), @"oridiff": @(oridiff)} mutableCopy];
         if (_type == STATE_TYPE_TRANSITION) {
+            options[@"type"] = @"transition";
             [man initLocalizationOnEdge:_targetEdge.edgeID withOptions:options];
         } else {
             [man initLocalizationOnEdge:_walkingEdge.edgeID withOptions:options];

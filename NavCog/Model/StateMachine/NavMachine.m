@@ -648,6 +648,13 @@
         return nil;
 }
 
+- (NavState*)getTransitionState {
+    if (_currentState.type == STATE_TYPE_TRANSITION)
+        return _currentState;
+    else
+        return nil;
+}
+
 - (NavCurrentLocationManager *)getCurrentLocationManager
 {
     return _currentLocationManager;
