@@ -503,6 +503,9 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     NavLightEdge* edge = [holder getNavLightEdgeByEdgeID:edgeID];
     
     double distanceSum = 0;
+    if (!_d1states) {
+        return 100 * 1000; // return far distance if not ready
+    }
     assert(_d1states);
     
     loc::Location stdloc = loc::Location::standardDeviation(*_d1states);
