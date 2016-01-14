@@ -375,6 +375,11 @@ static const float GyroDriftLimit = 3;
         NavEdgeLocalizer *nel = [NavLocalizerFactory localizerForEdge:edgeID];
         [nel inputAcceleration:data];
     }
+    if ([_currentMachine getTransitionState]) {
+        NSString *edgeID = [_currentMachine getTransitionState].targetEdge.edgeID;
+        NavEdgeLocalizer *nel = [NavLocalizerFactory localizerForEdge:edgeID];
+        [nel inputAcceleration:data];
+    }
 }
 
 - (void)triggerMotionWithData: (NSMutableDictionary*) data {

@@ -66,6 +66,8 @@ typedef struct LocalizerData {
 @property std::shared_ptr<Pose> d1meanPose;
 @property std::shared_ptr<States> d1states;
 
+@property BOOL transiting;
+
 @end
 
 @implementation OneDLocalizer
@@ -124,6 +126,20 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     
     printf("1D %f, %f, %f, %f, %f\n", loc.d1meanLoc->x(), loc.d1meanLoc->y(), loc.d1meanLoc->floor(), loc.d1meanPose->orientation(), loc.d1meanPose->velocity());
     //std::cout << meanLoc->toString() << std::endl;
+    
+    
+    if (loc.transiting) {
+        for(int i = 0; i < loc.d1states->size(); i++) {
+            //double v = (rand()%360-180)/180.0*M_PI;
+            double d1 = (rand()%100-50)/100.0;
+            double d2 = (rand()%100-50)/100.0;
+            //NSLog(@"i=%d v=%f", i, v);
+            //loc.d1states->at(i).orientationBias(v);
+            //loc.d1states->at(i).orientation(v);
+            loc.d1states->at(i).x(fmin(2,fmax(-2,loc.d1states->at(i).x()+d1)));
+            loc.d1states->at(i).y(loc.d1states->at(i).y()+d2);
+        }
+    }
 }
 
 - (void)initializeWithFile:(NSString *)path
@@ -309,10 +325,15 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     if (options == nil) {
         return;
     }
-    if (options[@"allreset"] || [options[@"type"] isEqualToString:@"transition"]) {
+    if ([options[@"type"] isEqualToString:@"transition"]) {
+        NSLog(@"1D localizer is all reset for transition");
+        self.localizer->resetStatus();
+        _transiting = true;
+        return;
+    }
+    _transiting = false;
+    if (options[@"allreset"]) {
         NSLog(@"1D localizer is all reset");
-        
-        
         self.localizer->resetStatus();
         return;
     }
@@ -456,9 +477,6 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
 
 - (void)inputAcceleration:(NSDictionary *)data
 {
-    if (activeLocalizer != nil && activeLocalizer != self) {
-        activeLocalizer.localizer->resetStatus();
-    }
     activeLocalizer = self;
     long timestamp = [data[@"timestamp"] doubleValue]*1000;
     
@@ -477,9 +495,6 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
 
 - (void) inputMotion: (NSDictionary*) data
 {
-    if (activeLocalizer != nil && activeLocalizer != self) {
-        activeLocalizer.localizer->resetStatus();
-    }
     activeLocalizer = self;
     long timestamp = [data[@"timestamp"] doubleValue]*1000;
     
@@ -488,6 +503,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
 //                                [data[@"pitch"] doubleValue ],
 //                                [data[@"roll"] doubleValue ],
 //                                [data[@"yaw"] doubleValue ]);
+        // ignore gyro sensor
         Attitude att = Attitude([data[@"timestamp"] doubleValue]*1000, 0, 0, 0);
         
         //NSLog(@"input att");
@@ -519,7 +535,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     double distanceMean = distanceSum/_d1states->size();
     double stdx = stdloc.x()*3;
     double stdy = stdloc.y()*3;
-    double v = fmax(distanceMean, sqrt(pow(stdx,2) + pow(stdy,2)))/3.0;
+    double v = fmax(distanceMean, sqrt(pow(stdx,2) + pow(stdy,2)))/6.0;
     
     NSLog(@"2D knnDist: %@, %.2f, %.2f, %.2f, %.2f, %.2f", edgeID, v, distanceMean, stdx, stdy, edgeLength);
     return v;

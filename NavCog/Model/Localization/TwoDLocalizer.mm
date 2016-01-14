@@ -503,6 +503,8 @@ void calledWhenUpdated(Status * pStatus){
     poseProperty.minVelocity(0.1);
     poseProperty.maxVelocity(1.5);
     poseProperty.stdOrientation(3.0/180.0*M_PI);
+    poseProperty.stdX(2.0);
+    poseProperty.stdY(2.0);
     
     stateProperty.meanRssiBias(0.0);
     stateProperty.stdRssiBias(0.2);
