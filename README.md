@@ -2,6 +2,7 @@
 
 ## Pre-Requisites
 - [OpenCV 3.0](http://opencv.org/) (BSD License)
+- [blelocpp (BLE localization library)](https://github.com/hulop/blelocpp)
 
 ## Setup
 
