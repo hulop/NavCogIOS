@@ -25,12 +25,20 @@
 
 #import "NavEdge.h"
 
+@class NavLineSegment;
+
 @interface Nav2DPoint: NSObject
 
 @property double x;
 @property double y;
+@property double lat;
+@property double lng;
 
-- (id) initWithX: (float)x Y:(float)y;
+- (id) initWithX: (double)x Y:(double)y;
+- (id) initWithX: (double)x Y:(double)y Lat:(double)lat Lng:(double)lng;
+
++ (instancetype) pointWithData:(NSDictionary*)data;
+- (double) distanceTo:(Nav2DPoint*)p;
 
 @end
 
@@ -38,23 +46,31 @@
 
 @property Nav2DPoint* point1;
 @property Nav2DPoint* point2;
+@property float ori1;
+@property float ori2;
 
-- (id) initWithPoint1:(Nav2DPoint*) point1 Point2:(Nav2DPoint*) point2;
+- (id) initWithPoint1:(Nav2DPoint*) point1 Point2:(Nav2DPoint*) point2 Ori1:(float)ori1 Ori2:(float)ori2;
 - (Nav2DPoint*) getNearestPointOnLineSegmentFromPoint: (Nav2DPoint*) p;
 - (double) getDistanceNearestPointOnLineSegmentFromPoint: (Nav2DPoint*) p;
+- (Nav2DPoint*) pointAtRatio:(double) ratio;
 - (double) length;
+- (NSDictionary*) toData;
 
 @end
 
 
-@interface NavLightEdge: NavLineSegment
+@interface NavLightEdge: NSObject
 
 @property(nonatomic) NSString* edgeID;
-@property NavLineSegment* lineSegment;
+@property NSArray<NavLineSegment*> *lineSegments;
 @property int floor;
 
 - (id) initWithEdge: (NavEdge*) edge;
-- (double) getDistanceNearestPointOnLineSegmentFromPoint: (Nav2DPoint*) p;
+- (NavLineSegment*) getNearestSegmentFromPoint:(Nav2DPoint*) p;
+- (double) distanceFrom:(Nav2DPoint*)from To:(Nav2DPoint*)to;
+- (NSArray*) pathFrom:(Nav2DPoint*)from To:(Nav2DPoint*)to;
+- (Nav2DPoint*) pointAtRatio:(double) ratio;
+- (double) length;
 
 @end
 

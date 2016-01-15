@@ -23,16 +23,20 @@
 #import <Foundation/Foundation.h>
 
 @interface NavLocalizeResult : NSObject
-@property float x;
-@property float y;
-@property float z;
+@property double x;
+@property double y;
+@property double z;
 @property float floor;
 @property float orientation;
 @property float velocity;
 @property float knndist;
+@property double lat;
+@property double lng;
 @property NSDictionary *option;
 @property NSString *edgeID;
+@property float ori1; // orientation of edge at the current location
+@property float ori2;
 
-- (id) initWithX:(float)x Y:(float)y Z:(float)z;
-- (id) initWithX:(float)x Y:(float)y Z:(float)z Ori:(float)ori Vel:(float)vel;
+- (id) initWithX:(double)x Y:(double)y Z:(double)z;
+- (id) initWithX:(double)x Y:(double)y Z:(double)z Ori:(float)ori Vel:(float)vel;
 @end

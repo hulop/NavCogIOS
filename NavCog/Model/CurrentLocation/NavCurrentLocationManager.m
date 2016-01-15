@@ -298,6 +298,10 @@ static const float GyroDriftLimit = 3;
     location.xInEdge = pos.x;
     location.yInEdge = pos.y;
     location.knndist = pos.knndist;
+    location.lat = pos.lat;
+    location.lng = pos.lng;
+    location.ori1 = pos.ori1;
+    location.ori2 = pos.ori2;
     
     return location;
 }
@@ -345,6 +349,9 @@ static const float GyroDriftLimit = 3;
             location.xInEdge = pos.x;
             location.yInEdge = pos.y;
             location.knndist = pos.knndist;
+            location.lat = pos.lat;
+            location.lng = pos.lng;
+            
             [data addObject:@"OK"];
         }
         [NavLog logArray:data withType:@"SearchingCurrentLocation"];
@@ -391,11 +398,13 @@ static const float GyroDriftLimit = 3;
     
     NavState* _currentState = [_currentMachine getWalkingState];
     if (_currentState) {
-        double edgeori;
+        double edgeori = _currentState.currentEdgeori;
+        /*
         if (_currentState.startNode == _currentState.walkingEdge.node1)
             edgeori = _currentState.walkingEdge.ori1;
         else
             edgeori = _currentState.walkingEdge.ori2;
+         */
         
         //model that gracefully adapts to drift.
         _gyroDrift += clipAngle2(clipAngle2(_curOri - _gyroDrift) - clipAngle2(edgeori))/GyroDriftMultiplier;

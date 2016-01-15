@@ -59,19 +59,23 @@
 }
 
 - (float)getStartDistance:(NavLocation*)pos {
-    return (_ty > _sy ? 1 : -1) * (pos.yInEdge - _sy);
+    return [pos distanceToNode:_startNode];
+    //return (_ty > _sy ? 1 : -1) * (pos.yInEdge - _sy);
 }
 
 - (float)getTargetDistance:(NavLocation*)pos {
-    return (_ty > _sy ? 1 : -1) * (_ty - pos.yInEdge);
+    return [pos distanceToNode:_targetNode];
+    //return (_ty > _sy ? 1 : -1) * (_ty - pos.yInEdge);
 }
 
 - (float)getStartRatio:(NavLocation*)pos {
-    return [self getStartDistance:pos] / ABS(_ty - _sy);
+    return [self getStartDistance:pos] / _walkingEdge.len;
+    //return [self getStartDistance:pos] / ABS(_ty - _sy);
 }
 
 - (float)getTargetRatio:(NavLocation*)pos {
-    return [self getTargetDistance:pos] / ABS(_ty - _sy);
+    return [self getTargetDistance:pos] / _walkingEdge.len;
+    //return [self getTargetDistance:pos] / ABS(_ty - _sy);
 }
 
 - (instancetype)init
@@ -118,13 +122,10 @@
             }
         }
 
-        
-        float oridiff = clipAngle2(_ori - man.currentOrientation);
-        NSMutableDictionary *options = [@{@"sx": @(_sx), @"sy": @(_sy), @"tx": @(_tx), @"ty": @(_ty), @"first": @(_isFirst), @"oridiff": @(oridiff)} mutableCopy];
         if (_type == STATE_TYPE_TRANSITION) {
-            options[@"type"] = @"transition";
-            [man initLocalizationOnEdge:_targetEdge.edgeID withOptions:options];
+            [man initLocalizationOnEdge:_targetEdge.edgeID withOptions:@{@"type":@"transition"}];
         } else {
+            NSDictionary *options = @{@"edgeID": _walkingEdge.edgeID, @"forward":@([_walkingEdge.node1 isEqual:_startNode]), @"first": @(_isFirst)};
             [man initLocalizationOnEdge:_walkingEdge.edgeID withOptions:options];
         }
         
@@ -141,7 +142,14 @@
 
     NavLocation *pos;
     if (_type == STATE_TYPE_WALKING) {
+        // pos has latitude, longitude
         pos = [man getLocationOnEdge:_walkingEdge.edgeID];
+        _currentEdgeori = [_walkingEdge.node1 isEqual:_startNode]?pos.ori1:pos.ori2;
+        
+        NSString *cmd = [NSString stringWithFormat:@"updateBlueDot({lat:%f, lng:%f})", pos.lat, pos.lng];
+        [[NavCogFuncViewController sharedNavCogFuntionViewController] runCmdWithString:cmd];
+        
+        /*
         float cx = pos.xInEdge;
         float cy = pos.yInEdge;
         float slat = _startNode.lat;
@@ -149,7 +157,7 @@
         float tlat = _targetNode.lat;
         float tlng = _targetNode.lng;
         
-        /*
+        / *
         float dlat = tlat - slat;
         float dlng = tlng - slng;
         float dx = _tx - _sx;
@@ -157,7 +165,7 @@
         
         float px = cx - _sx;
         float py = cy - _sy;
-        */
+        * /
         
         float distStartTarget = sqrtf(powf(_tx-_sx,2)+powf(_ty-_sy, 2));
         float distStartCurrent = sqrtf(powf(cx-_sx,2)+powf(cy-_sy,2));
@@ -170,13 +178,17 @@
         float lng = slng + ratio * (tlng - slng);
         NSString *cmd = [NSString stringWithFormat:@"updateBlueDot({lat:%f, lng:%f})", lat, lng];
         [[NavCogFuncViewController sharedNavCogFuntionViewController] runCmdWithString:cmd];
+         */
     }else {
         pos = [man getLocationOnEdge:_targetEdge.edgeID];
     }
     
+    float dist = [self getTargetDistance:pos];
+    
     NSMutableArray *data = [[NSMutableArray alloc] init];
     NavEdge *edge = _type == STATE_TYPE_WALKING ? _walkingEdge : _targetEdge;
-    [data addObject:[NSNumber numberWithFloat:ABS(pos.yInEdge - _ty)]];
+    //[data addObject:[NSNumber numberWithFloat:ABS(pos.yInEdge - _ty)]];
+    [data addObject:[NSNumber numberWithFloat:dist]];
     [data addObject:[NSNumber numberWithFloat:edge.len]];
     [data addObject:edge.edgeID];
     [data addObject:[NSNumber numberWithFloat:pos.xInEdge]];
@@ -184,8 +196,7 @@
     [data addObject:[NSNumber numberWithFloat:pos.knndist]];
     [NavLog logArray:data withType:@"CurrentPosition"];
     
-    
-    float dist = sqrtf((pos.xInEdge - _tx) * (pos.xInEdge - _tx) + (pos.yInEdge - _ty) * (pos.yInEdge - _ty)); // use this if you use 2d
+    //float dist = sqrtf((pos.xInEdge - _tx) * (pos.xInEdge - _tx) + (pos.yInEdge - _ty) * (pos.yInEdge - _ty)); // use this if you use 2d
     //float dist = ABS(pos.y - _ty); // use this if you use 1d, x has no affects
     if (dist < 50 && _isTricky && !_didTrickyNotification) {
         _didTrickyNotification = true;

@@ -46,8 +46,8 @@ enum NodeType {NODE_TYPE_NORMAL, NODE_TYPE_DOOR_TRANSIT, NODE_TYPE_STAIR_TRANSIT
 @property (nonatomic) NSString *layerZIndex;
 @property (nonatomic) NSString *buildingName;
 @property (nonatomic) int floor;
-@property (nonatomic) float lat;
-@property (nonatomic) float lng;
+@property (nonatomic) double lat;
+@property (nonatomic) double lng;
 @property (weak, nonatomic) NavLayer *parentLayer;
 
 @property (strong, nonatomic) NSMutableArray *neighbors; // used for Dijsktra's Algorithm
@@ -63,8 +63,8 @@ enum NodeType {NODE_TYPE_NORMAL, NODE_TYPE_DOOR_TRANSIT, NODE_TYPE_STAIR_TRANSIT
 - (NSString *)getTransitInfoToNode:(NavNode *)node;
 - (NSString *)getInfoComingFromEdgeWithID:(NSString *)edgeID;
 - (NSString *)getDestInfoComingFromEdgeWithID:(NSString *)edgeID;
-- (float)getXInEdgeWithID:(NSString *)edgeID;
-- (float)getYInEdgeWithID:(NSString *)edgeID;
+- (double)getXInEdgeWithID:(NSString *)edgeID;
+- (double)getYInEdgeWithID:(NSString *)edgeID;
 - (Boolean)isTrickyComingFromEdgeWithID:(NSString *)edgeID;
 - (NSString *)getTrickyInfoComingFromEdgeWithID:(NSString *)edgeID;
 - (NSArray *)getConnectingEdges;

@@ -61,6 +61,7 @@ enum EdgeType {EDGE_NORMAL, EDGE_NON_NAVIGATIONAL};
 @property (weak, nonatomic) NavLayer *parentLayer;
 
 @property (nonatomic) NSString *language;
+@property (strong, nonatomic) NSArray *path;
 
 
 // moved to CurrentLocationManager

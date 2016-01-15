@@ -46,26 +46,26 @@
 
 @implementation TopoMap
 
-float TopoMapUnit = 1.0;  // 1 = 1 foot
-static const float FEET_IN_METER = 0.3048;
+double TopoMapUnit = 1.0;  // 1 = 1 foot
+static const double FEET_IN_METER = 0.3048;
 
 
-+ (float)unit2feet:(float)value
++ (double)unit2feet:(double)value
 {
     return value*TopoMapUnit;
 }
 
-+ (float)feet2unit:(float)value
++ (double)feet2unit:(double)value
 {
     return value/TopoMapUnit;
 }
 
-+ (float)unit2meter:(float)value
++ (double)unit2meter:(double)value
 {
     return value*TopoMapUnit*FEET_IN_METER;
 }
 
-+ (float)meter2unit:(float)value
++ (double)meter2unit:(double)value
 {
     return value/TopoMapUnit/FEET_IN_METER;
 }
@@ -137,8 +137,8 @@ static const float FEET_IN_METER = 0.3048;
             node.buildingName = [nodeJson objectForKey:@"building"];
             node.floor = ((NSNumber *)[nodeJson objectForKey:@"floor"]).intValue;
             node.layerZIndex = zIndex;
-            node.lat = ((NSNumber *)[nodeJson objectForKey:@"lat"]).floatValue;
-            node.lng = ((NSNumber *)[nodeJson objectForKey:@"lng"]).floatValue;
+            node.lat = ((NSNumber *)[nodeJson objectForKey:@"lat"]).doubleValue;
+            node.lng = ((NSNumber *)[nodeJson objectForKey:@"lng"]).doubleValue;
             [node.infoFromEdges addEntriesFromDictionary:[nodeJson objectForKey:@"infoFromEdges"]];
             node.transitInfo = [nodeJson objectForKey:@"transitInfo"];
             node.transitKnnDistThres = ((NSNumber *)[nodeJson objectForKey:@"knnDistThres"]).floatValue;
@@ -174,6 +174,22 @@ static const float FEET_IN_METER = 0.3048;
             edge.node2 = [layer.nodes objectForKey:edge.nodeID2];
             
             NSString *idStr = [edgeJson objectForKey:@"localizationID"];
+            
+            if (edgeJson[@"path"]) {
+                NSMutableArray *temp = [@[] mutableCopy];
+                for(NSDictionary *point in edgeJson[@"path"]) {
+                    NSMutableDictionary *newPoint = [@{} mutableCopy];
+                    for(NSString *key in point.allKeys) {
+                        if ([key isEqualToString:@"x"] || [key isEqualToString:@"y"]) {
+                            newPoint[key] = @([TopoMap unit2feet:[point[key] doubleValue]]);
+                        } else {
+                            newPoint[key] = point[key];
+                        }
+                    }
+                    [temp addObject:newPoint];
+                }
+                edge.path = temp;
+            }
             
             NavLightEdge* edgeInfo = [[NavLightEdge alloc] initWithEdge:edge];
             [[NavLightEdgeHolder sharedInstance] appendNavLightEdge:edgeInfo];
@@ -241,31 +257,33 @@ static const float FEET_IN_METER = 0.3048;
         tmpNode.buildingName = curEdge.node1.buildingName;
         tmpNode.floor = curEdge.node1.floor;
         
-        float slat = curEdge.node1.lat;
-        float slng = curEdge.node1.lng;
-        float tlat = curEdge.node2.lat;
-        float tlng = curEdge.node2.lng;
+        double slat = curEdge.node1.lat;
+        double slng = curEdge.node1.lng;
+        double tlat = curEdge.node2.lat;
+        double tlng = curEdge.node2.lng;
 
-        float sx = [curEdge.node1 getXInEdgeWithID:curEdge.edgeID];
-        float sy = [curEdge.node1 getYInEdgeWithID:curEdge.edgeID];
-        float tx = [curEdge.node2 getXInEdgeWithID:curEdge.edgeID];
-        float ty = [curEdge.node2 getYInEdgeWithID:curEdge.edgeID];
+        double sx = [curEdge.node1 getXInEdgeWithID:curEdge.edgeID];
+        double sy = [curEdge.node1 getYInEdgeWithID:curEdge.edgeID];
+        double tx = [curEdge.node2 getXInEdgeWithID:curEdge.edgeID];
+        double ty = [curEdge.node2 getYInEdgeWithID:curEdge.edgeID];
         
-        float ax = tx-sx;
-        float ay = ty-sy;
-        float bx = curLocation.xInEdge - sx;
-        float by = curLocation.yInEdge - sy;
+        double ax = tx-sx;
+        double ay = ty-sy;
+        double bx = curLocation.xInEdge - sx;
+        double by = curLocation.yInEdge - sy;
         
-        float alen = sqrt(ax*ax+ay*ay);
-        float ratio = (ax*bx+ay*by)/alen/alen;
+        double alen = sqrt(ax*ax+ay*ay);
+        double ratio = (ax*bx+ay*by)/alen/alen;
         ratio = fmin(1, fmax(0, ratio));
         
-        //float ratio = (curLocation.yInEdge - sy) / (ty - sy);
+        //double ratio = (curLocation.yInEdge - sy) / (ty - sy);
         //ratio = ratio < 0 ? 0 : ratio;
         //ratio = ratio > 1 ? 1 : ratio;
         
-        tmpNode.lat = slat + ratio * (tlat - slat);
-        tmpNode.lng = slng + ratio * (tlng - slng);
+        //tmpNode.lat = slat + ratio * (tlat - slat);
+        //tmpNode.lng = slng + ratio * (tlng - slng);
+        tmpNode.lat = curLocation.lat;
+        tmpNode.lng = curLocation.lng;
         tmpNode.parentLayer = curLayer;
         
         // the dynamic topo map looks lik this
@@ -278,12 +296,24 @@ static const float FEET_IN_METER = 0.3048;
         tmpEdge1.edgeID = @"tmp_edge_1";
         tmpEdge1.node2 = tmpNode;
         tmpEdge1.nodeID2 = tmpNode.nodeID;
-        tmpEdge1.len = sqrt(pow(curLocation.yInEdge - sy,2)+pow(curLocation.xInEdge - sx,2));
+        tmpEdge1.len = [curLocation distanceToNode:curEdge.node1];
+        tmpEdge1.path = [curLocation pathFromNode:curEdge.node1];
+        if (tmpEdge1.path) {
+            tmpEdge1.ori1 = [tmpEdge1.path[0][@"forward"] floatValue];
+            tmpEdge1.ori2 = [tmpEdge1.path[tmpEdge1.path.count-1][@"backward"] floatValue];
+        }
+        //tmpEdge1.len = sqrt(pow(curLocation.yInEdge - sy,2)+pow(curLocation.xInEdge - sx,2));
         NavEdge *tmpEdge2 = [curEdge clone];
         tmpEdge2.edgeID = @"tmp_edge_2";
         tmpEdge2.node1 = tmpNode;
         tmpEdge2.nodeID1 = tmpNode.nodeID;
-        tmpEdge2.len = sqrt(pow(curLocation.yInEdge - ty,2)+pow(curLocation.xInEdge - tx,2));
+        tmpEdge2.len = [curLocation distanceToNode:curEdge.node2];
+        tmpEdge2.path = [curLocation pathToNode:curEdge.node2];
+        if (tmpEdge2.path) {
+            tmpEdge2.ori1 = [tmpEdge2.path[0][@"forward"] floatValue];
+            tmpEdge2.ori2 = [tmpEdge2.path[tmpEdge2.path.count-1][@"backward"] floatValue];
+        }
+        //tmpEdge2.len = sqrt(pow(curLocation.yInEdge - ty,2)+pow(curLocation.xInEdge - tx,2));
         
         // add info from edges to tmp node
         NSDictionary *infoDict = [self getNodeInfoDictFromEdgeWithID:tmpEdge1.edgeID andXInEdge:curLocation.xInEdge andYInEdge:curLocation.yInEdge];
@@ -319,8 +349,6 @@ static const float FEET_IN_METER = 0.3048;
         NavLightEdge* edgeInfo2 = [[NavLightEdge alloc] initWithEdge:tmpEdge2];
         [[NavLightEdgeHolder sharedInstance] appendNavLightEdge:edgeInfo2];
         NavEdgeLocalizer *nl2 = [NavLocalizerFactory cloneLocalizerForEdge:curEdge.edgeID withEdgeInfo:edgeInfo2];
-
-
         
         // add info from tmp edges for node1 and node2
         infoDict = [self getNodeInfoDictFromEdgeWithID:tmpEdge1.edgeID andXInEdge:[curEdge.node1 getXInEdgeWithID:curEdge.edgeID] andYInEdge:[curEdge.node1 getYInEdgeWithID:curEdge.edgeID]];
@@ -354,11 +382,11 @@ static const float FEET_IN_METER = 0.3048;
     }
 }
 
-- (NSDictionary *)getNodeInfoDictFromEdgeWithID:(NSString *)edgeID andXInEdge:(float)x andYInEdge:(float)y {
+- (NSDictionary *)getNodeInfoDictFromEdgeWithID:(NSString *)edgeID andXInEdge:(double)x andYInEdge:(double)y {
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
     [dict setObject:edgeID forKey:@"edgeID"];
-    [dict setObject:[NSNumber numberWithFloat:[TopoMap feet2unit:x]] forKey:@"x"];
-    [dict setObject:[NSNumber numberWithFloat:[TopoMap feet2unit:y]] forKey:@"y"];
+    [dict setObject:[NSNumber numberWithDouble:[TopoMap feet2unit:x]] forKey:@"x"];
+    [dict setObject:[NSNumber numberWithDouble:[TopoMap feet2unit:y]] forKey:@"y"];
     return dict;
 }
 

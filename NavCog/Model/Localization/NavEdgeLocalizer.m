@@ -62,12 +62,18 @@
     
     //2D -> 1D convert
     Nav2DPoint *p = [[Nav2DPoint alloc] initWithX:r.x Y:r.y];
-    Nav2DPoint *p2 = [_edgeInfo.lineSegment getNearestPointOnLineSegmentFromPoint:p];
+    
+    NavLineSegment *seg = [_edgeInfo getNearestSegmentFromPoint:p];
+    Nav2DPoint *p2 = [seg getNearestPointOnLineSegmentFromPoint:p];
     
     NavLocalizeResult *r2 = [[NavLocalizeResult alloc] init];
     r2.x = p2.x;
     r2.y = p2.y;
     r2.knndist = r.knndist;
+    r2.lat = p2.lat;
+    r2.lng = p2.lng;
+    r2.ori1 = seg.ori1;
+    r2.ori2 = seg.ori2;
     
     //NSLog(@"%@ %f %f %f %f %f", _edgeInfo.edgeID, r.x, r.y, r2.x, r2.y, r2.knndist);
     

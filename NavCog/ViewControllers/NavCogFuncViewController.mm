@@ -187,8 +187,13 @@
     if (location.edgeID == nil) {
         [self runCmdWithString:@"updateRedDot(null)"];
     } else {
+        NSString *cmd = [NSString stringWithFormat:@"updateRedDot({lat:%f, lng:%f})", location.lat, location.lng];
+        [self runCmdWithString:cmd];
+        
+        /*
         NavEdge *edge = [location getEdge];
         NavNode *node1 = edge.node1, *node2 = edge.node2;
+        
         //NSDictionary* info1 = [node1.infoFromEdges objectForKey:edge.edgeID];
         //NSDictionary* info2 = [node2.infoFromEdges objectForKey:edge.edgeID];
         float cy = location.yInEdge;
@@ -217,8 +222,7 @@
         //float ratio = (cy - sy) / (ty - sy);
         float lat = slat + ratio * (tlat - slat);
         float lng = slng + ratio * (tlng - slng);
-        NSString *cmd = [NSString stringWithFormat:@"updateRedDot({lat:%f, lng:%f})", lat, lng];
-        [self runCmdWithString:cmd];
+         */
     }
 }
 

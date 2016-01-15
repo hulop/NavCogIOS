@@ -49,6 +49,17 @@ function setStartNode(lat, lng) {
     updateBlueDot(_startNode);
 }
 
+
+function startNavigation(path, layerID) {
+    for(var i = 0; i < path.length-1; i++) {
+        if (path[i].layer == path[i+1].layer) {
+            addALineToLayer(path[i].layer, path[i], path[i+1]);
+        }
+    }
+    renderLayerWithID(layerID);
+}
+
+/*
 function startNavigation(pathNodeIds) {
 	var layerID = getLayerIDForNodeWitID(pathNodeIds[0]);
     addALineToLayerFromStartNode(layerID, pathNodeIds[0]);
@@ -63,6 +74,7 @@ function startNavigation(pathNodeIds) {
 	layerID = getLayerIDForNodeWitID(pathNodeIds[0]);
 	renderLayerWithID(layerID);
 }
+*/
 
 function updateBlueDot(latLng) {
 	if (_blueDot == null) {
@@ -157,6 +169,16 @@ function clearMap() {
 	}
 }
 
+function addALineToLayer(layerID, node1, node2) {
+    var layer = _layers[layerID];
+    if (!layer.edgeLines) {
+        layer.edgeLines = [];
+    };
+    var newLine = newLineBetweenNodes(node1, node2);
+    layer.edgeLines.push(newLine);
+}
+
+/*
 function addALineToLayer(layerID, nodeID1, nodeID2) {
 	var layer = _layers[layerID];
 	if (!layer.edgeLines) {
@@ -167,6 +189,7 @@ function addALineToLayer(layerID, nodeID1, nodeID2) {
 	var newLine = newLineBetweenNodes(node1, node2);
 	layer.edgeLines.push(newLine);
 }
+ */
 
 function addALineToLayerFromStartNode(layerID, nodeID) {
     var layer = _layers[layerID];

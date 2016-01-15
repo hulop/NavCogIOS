@@ -22,6 +22,7 @@
 
 #import "NavUtil.h"
 #import <zlib.h>
+#import "NavNode.h"
 
 
 
@@ -110,4 +111,31 @@
         return x;
 }
 
++ (NSArray *)buildPath:(NSArray *)pathNodes
+{
+    NSMutableArray *result = [@[] mutableCopy];
+    for(int i = (int)pathNodes.count-1; i>=0; i--) {
+        NavNode *node = pathNodes[i];
+        NavEdge *edge = node.preEdgeInPath;
+        if (edge != nil && edge.path != nil) {
+            if ([edge.node2.nodeID isEqualToString:node.nodeID]) {
+                for(int i = 0; i < (int)edge.path.count; i++) {
+                    NSMutableDictionary *p = [edge.path[i] mutableCopy];
+                    p[@"layer"] = node.layerZIndex;
+                    [result addObject:p];
+                }
+            } else {
+                for(int i = (int)edge.path.count-1; i >= 0; i--) {
+                    NSMutableDictionary *p = [edge.path[i] mutableCopy];
+                    p[@"layer"] = node.layerZIndex;
+                    [result addObject:p];
+                }
+            }
+        } else {
+            [result addObject:@{@"lat":@(node.lat), @"lng":@(node.lng), @"layer":node.layerZIndex}];
+        }
+    }
+    
+    return result;
+}
 @end

@@ -75,14 +75,14 @@
     return nil;
 }
 
-- (float)getXInEdgeWithID:(NSString *)edgeID {
+- (double)getXInEdgeWithID:(NSString *)edgeID {
     NSDictionary *infoFromEdgeJson = [_infoFromEdges objectForKey:edgeID];
-    return infoFromEdgeJson == nil ? INT32_MIN : [TopoMap unit2feet:((NSNumber *)[infoFromEdgeJson objectForKey:@"x"]).floatValue];
+    return infoFromEdgeJson == nil ? INT32_MIN : [TopoMap unit2feet:((NSNumber *)[infoFromEdgeJson objectForKey:@"x"]).doubleValue];
 }
 
-- (float)getYInEdgeWithID:(NSString *)edgeID {
+- (double)getYInEdgeWithID:(NSString *)edgeID {
     NSDictionary *infoFromEdgeJson = [_infoFromEdges objectForKey:edgeID];
-    return infoFromEdgeJson == nil ? INT32_MIN : [TopoMap unit2feet:((NSNumber *)[infoFromEdgeJson objectForKey:@"y"]).floatValue];
+    return infoFromEdgeJson == nil ? INT32_MIN : [TopoMap unit2feet:((NSNumber *)[infoFromEdgeJson objectForKey:@"y"]).doubleValue];
 }
 
 - (NSString *)getInfoComingFromEdgeWithID:(NSString *)edgeID {

@@ -25,19 +25,28 @@
 
 #import "TopoMap.h"
 #import "NavEdge.h"
+#import "NavNode.h"
 
 @class TopoMap;
 @class NavEdge;
+@class NavNode;
 
 @interface NavLocation : NSObject
 
 @property (strong, nonatomic) NSString *layerID;
 @property (strong, nonatomic) NSString *edgeID;
-@property (nonatomic) float yInEdge;
-@property (nonatomic) float xInEdge;
+@property (nonatomic) double yInEdge;
+@property (nonatomic) double xInEdge;
 @property (nonatomic) float knndist;
+@property (nonatomic) double lat;
+@property (nonatomic) double lng;
+@property (nonatomic) float ori1;
+@property (nonatomic) float ori2;
 
 - (instancetype)initWithMap:(TopoMap *)map;
+- (double) distanceToNode:(NavNode*)node;
+- (NSArray*) pathToNode:(NavNode*)node;
+- (NSArray*) pathFromNode:(NavNode*)node;
 - (NavEdge *)getEdge;
 
 @end

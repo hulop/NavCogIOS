@@ -22,6 +22,7 @@
 
 #import <Foundation/Foundation.h>
 #import "NavLocation.h"
+#import "NavLineSegment.h"
 
 @interface NavLocation ()
 
@@ -44,6 +45,43 @@
         return [_map getEdgeFromLayer:_layerID withEdgeID:_edgeID];
     else
         return nil;
+}
+
+- (double)distanceToNode:(NavNode *)node
+{
+    NavLightEdge *ledge = [[NavLightEdgeHolder sharedInstance] getNavLightEdgeByEdgeID:_edgeID];
+    
+    Nav2DPoint *p1 = [[Nav2DPoint alloc] initWithX:_xInEdge Y:_yInEdge];
+    
+    Nav2DPoint *p2 = [[Nav2DPoint alloc] initWithX:[node getXInEdgeWithID:_edgeID] Y:[node getYInEdgeWithID:_edgeID]];
+    
+    return [ledge distanceFrom:p1 To:p2];
+}
+
+- (NSArray *)pathToNode:(NavNode *)node
+{
+    NavLightEdge *ledge = [[NavLightEdgeHolder sharedInstance] getNavLightEdgeByEdgeID:_edgeID];
+    if (ledge.lineSegments.count == 1) {
+        return nil;
+    }
+    Nav2DPoint *p1 = [[Nav2DPoint alloc] initWithX:_xInEdge Y:_yInEdge Lat:_lat Lng:_lng];
+    
+    Nav2DPoint *p2 = [[Nav2DPoint alloc] initWithX:[node getXInEdgeWithID:_edgeID] Y:[node getYInEdgeWithID:_edgeID] Lat:node.lat Lng:node.lng];
+    
+    return [ledge pathFrom:p1 To:p2];
+}
+
+- (NSArray *)pathFromNode:(NavNode *)node
+{
+    NavLightEdge *ledge = [[NavLightEdgeHolder sharedInstance] getNavLightEdgeByEdgeID:_edgeID];
+    if (ledge.lineSegments.count == 1) {
+        return nil;
+    }
+    Nav2DPoint *p1 = [[Nav2DPoint alloc] initWithX:[node getXInEdgeWithID:_edgeID] Y:[node getYInEdgeWithID:_edgeID] Lat:node.lat Lng:node.lng];
+    
+    Nav2DPoint *p2 = [[Nav2DPoint alloc] initWithX:_xInEdge Y:_yInEdge Lat:_lat Lng:_lng];    
+    
+    return [ledge pathFrom:p1 To:p2];
 }
 
 - (BOOL)isEqualToNavLocation:(NavLocation *)other {

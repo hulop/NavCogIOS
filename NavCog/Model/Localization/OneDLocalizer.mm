@@ -216,8 +216,8 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     for(NSString* line: [lines subarrayWithRange:NSMakeRange(1, [lines count]-1)]) {
         NSArray *items = [line componentsSeparatedByString:@","];
         if ([items count] < 3) continue;
-        float x = [TopoMap unit2meter:[items[0] floatValue]*3];
-        float y = [TopoMap unit2meter:[items[1] floatValue]*3];
+        double x = [TopoMap unit2meter:[items[0] doubleValue]*3];
+        double y = [TopoMap unit2meter:[items[1] doubleValue]*3];
         Location location = Location(x, y, 0, 0);
         int n = [items[2] intValue];
         Beacons beacons;
@@ -286,8 +286,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     std::shared_ptr<PoseRandomWalker>poseRandomWalker(new PoseRandomWalker());
     poseRandomWalkerProperty.orientationMeter(orientationMeter.get());
     poseRandomWalkerProperty.pedometer(pedometer.get());
-    //poseRandomWalkerProperty.angularVelocityLimit(30.0/180.0*M_PI);
-    poseRandomWalkerProperty.angularVelocityLimit(360.0/180.0*M_PI);
+    poseRandomWalkerProperty.angularVelocityLimit(30.0/180.0*M_PI);
     poseRandomWalker->setProperty(poseRandomWalkerProperty);
     poseRandomWalker->setPoseProperty(poseProperty);
     poseRandomWalker->setStateProperty(stateProperty);
@@ -358,14 +357,28 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
         self.localizer->resetStatus();
         return;
     }
+    if (self.tryResetTimer != nil) {
+        [self.tryResetTimer invalidate];
+    }
     
     _transiting = false;
     
+    NavLightEdge *ledge = [[NavLightEdgeHolder sharedInstance] getNavLightEdgeByEdgeID:options[@"edgeID"]];
+    bool forward = [options[@"forward"] boolValue];
+    
+    NavLineSegment *seg = ledge.lineSegments[forward?0:ledge.lineSegments.count-1];
+    
+    double n1x = forward?seg.point1.x:seg.point2.x;
+    double n1y = forward?seg.point1.y:seg.point2.y;
+    double n2x = forward?seg.point2.x:seg.point1.x;
+    double n2y = forward?seg.point2.y:seg.point1.y;
+
+    NavLocalizeResult *r = [[NavLocalizeResult alloc] init];  // in feet
+    r.x = n1x;
+    r.y = n1y;
+    _result = r;
+
     double x, y, z, floor, orientation;
-    double n1x = [options[@"sx"] doubleValue];
-    double n1y = [options[@"sy"] doubleValue];
-    double n2x = [options[@"tx"] doubleValue];
-    double n2y = [options[@"ty"] doubleValue];
     
     x = Feet2Meter(n1x);
     y = Feet2Meter(n1y);
@@ -373,12 +386,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     floor = [options[@"floor"] doubleValue];
     orientation = atan2(n2y-n1y, n2x-n1x);
     loc::Pose pose;
-    pose.x(x).y(y).z(z).floor(floor).orientation(orientation);
-    
-    NavLocalizeResult *r = [[NavLocalizeResult alloc] init];
-    r.x = x;
-    r.y = y;
-    _result = r;
+    pose.x(x).y(y).z(z).floor(floor).orientation(orientation); // in meter
     
     NSLog(@"reset:(%f,%f)->(%f,%f), x=%f,y=%f,orientation=%f",n1x,n1y,n2x,n2y,x, y, orientation);
     
@@ -626,27 +634,17 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
 }
 
 - (std::vector<State>) navEdgeLightToKnotStates: (NavLightEdge*) edge ByFeet: (double) feet{
-    //int cutSize = 10;
-    Nav2DPoint* p1 = edge.point1;
-    Nav2DPoint* p2 = edge.point2;
-    double edgeLength = [[edge lineSegment] length];
-    
-    double x1 = p1.x, y1 = p1.y;
-    double x2 = p2.x, y2 = p2.y;
-    
-    double diffX = x2 - x1;
-    double diffY = y2 - y1;
+    double edgeLength = [edge length];
     
     double cutSize = edgeLength/feet;
-    double dx = diffX/cutSize;
-    double dy = diffY/cutSize;
     
     std::vector<State> states;
-    for(int i=0; i<(cutSize+1); i++){
-        double x = [self trim: (x1 + i*dx) InRangeBetween:x1 And:x2];
-        double y = [self trim: (y1 + i*dy) InRangeBetween:y1 And:y2];
-        double xM = Feet2Meter(x);
-        double yM = Feet2Meter(y);
+    for(int i=0; i <(cutSize+1); i++) {
+        double ratio = (feet*i)/edgeLength;
+        
+        Nav2DPoint *p = [edge pointAtRatio:ratio];
+        double xM = Feet2Meter(p.x);
+        double yM = Feet2Meter(p.y);
         double z = 0;
         double floor = 0;
         Location loc(xM, yM, z, floor);
@@ -717,7 +715,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
         double distance = [self computeDistanceBetweenState:state AndEdge:edge];
         distanceSum += distance;
     }
-    double edgeLength = [edge.lineSegment length];
+    double edgeLength = [edge length];
     
     double distanceMean = distanceSum/_d1states->size();
     double stdx = stdloc.x()*3;
@@ -746,7 +744,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
         distance += floorDifference*distanceByFloorDiff;
     }
     
-    distance += [edge getDistanceNearestPointOnLineSegmentFromPoint:point];
+    distance += [[edge getNearestSegmentFromPoint:point] getDistanceNearestPointOnLineSegmentFromPoint:point];
     return distance;
 }
 

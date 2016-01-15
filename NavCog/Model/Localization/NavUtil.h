@@ -31,6 +31,7 @@
 /// clips the angle between -180 and 180
 + (double) clipAngle2:(double) x;
 + (double) clipAngle:(double) x withLimit:(double) l;
++ (NSArray*) buildPath:(NSArray*) pathNodes;
 
 @end
 

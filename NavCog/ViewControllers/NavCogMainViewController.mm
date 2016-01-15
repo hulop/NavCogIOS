@@ -26,6 +26,7 @@
 
 #import "NavCogMainViewController.h"
 #import "NavLogFile.h"
+#import "NavUtil.h"
 
 @interface NavCogMainViewController ()
 
@@ -241,20 +242,30 @@
     if (_isWebViewLoaded) {
         _pathNodes = [_navMachine getPathNodes];
         NavNode *startNode = [_pathNodes lastObject];
+        
         NSMutableString *cmd = [[NSMutableString alloc] init];
         [cmd appendString:@"setStartNode("];
         [cmd appendFormat:@"%f,", startNode.lat];
         [cmd appendFormat:@"%f)", startNode.lng];
         [_navFuncViewCtrl runCmdWithString:cmd];
         cmd = [[NSMutableString alloc] init];
+        
+        NSArray *path = [NavUtil buildPath:_pathNodes];
+        NSString *pathStr = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:path options:0 error:nil] encoding:NSUTF8StringEncoding];
+        
+        [cmd appendFormat:@"startNavigation(%@, \"%@\");", pathStr, startNode.layerZIndex];
+        NSLog(@"%@", cmd);
+        /*
         [cmd appendString:@"startNavigation(["];
         for (int i = (int)[_pathNodes count] - 2; i >= 0; i--) {
-            [cmd appendFormat:@"'%@'", ((NavNode *)[_pathNodes objectAtIndex:i]).nodeID];
+            [cmd appendFormat:@"'%@'",[[[_pathNodes objectAtIndex:i] preEdgeInPath] edgeID]];
+            //[cmd appendFormat:@"'%@'", ((NavNode *)[_pathNodes objectAtIndex:i]).nodeID];
             if (i > 0) {
                 [cmd appendString:@","];
             }
         }
         [cmd appendString:@"])"];
+         */
         [_navFuncViewCtrl runCmdWithString:cmd];
     }
 }
@@ -295,6 +306,13 @@
     [cmd appendFormat:@"%f)", startNode.lng];
     [_navFuncViewCtrl runCmdWithString:cmd];
     cmd = [[NSMutableString alloc] init];
+    
+    NSArray *path = [NavUtil buildPath:_pathNodes];
+    NSString *pathStr = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:path options:0 error:nil] encoding:NSUTF8StringEncoding];
+    
+    [cmd appendFormat:@"startNavigation(%@, \"%@\");", pathStr, startNode.layerZIndex];
+    NSLog(@"%@", cmd);
+    /*
     [cmd appendString:@"startNavigation(["];
     for (int i = (int)[_pathNodes count] - 2; i >= 0; i--) {
         [cmd appendFormat:@"'%@'", ((NavNode *)[_pathNodes objectAtIndex:i]).nodeID];
@@ -303,6 +321,7 @@
         }
     }
     [cmd appendString:@"])"];
+     */
     [_navFuncViewCtrl runCmdWithString:cmd];
 }
 

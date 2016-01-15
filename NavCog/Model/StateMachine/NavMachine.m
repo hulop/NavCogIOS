@@ -150,6 +150,7 @@
             newState.sy = [node1 getYInEdgeWithID:node2.preEdgeInPath.edgeID];
             newState.tx = [node2 getXInEdgeWithID:node2.preEdgeInPath.edgeID];
             newState.ty = [node2 getYInEdgeWithID:node2.preEdgeInPath.edgeID];
+            newState.path = node2.preEdgeInPath.path;
             newState.floor = node1.floor;
             if (i >= 2) {
                 NavNode *node3 = [pathNodes objectAtIndex:i - 2];

@@ -24,7 +24,7 @@
 
 @implementation NavLocalizeResult
 
-- (id)initWithX:(float)x Y:(float)y Z:(float)z
+- (id)initWithX:(double)x Y:(double)y Z:(double)z
 {
     self = [super init];
     self.x = x;
@@ -33,7 +33,7 @@
     return self;
 }
 
-- (id)initWithX:(float)x Y:(float)y Z:(float)z Ori:(float)ori Vel:(float)vel
+- (id)initWithX:(double)x Y:(double)y Z:(double)z Ori:(float)ori Vel:(float)vel
 {
     self = [self initWithX:x Y:y Z:z];
     self.orientation = ori;

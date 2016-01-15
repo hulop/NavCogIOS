@@ -54,6 +54,8 @@
 
 #include <bleloc/StrongestBeaconFilter.hpp>
 
+#import "NavLineSegment.h"
+
 using namespace loc;
 
 @interface TwoDLocalizer ()
@@ -135,10 +137,15 @@ using namespace loc;
         
         double x, y, z, floor, orientation;
         
-        double n1x = [options[@"sx"] doubleValue];
-        double n1y = [options[@"sy"] doubleValue];
-        double n2x = [options[@"tx"] doubleValue];
-        double n2y = [options[@"ty"] doubleValue];
+        NavLightEdge *ledge = [[NavLightEdgeHolder sharedInstance] getNavLightEdgeByEdgeID:options[@"edgeID"]];
+        bool forward = [options[@"forward"] boolValue];
+        
+        NavLineSegment *seg = ledge.lineSegments[forward?0:ledge.lineSegments.count-1];
+        
+        double n1x = forward?seg.point1.x:seg.point2.x;
+        double n1y = forward?seg.point1.y:seg.point2.y;
+        double n2x = forward?seg.point2.x:seg.point1.x;
+        double n2y = forward?seg.point2.y:seg.point1.y;
         
         x = Feet2Meter(n1x);
         y = Feet2Meter(n1y);
@@ -317,7 +324,8 @@ using namespace loc;
         distance += floorDifference*distanceByFloorDiff;
     }
     
-    distance += [edge getDistanceNearestPointOnLineSegmentFromPoint:point];
+    distance += [[edge getNearestSegmentFromPoint:point] getDistanceNearestPointOnLineSegmentFromPoint:point];
+                 
     return distance;
 }
 

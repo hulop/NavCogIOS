@@ -29,6 +29,7 @@
 #import "TopoMap.h"
 #import <AVFoundation/AVFoundation.h>
 #import "NavI18nUtil.h"
+#import "NavLineSegment.h"
 
 @interface NavEdge ()
 
@@ -61,11 +62,32 @@
  * t = (a dot b)/|a|
  */
 - (NavNode *)checkValidEndNodeAtLocation:(NavLocation *)location {
-    float ax = [_node2 getXInEdgeWithID:_edgeID] - [_node1 getXInEdgeWithID:_edgeID];
-    float ay = [_node2 getYInEdgeWithID:_edgeID] - [_node1 getYInEdgeWithID:_edgeID];
-    float bx = location.xInEdge - [_node1 getXInEdgeWithID:_edgeID];
-    float by = location.yInEdge - [_node1 getYInEdgeWithID:_edgeID];
+    NavLightEdge *ledge = [[NavLightEdgeHolder sharedInstance] getNavLightEdgeByEdgeID:self.edgeID];
     
+    Nav2DPoint *loc = [[Nav2DPoint alloc] initWithX:location.xInEdge Y:location.yInEdge];
+    Nav2DPoint *n1 = [[Nav2DPoint alloc] initWithX:[_node1 getXInEdgeWithID:_edgeID] Y: [_node1 getYInEdgeWithID:_edgeID]];
+    Nav2DPoint *n2 = [[Nav2DPoint alloc] initWithX:[_node2 getXInEdgeWithID:_edgeID] Y: [_node2 getYInEdgeWithID:_edgeID]];
+
+    double d1 = [ledge distanceFrom:loc To:n1];
+    double d2 = [ledge distanceFrom:loc To:n2];
+    
+    if (d1 < 5) {
+        return _node1;
+    }
+    if (d2 < 5) {
+        return _node2;
+    }
+    NavLineSegment *seg = [ledge getNearestSegmentFromPoint:loc];
+    Nav2DPoint *p = [seg getNearestPointOnLineSegmentFromPoint:loc];
+    if ([seg.point1 distanceTo:p] < 0.1) {
+        return _node1;
+    }
+    if ([seg.point2 distanceTo:p] < 0.1) {
+        return _node2;
+    }
+    return nil;
+
+    /*
     float alen = sqrt(ax*ax+ay*ay);
     float t = (ax*bx + ay*by) / alen;
     
@@ -75,6 +97,7 @@
         return _node2;
     }
     return nil;
+     */
 }
 /*
 - (NavNode *)checkValidEndNodeAtLocation:(NavLocation *)location {
@@ -114,6 +137,7 @@
     edge.info1 = _info1;
     edge.info2 = _info2;
     edge.parentLayer = _parentLayer;
+    edge.path = [edge.path copy];
     return edge;
 }
 
