@@ -8,6 +8,7 @@
 
 1. Install [CocoaPods](https://cocoapods.org/).
 2. In the project directory, run `pod install`.
+3. Build blelocpp project in a sibling `blelocpp` folder 
 
 ----
 ## About
