@@ -38,8 +38,11 @@
 
 // for pose random walker in building
 #import <bleloc/Building.hpp>
+#import <bleloc/RandomWalker.hpp>
 #import <bleloc/PoseRandomWalkerInBuilding.hpp>
 
+#import <bleloc/BeaconFilterChain.hpp>
+#import <bleloc/CleansingBeaconFilter.hpp>
 #import <bleloc/StrongestBeaconFilter.hpp>
 
 using namespace loc;
@@ -66,12 +69,19 @@ typedef struct LocalizerData {
 @property std::shared_ptr<Pose> d1meanPose;
 @property std::shared_ptr<States> d1states;
 
+@property std::shared_ptr<GaussianProcessLDPLMultiModel<State, Beacons>> obsModel;
+@property std::shared_ptr<BeaconFilterChain> beaconFilter;
+@property std::shared_ptr<StatusInitializerImpl> statusInitializer;
+@property Beacons cbeacons;
+@property int minNBeacon;
+
 @property BOOL transiting;
 
 @end
 
 @implementation OneDLocalizer
 static OneDLocalizer *activeLocalizer;
+
 
 - (void)dealloc
 {
@@ -120,7 +130,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
                            @"velocity":@(loc.d1meanPose->velocity())
                            };
     
-    if (loc == activeLocalizer) {
+    if (loc.p2pDebug == true && loc == activeLocalizer) {
         [[P2PManager sharedInstance] send:data withType:@"2d-position" ];
     }
     
@@ -261,22 +271,31 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     poseProperty.minVelocity(0.1);
     poseProperty.maxVelocity(1.5);
     poseProperty.stdOrientation(3.0/180.0*M_PI);
-    poseProperty.stdX(2);
+    //poseProperty.stdX(2);
+    poseProperty.stdX(0);
     poseProperty.stdY(2);
     
     //stateProperty.meanRssiBias(-4.0);
     stateProperty.meanRssiBias(0.0);
-    stateProperty.stdRssiBias(0.2);
+    stateProperty.stdRssiBias(2.0);
     stateProperty.diffusionRssiBias(0.2);
+    //stateProperty.stdRssiBias(0.0);
+    //stateProperty.diffusionRssiBias(0.0);
     stateProperty.diffusionOrientationBias(1.0/180*M_PI);
     // END TODO
+    
+    // Build RandomWalker
+    //RandomWalkerProperty rwProperty;
+    //std::shared_ptr<RandomWalker<State, PoseRandomWalkerInput>> randomWalker(new RandomWalker<State, PoseRandomWalkerInput>());
+    //randomWalker->setProperty(rwProperty);
     
     // Build poseRandomWalker
     PoseRandomWalkerProperty poseRandomWalkerProperty;
     std::shared_ptr<PoseRandomWalker>poseRandomWalker(new PoseRandomWalker());
     poseRandomWalkerProperty.orientationMeter(orientationMeter.get());
     poseRandomWalkerProperty.pedometer(pedometer.get());
-    poseRandomWalkerProperty.angularVelocityLimit(30.0/180.0*M_PI);
+    //poseRandomWalkerProperty.angularVelocityLimit(30.0/180.0*M_PI);
+    poseRandomWalkerProperty.angularVelocityLimit(360.0/180.0*M_PI);
     poseRandomWalker->setProperty(poseRandomWalkerProperty);
     poseRandomWalker->setPoseProperty(poseProperty);
     poseRandomWalker->setStateProperty(stateProperty);
@@ -293,6 +312,9 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     poseRandomWalkerInBuilding->building(building);
     poseRandomWalkerInBuilding->poseRandomWalkerInBuildingProperty(prwBuildingProperty);
     
+    
+    std::shared_ptr<SystemModel<State, PoseRandomWalkerInput>> sysModel = poseRandomWalkerInBuilding;
+    
     _localizer->systemModel(poseRandomWalkerInBuilding);
     
     // set resampler
@@ -307,15 +329,23 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     statusInitializer->dataStore(_dataStore)
     .poseProperty(poseProperty).stateProperty(stateProperty);
     _localizer->statusInitializer(statusInitializer);
+    _statusInitializer = statusInitializer;
     
     // Set localizer
     //_localizer->observationModel(deserializedModel);
     
     // Beacon filter
-    std::shared_ptr<StrongestBeaconFilter> beaconFilter(new StrongestBeaconFilter());
-    beaconFilter->nStrongest(10);
-    _localizer->beaconFilter(beaconFilter);
+    std::shared_ptr<CleansingBeaconFilter> cleansingBeaconFilter(new CleansingBeaconFilter());
+    std::shared_ptr<StrongestBeaconFilter> strongestBeaconFilter(new StrongestBeaconFilter());
     
+    int nStrongest = 10;
+    _minNBeacon = 3;
+    strongestBeaconFilter->nStrongest(nStrongest);
+    _beaconFilter.reset(new BeaconFilterChain());
+    _beaconFilter->addFilter(cleansingBeaconFilter);
+    _beaconFilter->addFilter(strongestBeaconFilter);
+    
+    _localizer->beaconFilter(_beaconFilter);
     
 }
 
@@ -430,10 +460,17 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
         Beacon cb(b.major.intValue, b.minor.intValue, rssi);
         cbeacons.push_back(cb);
     }
-
-    cbeacons.timestamp([[NSDate date] timeIntervalSince1970]*1000);
-    _localizer->putBeacons(cbeacons);
     
+    cbeacons.timestamp([[NSDate date] timeIntervalSince1970]*1000);
+    _cbeacons = cbeacons;
+    
+    if(_transiting){
+        [self inputBeaconsTransit:cbeacons];
+        return;
+    }
+    
+    _localizer->putBeacons(cbeacons);
+    [self sendStatusByP2P: *_localizer->getStatus()];
     
     if (_d1meanLoc) {
         r.x = Meter2Feet(_d1meanLoc->x());
@@ -447,9 +484,87 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     
     //std::cout << "meanPose=" << *_d1meanPose << std::endl;
     
-    [self sendStatusByP2P: *_localizer->getStatus()];
+    _result = r;
+}
+
+
+- (void) inputBeaconsTransit: (Beacons) beacons{
+    
+    int nEvalPoint = 1000;
+    States states = _statusInitializer->initializeStates(nEvalPoint);
+    
+    double cumProba = 0.99;
+    cumProba = 0.67;
+    State maxLLState = [self findMaximumLikelihoodLocation:beacons Given:states With: cumProba];
+    NavLocalizeResult *r = [[NavLocalizeResult alloc] init];
+    
+    r.x = Meter2Feet(maxLLState.x());
+    r.y = Meter2Feet(maxLLState.y());
+    r.knndist = maxLLState.mahalanobisDistance();
+    
+    NSLog(@"TRANSIT:x=%f,y=%f,knndist=%f",r.x,r.y,r.knndist);
+
+    [self sendStatesByP2P:states];
+
+    NSDictionary *data = @{
+                           @"x": @(maxLLState.x()),
+                           @"y": @(maxLLState.y()),
+                           @"z": @(maxLLState.z()),
+                           @"floor": @(maxLLState.floor()),
+                           @"orientation": @(maxLLState.orientation()),
+                           @"velocity":@(maxLLState.velocity())
+                           };
+    
+    if (self.p2pDebug == true && self == activeLocalizer) {
+        [[P2PManager sharedInstance] send:data withType:@"2d-position" ];
+    }
     
     _result = r;
+}
+
+- (State) findMaximumLikelihoodLocation: (Beacons) beacons Given: (States) states With:(double) cumulative{
+    Beacons beaconsFiltered = _beaconFilter->filter(beacons);
+    
+    _obsModel->fillsUnknownBeaconRssi(false);
+    std::vector<std::vector<double>> logLLAndMahaDists = _obsModel->computeLogLikelihoodRelatedValues(states, beaconsFiltered);
+    
+    double countKnown = 0, countUnknown = 0;
+    double minMahaDist = std::numeric_limits<double>::max();
+    State stateMinMD;
+    for(int i=0; i<states.size(); i++){
+        std::vector<double> logLLAndMahaDist = logLLAndMahaDists.at(i);
+        double logLikelihood = logLLAndMahaDist.at(0);
+        double mahaDist = logLLAndMahaDist.at(1);
+        countKnown = logLLAndMahaDist.at(2);
+        countUnknown = logLLAndMahaDist.at(3);
+        if(mahaDist < minMahaDist){
+            minMahaDist = mahaDist;
+            stateMinMD = states.at(i);
+        }
+    }
+    
+    int dof = 0;
+    double quantile = 0.0;
+    if(self.minNBeacon<=countKnown){
+        dof = countKnown;
+        quantile = MathUtils::quantileChiSquaredDistribution(dof, cumulative);
+    }else{
+        dof = 0;
+        minMahaDist = 1000; // large value
+        quantile = 1; // small value
+    }
+    
+    if(minMahaDist<1000){
+        NSLog(@"Mahalanobis distance: dof=%d, distance=%.2f, quantile=%.2f, #known=%.0f, #unknown=%.0f", dof, minMahaDist, quantile, countKnown, countUnknown);
+    }
+    double normalizedMD = minMahaDist/quantile;
+    stateMinMD.mahalanobisDistance(normalizedMD);
+    return stateMinMD;
+}
+
+- (double) computeNormalizedMahalanobisDistance: (Beacons) beacons Given: (States) states With:(double) quantile{
+    State stateMinMD = [self findMaximumLikelihoodLocation:beacons Given:states With:quantile];
+    return stateMinMD.mahalanobisDistance();
 }
 
 - (NSDictionary*) statusToNSData: (Status) status{
@@ -467,6 +582,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     return obj;
 }
 
+
 - (void) sendStatusByP2P: (Status) status{
     if (!_p2pDebug || self != activeLocalizer) {
         return;
@@ -474,6 +590,14 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     NSDictionary* data = [self statusToNSData: status];
     [[P2PManager sharedInstance] send:data withType:@"2d-status" ];
 }
+
+- (void) sendStatesByP2P: (States) states{
+    Status status;
+    States* statesNew = new States(states);
+    status.states(statesNew);
+    [self sendStatusByP2P:status];
+}
+
 
 - (void)inputAcceleration:(NSDictionary *)data
 {
@@ -488,7 +612,9 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
                                         [data[@"z"] doubleValue ]);
         
         //NSLog(@"input acc");
-        _localizer->putAcceleration(acc);
+        if(!_transiting){
+            _localizer->putAcceleration(acc);
+        }
     }
     _previousAccTimestamp = timestamp;
 }
@@ -507,13 +633,89 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
         Attitude att = Attitude([data[@"timestamp"] doubleValue]*1000, 0, 0, 0);
         
         //NSLog(@"input att");
-        _localizer->putAttitude(att);
+        if(!_transiting){
+            _localizer->putAttitude(att);
+        }
     }
     _previousAttTimestamp = timestamp;
 }
 
+- (std::vector<State>) navEdgeLightToKnotStates: (NavLightEdge*) edge ByFeet: (double) feet{
+    //int cutSize = 10;
+    Nav2DPoint* p1 = edge.point1;
+    Nav2DPoint* p2 = edge.point2;
+    double edgeLength = [[edge lineSegment] length];
+    
+    double x1 = p1.x, y1 = p1.y;
+    double x2 = p2.x, y2 = p2.y;
+    
+    double diffX = x2 - x1;
+    double diffY = y2 - y1;
+    
+    double cutSize = edgeLength/feet;
+    double dx = diffX/cutSize;
+    double dy = diffY/cutSize;
+    
+    std::vector<State> states;
+    for(int i=0; i<(cutSize+1); i++){
+        double x = [self trim: (x1 + i*dx) InRangeBetween:x1 And:x2];
+        double y = [self trim: (y1 + i*dy) InRangeBetween:y1 And:y2];
+        double xM = Feet2Meter(x);
+        double yM = Feet2Meter(y);
+        double z = 0;
+        double floor = 0;
+        Location loc(xM, yM, z, floor);
+        Pose pose(loc);
+        State state(pose);
+        states.push_back(state);
+    }
+    return states;
+}
+
+- (double) trim: (double)x InRangeBetween : (double)x1 And : (double)x2{
+    if(x1<x2){
+        return [self trim: x InRangeFrom:x1 To:x2];
+    }else{
+        return [self trim: x InRangeFrom:x2 To:x1];
+    }
+}
+
+- (double) trim:(double) x InRangeFrom: (double)x1 To: (double)x2{
+    double xnew = std::max(x, x1);
+    xnew = std::min(xnew, x2);
+    return xnew;
+}
+
 
 - (double) computeDistanceScoreWithOptions: (NSDictionary*) options{
+    if (_transiting) {
+        return _result.knndist;
+    }
+    return [self computeBeaconBasedDistanceScoreWithOptions:options];
+}
+
+- (double) computeBeaconBasedDistanceScoreWithOptions: (NSDictionary*) options{
+    double intervalInFeet = 1;
+    double cumDensity = 0.99;
+    NSString* edgeID = options[@"edgeID"];
+    NavLightEdgeHolder* holder = [NavLightEdgeHolder sharedInstance];
+    NavLightEdge* edge = [holder getNavLightEdgeByEdgeID:edgeID];
+    
+    States states = [self navEdgeLightToKnotStates:edge ByFeet:intervalInFeet];
+    double v = 100;
+    
+    Beacons beaconsFiltered = _beaconFilter->filter(_cbeacons);
+    int dof = static_cast<int>(beaconsFiltered.size());
+    
+    if(_cbeacons.size()>0){
+        v = [self computeNormalizedMahalanobisDistance:beaconsFiltered Given:states With: cumDensity];
+    }
+    //double v = _normalizedMahalanobisDistance;
+    NSLog(@"2D knnDist: eid=%@, dist=%.2f, dof=%d", edgeID, v, dof);
+    return v;
+}
+
+- (double) computeParticleBasedDistanceScoreWithOptions: (NSDictionary*) options{
     NSString* edgeID = options[@"edgeID"];
     NavLightEdgeHolder* holder = [NavLightEdgeHolder sharedInstance];
     NavLightEdge* edge = [holder getNavLightEdgeByEdgeID:edgeID];
@@ -538,6 +740,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     double v = fmax(distanceMean, sqrt(pow(stdx,2) + pow(stdy,2)))/6.0;
     
     NSLog(@"2D knnDist: %@, %.2f, %.2f, %.2f, %.2f, %.2f", edgeID, v, distanceMean, stdx, stdy, edgeLength);
+    
     return v;
 }
 
@@ -601,19 +804,24 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     std::string serializedModelPath = [tempPath UTF8String];
     std::cout << "serializedModelPath: " << serializedModelPath << std::endl;
     
+    std::shared_ptr<GaussianProcessLDPLMultiModel<State, Beacons>> obsModel;
     if ([fm fileExistsAtPath:tempPath]) {
-        std::shared_ptr<GaussianProcessLDPLMultiModel<State, Beacons>> deserializedModel(new GaussianProcessLDPLMultiModel<State, Beacons>());
+        //std::shared_ptr<GaussianProcessLDPLMultiModel<State, Beacons>> deserializedModel(new GaussianProcessLDPLMultiModel<State, Beacons>());
+        obsModel.reset(new GaussianProcessLDPLMultiModel<State, Beacons>());
         {
             std::ifstream ifs(serializedModelPath);
-            deserializedModel->load(ifs);
+            obsModel->load(ifs);
         }
-        _localizer->observationModel(deserializedModel);
+        _localizer->observationModel(obsModel);
+        _obsModel = obsModel;
     } else {
         // Train observation model
         std::shared_ptr<GaussianProcessLDPLMultiModelTrainer<State, Beacons>>obsModelTrainer( new GaussianProcessLDPLMultiModelTrainer<State, Beacons>());
         obsModelTrainer->dataStore(_dataStore);
-        std::shared_ptr<GaussianProcessLDPLMultiModel<State, Beacons>> obsModel( obsModelTrainer->train());
+        obsModel.reset(obsModelTrainer->train());
+        ////std::shared_ptr<GaussianProcessLDPLMultiModel<State, Beacons>> obsModel( obsModelTrainer->train());
         _localizer->observationModel(obsModel);
+        _obsModel = obsModel;
         
         // Seriealize observation model
         //std::cout << "Serializing observationModel" <<std::endl;
@@ -622,6 +830,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
         //    obsModel->save(ofs);
         //}
     }
+    obsModel->fillsUnknownBeaconRssi(false);
 }
 
 @end
