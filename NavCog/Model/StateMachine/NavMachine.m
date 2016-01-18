@@ -393,7 +393,8 @@
     if (_navState == NAV_STATE_TURNING) {
         //if (ABS(_curOri - _currentState.ori) <= 10) {
         float diff = clipAngle2(clipAngle2(_curOri) - clipAngle2(_currentState.ori));
-        if (ABS(diff) <= 10) {
+        //if (ABS(diff) <= 10) {
+        if (ABS(diff) <= 22.5) {
             [NavSoundEffects playSuccessSound];
             _navState = NAV_STATE_WALKING;
             [self logState];
@@ -648,11 +649,8 @@
         return nil;
 }
 
-- (NavState*)getTransitionState {
-    if (_currentState.type == STATE_TYPE_TRANSITION)
-        return _currentState;
-    else
-        return nil;
+- (NavState*)getCurrentState {
+    return _currentState;
 }
 
 - (NavCurrentLocationManager *)getCurrentLocationManager

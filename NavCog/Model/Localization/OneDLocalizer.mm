@@ -134,7 +134,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
         [[P2PManager sharedInstance] send:data withType:@"2d-position" ];
     }
     
-    printf("1D %f, %f, %f, %f, %f\n", loc.d1meanLoc->x(), loc.d1meanLoc->y(), loc.d1meanLoc->floor(), loc.d1meanPose->orientation(), loc.d1meanPose->velocity());
+    NSLog(@"1D %f, %f, %f, %f, %f\n", loc.d1meanLoc->x(), loc.d1meanLoc->y(), loc.d1meanLoc->floor(), loc.d1meanPose->orientation(), loc.d1meanPose->velocity());
     //std::cout << meanLoc->toString() << std::endl;
     
     
@@ -175,12 +175,6 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     
     BuildingBuilder buildingBuilder;
 
-//    double ppmx = 2;
-//    double ppmy = -2;
-//    double ppmz = 1;
-//    double originx = 400;
-//    double originy = 20;
-//    double originz = 0;
     double ppmx = 8;
     double ppmy = -8;
     double ppmz = 1;
@@ -254,6 +248,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     PedometerWalkingStateParameters pedometerWSParams;
     // TODO
     pedometerWSParams.updatePeriod(0.1);
+    pedometerWSParams.walkDetectSigmaThreshold(0.1);
     // END TODO
     std::shared_ptr<Pedometer> pedometer(new PedometerWalkingState(pedometerWSParams));
     
@@ -355,22 +350,51 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     if (options == nil) {
         return;
     }
+    _transiting = true;
     if ([options[@"type"] isEqualToString:@"transition"]) {
         NSLog(@"1D localizer is all reset for transition");
         self.localizer->resetStatus();
-        _transiting = true;
         return;
     }
-    _transiting = false;
     if (options[@"allreset"]) {
         NSLog(@"1D localizer is all reset");
         self.localizer->resetStatus();
         return;
     }
-    if (self.tryResetTimer != nil) {
-        [self.tryResetTimer invalidate];
-    }
-    self.tryResetTimer = [NSTimer scheduledTimerWithTimeInterval:0.3 target:self selector:@selector(tryReset:) userInfo:options repeats:YES];
+    
+    _transiting = false;
+    
+    double x, y, z, floor, orientation;
+    double n1x = [options[@"sx"] doubleValue];
+    double n1y = [options[@"sy"] doubleValue];
+    double n2x = [options[@"tx"] doubleValue];
+    double n2y = [options[@"ty"] doubleValue];
+    
+    x = Feet2Meter(n1x);
+    y = Feet2Meter(n1y);
+    z = Feet2Meter(0);
+    floor = [options[@"floor"] doubleValue];
+    orientation = atan2(n2y-n1y, n2x-n1x);
+    loc::Pose pose;
+    pose.x(x).y(y).z(z).floor(floor).orientation(orientation);
+    
+    NavLocalizeResult *r = [[NavLocalizeResult alloc] init];
+    r.x = x;
+    r.y = y;
+    _result = r;
+    
+    NSLog(@"reset:(%f,%f)->(%f,%f), x=%f,y=%f,orientation=%f",n1x,n1y,n2x,n2y,x, y, orientation);
+    
+    std::cout << "Sending reset request to the localizer.";
+    std::cout << ", resetPose = " << pose << std::endl;
+    
+    // Set standard deviation of Pose
+    loc::Pose stdevPose;
+    stdevPose.x(0.25).y(0.25).orientation(1.0/180.0*M_PI);
+    // stdevPose.normalVelocity(0.2); // TODO
+    
+    self.localizer->resetStatus(pose, stdevPose);
+    NSLog(@"Reset %f %f %f %f", pose.x(), pose.y(), pose.floor(), pose.orientation());
 }
 
 - (NavLocalizeResult *)getLocation
@@ -378,46 +402,6 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     // need to convert 2D result into 1D
     return _result;
 }
-
-
-- (void) tryReset:(NSTimer *)timer {
-    if (self.orientationMeter->isUpdated()) {
-        NSDictionary *options = timer.userInfo;
-        
-        double x, y, z, floor, orientation;
-        
-        double n1x = [options[@"sx"] doubleValue];
-        double n1y = [options[@"sy"] doubleValue];
-        double n2x = [options[@"tx"] doubleValue];
-        double n2y = [options[@"ty"] doubleValue];
-        
-        x = Feet2Meter(n1x);
-        y = Feet2Meter(n1y);
-        z = Feet2Meter(0);
-        floor = [options[@"floor"] doubleValue];
-        orientation = atan2(n2y-n1y, n2x-n1x);
-        loc::Pose pose;
-        pose.x(x).y(y).z(z).floor(floor).orientation(orientation);
-        
-        // pose.normalVelocity(0.1~1.5) // TODO
-        
-        std::cout << "Sending reset request to the localizer.";
-        std::cout << ", resetPose = " << pose << std::endl;
-        self.localizer->resetStatus();
-        // self.localizer->resetStatus(pose);
-
-        // Set standard deviation of Pose
-        loc::Pose stdevPose;
-        stdevPose.x(0.25).y(0.25);
-        // stdevPose.normalVelocity(0.2); // TODO
-
-        self.localizer->resetStatus(pose, stdevPose);
-        NSLog(@"Reset %f %f %f %f", pose.x(), pose.y(), pose.floor(), pose.orientation());
-        
-        [timer invalidate];
-    }
-}
-
 
 - (void) inputBeacons:(NSArray*) beacons
 {
@@ -502,7 +486,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     r.y = Meter2Feet(maxLLState.y());
     r.knndist = maxLLState.mahalanobisDistance();
     
-    NSLog(@"TRANSIT:x=%f,y=%f,knndist=%f",r.x,r.y,r.knndist);
+    //NSLog(@"TRANSIT:x=%f,y=%f,knndist=%f",r.x,r.y,r.knndist);
 
     [self sendStatesByP2P:states];
 
@@ -555,7 +539,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     }
     
     if(minMahaDist<1000){
-        NSLog(@"Mahalanobis distance: dof=%d, distance=%.2f, quantile=%.2f, #known=%.0f, #unknown=%.0f", dof, minMahaDist, quantile, countKnown, countUnknown);
+        //NSLog(@"Mahalanobis distance: dof=%d, distance=%.2f, quantile=%.2f, #known=%.0f, #unknown=%.0f", dof, minMahaDist, quantile, countKnown, countUnknown);
     }
     double normalizedMD = minMahaDist/quantile;
     stateMinMD.mahalanobisDistance(normalizedMD);
@@ -631,6 +615,10 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
 //                                [data[@"yaw"] doubleValue ]);
         // ignore gyro sensor
         Attitude att = Attitude([data[@"timestamp"] doubleValue]*1000, 0, 0, 0);
+        
+        if (_p2pDebug) {            
+            [[P2PManager sharedInstance] send:@{@"value":@(-[data[@"yaw"] doubleValue]/M_PI*180)} withType:@"orientation"];
+        }
         
         //NSLog(@"input att");
         if(!_transiting){
@@ -711,7 +699,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
         v = [self computeNormalizedMahalanobisDistance:beaconsFiltered Given:states With: cumDensity];
     }
     //double v = _normalizedMahalanobisDistance;
-    NSLog(@"2D knnDist: eid=%@, dist=%.2f, dof=%d", edgeID, v, dof);
+    //NSLog(@"2D knnDist: eid=%@, dist=%.2f, dof=%d", edgeID, v, dof);
     return v;
 }
 
@@ -739,7 +727,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     double stdy = stdloc.y()*3;
     double v = fmax(distanceMean, sqrt(pow(stdx,2) + pow(stdy,2)))/6.0;
     
-    NSLog(@"2D knnDist: %@, %.2f, %.2f, %.2f, %.2f, %.2f", edgeID, v, distanceMean, stdx, stdy, edgeLength);
+    //NSLog(@"2D knnDist: %@, %.2f, %.2f, %.2f, %.2f, %.2f", edgeID, v, distanceMean, stdx, stdy, edgeLength);
     
     return v;
 }
@@ -824,11 +812,11 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
         _obsModel = obsModel;
         
         // Seriealize observation model
-        //std::cout << "Serializing observationModel" <<std::endl;
-        //{
-        //    std::ofstream ofs(serializedModelPath);
-        //    obsModel->save(ofs);
-        //}
+        std::cout << "Serializing observationModel" <<std::endl;
+        {
+            std::ofstream ofs(serializedModelPath);
+            obsModel->save(ofs);
+        }
     }
     obsModel->fillsUnknownBeaconRssi(false);
 }

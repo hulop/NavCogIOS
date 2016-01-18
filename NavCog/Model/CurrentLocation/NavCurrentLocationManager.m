@@ -56,7 +56,7 @@
 
 @implementation NavCurrentLocationManager;
 
-static const float GyroDriftMultiplier = 100;
+static const float GyroDriftMultiplier = 1000;
 static const float GyroDriftLimit = 3;
 
 
@@ -370,13 +370,8 @@ static const float GyroDriftLimit = 3;
 
 - (void)triggerAccelerationWithData: (NSMutableDictionary*) data {
     [NavLog logAcc:data];
-    if ([_currentMachine getWalkingState]) {
-        NSString *edgeID = [_currentMachine getWalkingState].walkingEdge.edgeID;
-        NavEdgeLocalizer *nel = [NavLocalizerFactory localizerForEdge:edgeID];
-        [nel inputAcceleration:data];
-    }
-    if ([_currentMachine getTransitionState]) {
-        NSString *edgeID = [_currentMachine getTransitionState].targetEdge.edgeID;
+    if ([_currentMachine getCurrentState]) {
+        NSString *edgeID = [[[_currentMachine getCurrentState] walkingEdge] edgeID];
         NavEdgeLocalizer *nel = [NavLocalizerFactory localizerForEdge:edgeID];
         [nel inputAcceleration:data];
     }
@@ -385,14 +380,9 @@ static const float GyroDriftLimit = 3;
 - (void)triggerMotionWithData: (NSMutableDictionary*) data {
     [NavLog logMotion:data];
     
-    if ([_currentMachine getWalkingState]) {
-        NSString *edgeID = [_currentMachine getWalkingState].walkingEdge.edgeID;
-        NavEdgeLocalizer *nel = [NavLocalizerFactory localizerForEdge:edgeID];
-        [nel inputMotion:data];
-    }
-    if ([_currentMachine getTransitionState]) {
-        NSString *edgeID = [_currentMachine getTransitionState].targetEdge.edgeID;
-        NavEdgeLocalizer *nel = [NavLocalizerFactory localizerForEdge:edgeID];
+    if ([_currentMachine getCurrentState]) {
+        NSString *edgeID = [[[_currentMachine getCurrentState] walkingEdge] edgeID];
+                NavEdgeLocalizer *nel = [NavLocalizerFactory localizerForEdge:edgeID];
         [nel inputMotion:data];
     }
     
