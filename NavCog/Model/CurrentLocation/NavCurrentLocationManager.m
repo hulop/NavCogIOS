@@ -132,6 +132,15 @@ static const float GyroDriftLimit = 3;
         accData[@"y"] = @(acc.acceleration.y);
         accData[@"z"] = @(acc.acceleration.z);
         
+        NSDictionary* env = [[NSProcessInfo processInfo] environment];
+        if ([[env valueForKey:@"autoacc"] isEqualToString:@"true"]) {
+            accData[@"x"] = @(arc4random_uniform(100)*0.01);
+            
+            if ([env valueForKey:@"simspeed"]) {
+                accData[@"timestamp"] = @(acc.timestamp*[[env valueForKey:@"simspeed"] doubleValue]);
+            }
+        }
+        
         [self triggerAccelerationWithData: accData];
     }];
 }
