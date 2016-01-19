@@ -190,6 +190,8 @@ static const double FEET_IN_METER = 0.3048;
                     [temp addObject:newPoint];
                 }
                 edge.path = temp;
+                edge.ori1 = [temp[0][@"forward"] doubleValue];
+                edge.ori2 = [temp[temp.count-1][@"backward"] doubleValue];
             }
             
             NavLightEdge* edgeInfo = [[NavLightEdge alloc] initWithEdge:edge];

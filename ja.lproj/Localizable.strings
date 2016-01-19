@@ -87,6 +87,18 @@
 /* format string describing the number of meter left to a named location */
 "meterToNameFormat" = "%2$@まで%1$dメートル。。";
 
+/* Use to express a distance in feet on a curving edge with a pause */
+"feetPauseAlongFormat" = "道なりに%dフィート。。";
+
+/* format string describing the number of feet left to a named location on a curving edge*/
+"feetToNameAlongFormat" = "道なりに%2$@まで%1$dフィート。。";
+
+/* Use to express a distance in feet on a curving edge with a pause */
+"meterPauseAlongFormat" = "道なりに%dメートル。。";
+
+/* format string describing the number of feet left to a named location on a curving edge*/
+"meterToNameAlongFormat" = "道なりに%2$@まで%1$dメートル。。";
+
 /* Format string for a floor that takes an ordinal number */
 "floorFormat" = "%@階。。 ";
 

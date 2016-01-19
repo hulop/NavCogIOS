@@ -143,14 +143,16 @@
             newState.surroundInfo = [node2.preEdgeInPath getInfoFromNode:node1];
             newState.isTricky = [node2 isTrickyComingFromEdgeWithID:node2.preEdgeInPath.edgeID];
             newState.trickyInfo = newState.isTricky ? [node2 getTrickyInfoComingFromEdgeWithID:node2.preEdgeInPath.edgeID] : nil;
+            newState.path = node2.preEdgeInPath.path;
             newState.distMsg = [self getDistMessage:newState withLen:node2.preEdgeInPath.len withName:node2.name];
             float curOri = [node2.preEdgeInPath getOriFromNode:node1];
+            float lastOri = clipAngle2([node2.preEdgeInPath getOriFromNode:node2] + 180);
             newState.ori = curOri;
+            newState.lastOri = lastOri;
             newState.sx = [node1 getXInEdgeWithID:node2.preEdgeInPath.edgeID];
             newState.sy = [node1 getYInEdgeWithID:node2.preEdgeInPath.edgeID];
             newState.tx = [node2 getXInEdgeWithID:node2.preEdgeInPath.edgeID];
             newState.ty = [node2 getYInEdgeWithID:node2.preEdgeInPath.edgeID];
-            newState.path = node2.preEdgeInPath.path;
             newState.floor = node1.floor;
             if (i >= 2) {
                 NavNode *node3 = [pathNodes objectAtIndex:i - 2];
@@ -185,13 +187,13 @@
                     }
                 } else { // if next state is normal walking state, then pre-tell the turn
                     float nextOri = [node3.preEdgeInPath getOriFromNode:node2];
-                    [startInfo appendString:[self getTurnStringFromOri:curOri toOri:nextOri]];
+                    [startInfo appendString:[self getTurnStringFromOri:lastOri toOri:nextOri]];
                     if (![node2 hasTransition] && node2.type != NODE_TYPE_DESTINATION) {
                         newState.arrivedInfo = [node2 getInfoComingFromEdgeWithID:node2.preEdgeInPath.edgeID];
                     }
-                    newState.nextActionInfo = [self getTurnStringFromOri:curOri toOri:nextOri];
-                    if (curOri != nextOri) {
-                        newState.approachingInfo = [NSString stringWithFormat:NSLocalizedString(@"approachingToTurnFormat", @"Format string to tell the user they are approaching a turn"), [self getTurnStringFromOri:curOri toOri:nextOri]];
+                    newState.nextActionInfo = [self getTurnStringFromOri:lastOri toOri:nextOri];
+                    if (lastOri != nextOri) {
+                        newState.approachingInfo = [NSString stringWithFormat:NSLocalizedString(@"approachingToTurnFormat", @"Format string to tell the user they are approaching a turn"), [self getTurnStringFromOri:lastOri toOri:nextOri]];
                     }
                 }
             } else {
@@ -204,7 +206,7 @@
             [startInfo appendString:newState.surroundInfo];
         }
 
-        if (![node1.buildingName isEqualToString:node2.buildingName]) {
+        if (![node1.buildingName isEqualToString:node2.buildingName] && node2.buildingName) {
             [startInfo appendString:[NSString stringWithFormat:NSLocalizedString(@"enteringFormat", @"Spoken when entering a location"), node2.buildingName]];
         }
 
@@ -662,10 +664,19 @@
 // message distance to target
 - (NSString*)getDistMessage:(NavState*) state withLen:(int)len withName:(NSString*)name {
     int edgeLen = [state isMeter] ? [state toMeter:len] : len;
-    if ([name length] > 0) {
-        return [NSString stringWithFormat:NSLocalizedString([state isMeter]?@"meterToNameFormat":@"feetToNameFormat", @"format string describing the number of feet left to a named location"), edgeLen, name];
+    
+    if (state.path) {
+        if ([name length] > 0) {
+            return [NSString stringWithFormat:NSLocalizedString([state isMeter]?@"meterToNameAlongFormat":@"feetToNameAlongFormat", @"format string describing the number of feet left to a named location on a curving edge"), edgeLen, name];
+        } else {
+            return [NSString stringWithFormat:NSLocalizedString([state isMeter]?@"meterPauseAlongFormat":@"feetPauseAlongFormat", @"Use to express a distance in feet with a pause on a curving edge"), edgeLen];
+        }
     } else {
-        return [NSString stringWithFormat:NSLocalizedString([state isMeter]?@"meterPauseFormat":@"feetPauseFormat", @"Use to express a distance in feet with a pause"), edgeLen];
+        if ([name length] > 0) {
+            return [NSString stringWithFormat:NSLocalizedString([state isMeter]?@"meterToNameFormat":@"feetToNameFormat", @"format string describing the number of feet left to a named location"), edgeLen, name];
+        } else {
+            return [NSString stringWithFormat:NSLocalizedString([state isMeter]?@"meterPauseFormat":@"feetPauseFormat", @"Use to express a distance in feet with a pause"), edgeLen];
+        }
     }
 }
 
@@ -684,7 +695,7 @@
 //            if ([end.targetNode.name length] > 0) {
 //                break;
 //            }
-            if (ABS([NavUtil clipAngle2:(end.ori - end.nextState.ori)]) > 15) {
+            if (ABS([NavUtil clipAngle2:(end.lastOri - end.nextState.ori)]) > 15) {
                 break;
             }
             totalLen += (end = end.nextState).walkingEdge.len;

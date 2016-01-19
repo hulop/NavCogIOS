@@ -60,6 +60,7 @@ enum StateType {STATE_TYPE_WALKING, STATE_TYPE_TRANSITION};
 @property (nonatomic) float closestDist;
 
 @property (nonatomic) float ori; // expected orientation when walking in this state
+@property (nonatomic) float lastOri; // expected orientation at the end of edge (ori != lastOri when it is curving)
 @property (nonatomic) float sx; // x of start node
 @property (nonatomic) float sy; // y of start node
 @property (nonatomic) float tx; // x of target node

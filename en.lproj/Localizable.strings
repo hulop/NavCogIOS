@@ -87,6 +87,18 @@ Instruction";
 /* format string describing the number of meter left to a named location */
 "meterToNameFormat" = "%d meters to %@..";
 
+/* Use to express a distance in feet on a curving edge with a pause */
+"feetPauseAlongFormat" = "%d feet along with the way ..";
+
+/* format string describing the number of feet left to a named location on a curving edge*/
+"feetToNameAlongFormat" = "%d feet along with the way to %@..";
+
+/* Use to express a distance in feet on a curving edge with a pause */
+"meterPauseAlongFormat" = "%d meters along with the way ..";
+
+/* format string describing the number of feet left to a named location on a curving edge*/
+"meterToNameAlongFormat" = "%d meters along with the way to %@..";
+
 /* Format string for a floor that takes an ordinal number */
 "floorFormat" = "the %@ floor.. ";
 
