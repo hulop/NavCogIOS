@@ -264,7 +264,8 @@
                 }
                 _didApproaching = true;
                 return false;
-            } else if ((dist - _extraEdgeLength) <= 2 + threshold) {
+            }
+            if ((dist - _extraEdgeLength) <= 2 + threshold) {
                 if (_nextState != nil && _nextState.isCombined) {
                     // combined edge: copy current navigation status to next state
                     _nextState.preAnnounceDist = _preAnnounceDist;
