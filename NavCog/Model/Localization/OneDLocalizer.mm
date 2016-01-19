@@ -56,7 +56,6 @@ typedef struct LocalizerData {
 @property std::shared_ptr<DataStoreImpl> dataStore;
 @property NSTimer *tryResetTimer;
 @property NSDictionary *currentOptions;
-@property bool p2pDebug;
 
 @property NSArray *previousBeaconInput;
 @property NavLocalizeResult *result;
@@ -104,10 +103,6 @@ static OneDLocalizer *activeLocalizer;
 
 - (void) initDebug {
     NSDictionary* env = [[NSProcessInfo processInfo] environment];
-    self.p2pDebug = false;
-    if ([[env valueForKey:@"p2pdebug"] isEqual:@"true"]) {
-        self.p2pDebug = true;
-    }
 }
 
 void d1calledWhenUpdated(void *userData, Status * pStatus){
@@ -129,10 +124,8 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
                            @"velocity":@(loc.d1meanPose->velocity())
                            };
     
-    if (loc.p2pDebug == true && loc == activeLocalizer) {
-        [[P2PManager sharedInstance] send:data withType:@"2d-position" ];
-        [loc sendStatusByP2P: *loc.localizer->getStatus()];
-    }
+    [[P2PManager sharedInstance] send:data withType:@"2d-position" ];
+    [loc sendStatusByP2P: *loc.localizer->getStatus()];
     
     NSLog(@"1D %f, %f, %f, %f, %f\n", loc.d1meanLoc->x(), loc.d1meanLoc->y(), loc.d1meanLoc->floor(), loc.d1meanPose->orientation(), loc.d1meanPose->velocity());
     //std::cout << meanLoc->toString() << std::endl;
@@ -505,7 +498,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
                            @"velocity":@(maxLLState.velocity())
                            };
     
-    if (self.p2pDebug == true && self == activeLocalizer) {
+    if (self == activeLocalizer) {
         [[P2PManager sharedInstance] send:data withType:@"2d-position" ];
     }
     
@@ -574,7 +567,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
 
 
 - (void) sendStatusByP2P: (Status) status{
-    if (!_p2pDebug || self != activeLocalizer) {
+    if (self != activeLocalizer) {
         return;
     }
     NSDictionary* data = [self statusToNSData: status];
@@ -622,9 +615,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
         // ignore gyro sensor
         Attitude att = Attitude([data[@"timestamp"] doubleValue]*1000, 0, 0, 0);
         
-        if (_p2pDebug) {            
-            [[P2PManager sharedInstance] send:@{@"value":@(-[data[@"yaw"] doubleValue]/M_PI*180)} withType:@"orientation"];
-        }
+        [[P2PManager sharedInstance] send:@{@"value":@(-[data[@"yaw"] doubleValue]/M_PI*180)} withType:@"orientation"];
         
         //NSLog(@"input att");
         if(!_transiting){

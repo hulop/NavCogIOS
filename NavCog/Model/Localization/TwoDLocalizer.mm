@@ -58,13 +58,22 @@
 
 using namespace loc;
 
+typedef struct LocalizerData2 {
+    TwoDLocalizer* localizer;
+} LocalizerData;
+
+
 @interface TwoDLocalizer ()
 @property NavEdge *currentEdge;
 @property std::shared_ptr<OrientationMeter> orientationMeter;
 @property NSMutableArray *buildingJSON;
 @property NSTimer *tryResetTimer;
 @property NSDictionary *currentOptions;
-@property bool p2pDebug;
+@property LocalizerData2 userData;
+
+@property std::shared_ptr<Location> meanLoc;
+@property std::shared_ptr<Pose> meanPose;
+@property std::shared_ptr<States> states;
 
 @property loc::Pose stdevPose;
 @property NSArray *previousBeaconInput;
@@ -97,10 +106,6 @@ using namespace loc;
 
 - (void) initDebug {
     NSDictionary* env = [[NSProcessInfo processInfo] environment];
-    self.p2pDebug = false;
-    if ([[env valueForKey:@"p2pdebug"] isEqual:@"true"]) {
-        self.p2pDebug = true;
-    }
 }
 
 - (void)initializeState:(NSDictionary *)options;
@@ -177,9 +182,9 @@ using namespace loc;
     
     // for run test
     if ([beacons count] == 1 && [[beacons objectAtIndex:0] isKindOfClass:[NSString class]]) {
-        if (meanLoc) {
-            r.x = Meter2Feet(meanLoc->x());
-            r.y = Meter2Feet(meanLoc->y());
+        if (_meanLoc) {
+            r.x = Meter2Feet(_meanLoc->x());
+            r.y = Meter2Feet(_meanLoc->y());
             r.knndist = 0.25;
         }
         _result = r;
@@ -187,9 +192,9 @@ using namespace loc;
     }
     
     if ([beacons count] == 0) {
-        if (meanLoc) {
-            r.x = Meter2Feet(meanLoc->x());
-            r.y = Meter2Feet(meanLoc->y());
+        if (_meanLoc) {
+            r.x = Meter2Feet(_meanLoc->x());
+            r.y = Meter2Feet(_meanLoc->y());
             r.knndist = 0.25;
         }
         _result = r;
@@ -212,9 +217,9 @@ using namespace loc;
     _localizer->putBeacons(cbeacons);
     
 
-    if (meanLoc) {
-        r.x = Meter2Feet(meanLoc->x());
-        r.y = Meter2Feet(meanLoc->y());
+    if (_meanLoc) {
+        r.x = Meter2Feet(_meanLoc->x());
+        r.y = Meter2Feet(_meanLoc->y());
         r.knndist = 0.25;
         //NSLog(@"%f, %f, %f", r.x, r.y, r.knndist);
     } else {
@@ -222,9 +227,9 @@ using namespace loc;
         r.y = 0;
     }
     
-    std::cout << "meanPose=" << *meanPose << std::endl;
+    std::cout << "meanPose=" << *_meanPose << std::endl;
     
-    [self sendStatusByP2P: *_localizer->getStatus()];
+    //[self sendStatusByP2P: *_localizer->getStatus()];
     
     _result = r;
 }
@@ -245,9 +250,6 @@ using namespace loc;
 }
 
 - (void) sendStatusByP2P: (Status) status{
-    if (!_p2pDebug) {
-        return;
-    }
     NSDictionary* data = [self statusToNSData: status];
     [[P2PManager sharedInstance] send:data withType:@"2d-status" ];
 }
@@ -294,15 +296,15 @@ using namespace loc;
     NavLightEdge* edge = [holder getNavLightEdgeByEdgeID:edgeID];
     
     double distanceSum = 0;
-    assert(states);
+    assert(_states);
     
-    loc::Location stdloc = loc::Location::standardDeviation(*states);
+    loc::Location stdloc = loc::Location::standardDeviation(*_states);
     
-    for(State state: *states){
+    for(State state: *_states){
         double distance = [self computeDistanceBetweenState:state AndEdge:edge];
         distanceSum += distance;
     }
-    double distanceMean = distanceSum/states->size();
+    double distanceMean = distanceSum/_states->size();
     double v = fmax(distanceMean, sqrt(pow(stdloc.x(),2) + pow(stdloc.y(),2)))/6.0;
     
     NSLog(@"2D knnDist: %@, %.2f, %.2f, %.2f, %.2f", edgeID, v, distanceMean, stdloc.x(), stdloc.y());
@@ -330,25 +332,26 @@ using namespace loc;
 }
 
 
-std::shared_ptr<Location> meanLoc;
-std::shared_ptr<Pose> meanPose;
-std::shared_ptr<States> states;
-void calledWhenUpdated(Status * pStatus){
+void calledWhenUpdated(void *userData, Status * pStatus){
     //NSLog(@"location updated");
-    meanLoc = pStatus->meanLocation();
-    meanPose = pStatus->meanPose();
-    states = pStatus->states();
+    LocalizerData2 *localizerData = (LocalizerData2*)userData;
+    TwoDLocalizer *loc = localizerData->localizer;
+    
+    loc.meanLoc = pStatus->meanLocation();
+    loc.meanPose = pStatus->meanPose();
+    loc.states = pStatus->states();
     
     NSDictionary *data = @{
-                           @"x": @(meanLoc->x()),
-                           @"y": @(meanLoc->y()),
-                           @"z": @(meanLoc->z()),
-                           @"floor": @(meanLoc->floor()),
-                           @"orientation": @(meanPose->orientation()),
-                           @"velocity":@(meanPose->velocity())
+                           @"x": @(loc.meanLoc->x()),
+                           @"y": @(loc.meanLoc->y()),
+                           @"z": @(loc.meanLoc->z()),
+                           @"floor": @(loc.meanLoc->floor()),
+                           @"orientation": @(loc.meanPose->orientation()),
+                           @"velocity":@(loc.meanPose->velocity())
                            };
-    
+
     [[P2PManager sharedInstance] send:data withType:@"2d-position" ];
+    [loc sendStatusByP2P: *loc.localizer->getStatus()];
     
    // printf("2D %f, %f, %f, %f, %f\n", meanLoc->x(), meanLoc->y(), meanLoc->floor(), meanPose->orientation(), meanPose->velocity());
     //std::cout << meanLoc->toString() << std::endl;
@@ -402,8 +405,8 @@ void calledWhenUpdated(Status * pStatus){
     
     
     _localizer = new StreamParticleFilter();
-    
-    _localizer->updateHandler(calledWhenUpdated);
+    _userData.localizer = self;
+    _localizer->updateHandler(calledWhenUpdated, &_userData);
     
     int nStates = 1000;
     _localizer->numStates(nStates);
