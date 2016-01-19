@@ -82,10 +82,6 @@ static const float GyroDriftLimit = 3;
         NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:uuidStr];
         _beaconRegion = [[CLBeaconRegion alloc] initWithProximityUUID:uuid identifier:@"navcog"];
 
-        //[self startMotionSensor];
-        //[self startAccSensor];
-        //[self startBeaconSensor];
-        
         
         _dateFormatter = [[NSDateFormatter alloc] init];
         [_dateFormatter setDateFormat:@"yyyy-MM-dd-HH-mm-ss"];
@@ -136,6 +132,15 @@ static const float GyroDriftLimit = 3;
         accData[@"y"] = @(acc.acceleration.y);
         accData[@"z"] = @(acc.acceleration.z);
         
+        NSDictionary* env = [[NSProcessInfo processInfo] environment];
+        if ([[env valueForKey:@"autoacc"] isEqualToString:@"true"]) {
+            accData[@"x"] = @(arc4random_uniform(100)*0.01);
+            
+            if ([env valueForKey:@"simspeed"]) {
+                accData[@"timestamp"] = @(acc.timestamp*[[env valueForKey:@"simspeed"] doubleValue]);
+            }
+        }
+        
         [self triggerAccelerationWithData: accData];
     }];
 }
@@ -163,25 +168,6 @@ static const float GyroDriftLimit = 3;
     [_beaconManager stopRangingBeaconsInRegion:_beaconRegion];
 }
 
-- (void) setCurrentState: (NavState*) currentState
-{
-//    _currentState = currentState;
-    /*
-    if (_currentState.type == STATE_TYPE_WALKING) {
-        _currentEdge = currentState.walkingEdge;
-    } else {
-        _currentEdge = currentState.targetEdge;
-    }
-    _currentNode = currentState.targetNode;
-    _currentLocalizer = _currentEdge.localization;
-     */
-}
-
-- (void) setNavState:(enum NavigationState)navState
-{
-//    _navState = navState;
-}
-
 // callback for beacon manager when beacons have been found
 // if no location has been set yet, this will search the entire
 // map for the most probable location. After that it will only
@@ -197,13 +183,6 @@ static const float GyroDriftLimit = 3;
     for(NavLocalizer *localizer in [NavLocalizerFactory allCoreLocalizers]) {
         [localizer inputBeacons:beacons];
     }
-
-    // trigger locationUpdate
-    [self setLocationUpdated:@(YES)];
-//    [[NSNotificationCenter defaultCenter]
-//     postNotificationName:@LOCATION_UPDATED_NOTIFICATION_NAME
-//     object:self userInfo:nil];
-    
 
     NavLocation *location = [[NavLocation alloc] initWithMap:_topoMap];
     if (_currentLocation == nil) {
@@ -233,16 +212,12 @@ static const float GyroDriftLimit = 3;
     }
     [self updateCurrentLocation:location];
     
+    [self setLocationUpdated:@(YES)];
     
     // trigger debugCurrentLocation
     if (_currentLocation) {
         [self setDebugCurrentLocation:_currentLocation];
     }
-//    [[NSNotificationCenter defaultCenter]
-//     postNotificationName:@CURRENT_LOCATION_NOTIFICATION_NAME
-//     object:self
-//     userInfo:@{@"location": location}
-//     ];
 }
 
 - (void)updateCurrentLocation:(NavLocation *)location {
@@ -257,13 +232,13 @@ static const float GyroDriftLimit = 3;
             _currentEdge = nil;
         }
     }
+}
 
-//  redundant. TODO: to be removed
-//    [[NSNotificationCenter defaultCenter]
-//     postNotificationName:@CURRENT_LOCATION_NOTIFICATION_NAME
-//     object:self
-//     userInfo:@{@"location": location}
-//     ];
+- (void) initLocalizaion
+{
+    for(NavLocalizer* nl in [NavLocalizerFactory allCoreLocalizers]) {
+        [nl initializeState:@{@"allreset":@(true)}];
+    }
 }
 
 - (void)initLocalizationOnEdge:(NSString *)edgeID withOptions:(NSDictionary *)options
@@ -275,9 +250,7 @@ static const float GyroDriftLimit = 3;
 
 - (NavLocation *)getCurrentLocationWithInit: (BOOL) init {
     if (init) {
-        for(NavLocalizer* nl in [NavLocalizerFactory allCoreLocalizers]) {
-            [nl initializeState:@{@"allreset":@(true)}];
-        }
+        [self initLocalizaion];
     }
     
     NavLocation *r = [self getLocation:[NavLocalizerFactory allEdgeLocalizers] withKNNThreshold:1.0 withInit:NO];
@@ -418,9 +391,6 @@ static const float GyroDriftLimit = 3;
     // trigger orientationUpdated
     _currentOrientation = [NavUtil clipAngle2:_curOri - _gyroDrift];
     [self setOrientationUpdated:@(YES)];
-//    [[NSNotificationCenter defaultCenter]
-//     postNotificationName:@CURRENT_ORIENTATION_NOTIFICATION_NAME
-//     object:self userInfo:nil];
 
 }
 
@@ -550,27 +520,6 @@ static const float GyroDriftLimit = 3;
 {
     _logReplay = false;
 }
-
-
-/*
- 
- //TODO: this even used?
- - (void)triggerNextState {
- if (!(_logReplay)) {
- [_beaconManager stopRangingBeaconsInRegion:_beaconRegion];
- }
- _currentState = _currentState.nextState;
- if (_currentState != nil) {
- if (!(_logReplay)) {
- [_beaconManager startRangingBeaconsInRegion:_beaconRegion];
- }
- } else {
- [_delegate navigationFinished];
- [NavNotificationSpeaker speakWithCustomizedSpeed:NSLocalizedString(@"arrived", @"Spoken when you arrive at a destination")];
- [_topoMap cleanTmpNodeAndEdges];
- }
- }
- */
 
 
 @end;

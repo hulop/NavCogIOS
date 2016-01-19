@@ -227,7 +227,6 @@
             }
         }
         
-        dist += _extraEdgeLength;
         NSString *distFormat = NSLocalizedString([self isMeter]?@"meterFormat":@"feetFormat", @"Use to express a distance in feet");
         dist += _extraEdgeLength; // dist is distance to the target node
         // if you're walking, check distance to target node
@@ -276,7 +275,8 @@
                 }
                 _didApproaching = true;
                 return false;
-            } else if ((dist - _extraEdgeLength) <= 2 + threshold) {
+            }
+            if ((dist - _extraEdgeLength) <= 2 + threshold) {
                 if (_nextState != nil && _nextState.isCombined) {
                     // combined edge: copy current navigation status to next state
                     _nextState.preAnnounceDist = _preAnnounceDist;

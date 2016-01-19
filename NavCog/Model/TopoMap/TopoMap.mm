@@ -114,6 +114,7 @@ static const double FEET_IN_METER = 0.3048;
     _uuidString = [mapDataJson objectForKey:@"lastUUID"];
     _majoridString = [mapDataJson objectForKey:@"lastMajorID"];
     
+    [NavLocalizerFactory reset];    
     for (int i = 0; i < localizationsJson.count; i++) {
         NSDictionary *loc = [localizationsJson objectAtIndex:i];
         [NavLocalizerFactory createLocalizer:loc];

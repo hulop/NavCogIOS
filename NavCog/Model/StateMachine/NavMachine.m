@@ -358,12 +358,12 @@
     _speechEnabled = speechEnabled;
     _clickEnabled = clickEnabled;
 
-
-    //_currentLocationManager = [[NavCurrentLocationManager alloc] initWithTopoMap:topoMap withUUID:uuidstr];
-    //_currentLocationManager.currentMachine = self;
+    // init all localizer status
+    [_currentLocationManager initLocalizaion];
+    
+    // init sensors
     [_currentLocationManager startAccSensor];
     [_currentLocationManager startBeaconSensor];
-
 
     // search a path
     _topoMap = topoMap;
@@ -414,6 +414,9 @@
     // set UI type (speech and click sound)
     _speechEnabled = speechEnabled;
     _clickEnabled = clickEnabled;
+    
+    // init all localizer status
+    [_currentLocationManager initLocalizaion];
     
     // search a path
     _topoMap = topoMap;
