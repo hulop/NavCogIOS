@@ -199,7 +199,6 @@ static const float GyroDriftLimit = 3;
     }
 
     // trigger locationUpdate
-    [self setLocationUpdated:@(YES)];
 //    [[NSNotificationCenter defaultCenter]
 //     postNotificationName:@LOCATION_UPDATED_NOTIFICATION_NAME
 //     object:self userInfo:nil];
@@ -233,6 +232,7 @@ static const float GyroDriftLimit = 3;
     }
     [self updateCurrentLocation:location];
     
+    [self setLocationUpdated:@(YES)];
     
     // trigger debugCurrentLocation
     if (_currentLocation) {
