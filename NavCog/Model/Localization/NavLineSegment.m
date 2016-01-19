@@ -70,6 +70,11 @@
     return distance;
 }
 
+- (double) length
+{
+    return sqrt(pow(_point1.x - _point2.x,2)+pow(_point1.y - _point2.y, 2));
+}
+
 @end
 
 

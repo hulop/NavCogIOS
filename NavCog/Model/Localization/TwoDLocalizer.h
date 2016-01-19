@@ -33,6 +33,7 @@
 
 @property loc::StreamParticleFilter *localizer;
 
+- (instancetype) initWithID: (NSString*) idStr;
 - (void)initializeWithJSON:(NSDictionary *)json;
 - (double) computeDistanceScoreWithOptions:(NSDictionary *)options;
 

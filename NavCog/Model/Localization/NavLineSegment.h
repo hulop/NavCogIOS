@@ -42,6 +42,7 @@
 - (id) initWithPoint1:(Nav2DPoint*) point1 Point2:(Nav2DPoint*) point2;
 - (Nav2DPoint*) getNearestPointOnLineSegmentFromPoint: (Nav2DPoint*) p;
 - (double) getDistanceNearestPointOnLineSegmentFromPoint: (Nav2DPoint*) p;
+- (double) length;
 
 @end
 

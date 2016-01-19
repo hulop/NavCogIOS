@@ -68,6 +68,8 @@ using namespace loc;
 @property NSArray *previousBeaconInput;
 @property NavLocalizeResult *result;
 
+@property long previousTimestamp;
+
 @end
 
 @implementation TwoDLocalizer
@@ -80,12 +82,23 @@ using namespace loc;
 - (id) init
 {
     self = [super init];
+    [self initDebug];
+    return self;
+}
+
+- (instancetype) initWithID: (NSString*) idStr
+{
+    self = [super initWithID: idStr];
+    [self initDebug];
+    return self;
+}
+
+- (void) initDebug {
     NSDictionary* env = [[NSProcessInfo processInfo] environment];
     self.p2pDebug = false;
     if ([[env valueForKey:@"p2pdebug"] isEqual:@"true"]) {
         self.p2pDebug = true;
     }
-    return self;
 }
 
 - (void)initializeState:(NSDictionary *)options;
@@ -234,10 +247,10 @@ using namespace loc;
 
 - (void)inputAcceleration:(NSDictionary *)data
 {
-    static long previousTimestamp = -1;
+    
     long timestamp = [data[@"timestamp"] doubleValue]*1000;
     
-    if(timestamp!=previousTimestamp){
+    if(timestamp!=_previousTimestamp){
     
     Acceleration acc = Acceleration([data[@"timestamp"] doubleValue]*1000,
                                     [data[@"x"] doubleValue ],
@@ -247,7 +260,7 @@ using namespace loc;
     //NSLog(@"input acc");
     _localizer->putAcceleration(acc);
     }
-    previousTimestamp = timestamp;
+    _previousTimestamp = timestamp;
 }
 
 - (void) inputMotion: (NSDictionary*) data
@@ -490,6 +503,8 @@ void calledWhenUpdated(Status * pStatus){
     poseProperty.minVelocity(0.1);
     poseProperty.maxVelocity(1.5);
     poseProperty.stdOrientation(3.0/180.0*M_PI);
+    poseProperty.stdX(2.0);
+    poseProperty.stdY(2.0);
     
     stateProperty.meanRssiBias(0.0);
     stateProperty.stdRssiBias(0.2);

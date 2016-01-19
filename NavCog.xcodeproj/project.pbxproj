@@ -28,6 +28,9 @@
 		7ED823171C205DD60003841D /* NavEdgeLocalizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7ED823161C205DD60003841D /* NavEdgeLocalizer.m */; };
 		7EDED7861C04ACC800D5EEB9 /* NavLocalizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EDED7851C04ACC800D5EEB9 /* NavLocalizer.m */; };
 		7EDED7891C04AD0C00D5EEB9 /* NavLocalizerFactory.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7EDED7881C04AD0C00D5EEB9 /* NavLocalizerFactory.mm */; };
+		7EEB5E531C2302F000914FD4 /* OneDLocalizer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7EEB5E521C2302F000914FD4 /* OneDLocalizer.mm */; };
+		7EEB5E781C23220E00914FD4 /* corridor.png in Resources */ = {isa = PBXBuildFile; fileRef = 7EEB5E771C23220E00914FD4 /* corridor.png */; };
+		7EEB5E7A1C2390D900914FD4 /* white.png in Resources */ = {isa = PBXBuildFile; fileRef = 7EEB5E791C2390D900914FD4 /* white.png */; };
 		7EEFB5591C1E430F00822E14 /* NavI18nUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EEFB5581C1E430F00822E14 /* NavI18nUtil.m */; };
 		A02EFF811BBC41740026DC98 /* click.wav in Resources */ = {isa = PBXBuildFile; fileRef = A02EFF7C1BBC41740026DC98 /* click.wav */; };
 		A06736781BC575360008B818 /* NavCogMapView in Resources */ = {isa = PBXBuildFile; fileRef = A06736771BC575360008B818 /* NavCogMapView */; };
@@ -100,6 +103,10 @@
 		7EDED7851C04ACC800D5EEB9 /* NavLocalizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NavLocalizer.m; path = NavCog/Model/Localization/NavLocalizer.m; sourceTree = SOURCE_ROOT; };
 		7EDED7871C04AD0C00D5EEB9 /* NavLocalizerFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NavLocalizerFactory.h; path = NavCog/Model/Localization/NavLocalizerFactory.h; sourceTree = SOURCE_ROOT; };
 		7EDED7881C04AD0C00D5EEB9 /* NavLocalizerFactory.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = NavLocalizerFactory.mm; path = NavCog/Model/Localization/NavLocalizerFactory.mm; sourceTree = SOURCE_ROOT; };
+		7EEB5E511C2302F000914FD4 /* OneDLocalizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OneDLocalizer.h; path = NavCog/Model/Localization/OneDLocalizer.h; sourceTree = SOURCE_ROOT; };
+		7EEB5E521C2302F000914FD4 /* OneDLocalizer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = OneDLocalizer.mm; path = NavCog/Model/Localization/OneDLocalizer.mm; sourceTree = SOURCE_ROOT; };
+		7EEB5E771C23220E00914FD4 /* corridor.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = corridor.png; path = NavCog/Model/Localization/corridor.png; sourceTree = SOURCE_ROOT; };
+		7EEB5E791C2390D900914FD4 /* white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = white.png; path = NavCog/Model/Localization/white.png; sourceTree = SOURCE_ROOT; };
 		7EEB5E7B1C23F7B500914FD4 /* NavigationState.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NavigationState.h; path = NavCog/Model/StateMachine/NavigationState.h; sourceTree = SOURCE_ROOT; };
 		7EEFB5571C1E430F00822E14 /* NavI18nUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NavI18nUtil.h; path = NavCog/Model/TopoMap/NavI18nUtil.h; sourceTree = SOURCE_ROOT; };
 		7EEFB5581C1E430F00822E14 /* NavI18nUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NavI18nUtil.m; path = NavCog/Model/TopoMap/NavI18nUtil.m; sourceTree = SOURCE_ROOT; };
@@ -352,6 +359,10 @@
 				7E908E211C1674C400CD7F36 /* TwoDFloorLocalizer.mm */,
 				FB4791671C21320200E80EFD /* NavLineSegment.h */,
 				FB4791651C2131D600E80EFD /* NavLineSegment.m */,
+				7EEB5E511C2302F000914FD4 /* OneDLocalizer.h */,
+				7EEB5E521C2302F000914FD4 /* OneDLocalizer.mm */,
+				7EEB5E791C2390D900914FD4 /* white.png */,
+				7EEB5E771C23220E00914FD4 /* corridor.png */,
 			);
 			name = Localization;
 			sourceTree = "<group>";
@@ -462,8 +473,10 @@
 				23E77D4F1BE1ADB600625020 /* Localizable.strings in Resources */,
 				2365BC791BE1802D007F14C3 /* NavCogChooseMapViewController.xib in Resources */,
 				A06736B81BC577050008B818 /* Images.xcassets in Resources */,
+				7EEB5E7A1C2390D900914FD4 /* white.png in Resources */,
 				2365BC7F1BE1808C007F14C3 /* NavCogHelpPageViewController.xib in Resources */,
 				B4048C571C11DEE500634A15 /* NavCogChooseLogViewController.xib in Resources */,
+				7EEB5E781C23220E00914FD4 /* corridor.png in Resources */,
 				2365BC741BE17ECC007F14C3 /* NavCogMainViewController.xib in Resources */,
 				2365BC7C1BE18079007F14C3 /* NavCogDataSamplingViewController.xib in Resources */,
 				A06736781BC575360008B818 /* NavCogMapView in Resources */,
@@ -528,6 +541,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7ED8230E1C1FF5690003841D /* NavState.mm in Sources */,
+				7EEB5E531C2302F000914FD4 /* OneDLocalizer.mm in Sources */,
 				7E78834E1C15042E00AB19A9 /* NavCogChooseLogViewController.m in Sources */,
 				A067369F1BC576B80008B818 /* AppDelegate.mm in Sources */,
 				7E60021B1C075EF2007A9B2B /* NavUtil.m in Sources */,
@@ -735,6 +749,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COMPRESS_PNG_FILES = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SOURCE_ROOT)",
@@ -758,6 +773,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COMPRESS_PNG_FILES = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SOURCE_ROOT)",

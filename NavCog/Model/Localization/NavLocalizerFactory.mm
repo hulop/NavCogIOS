@@ -22,6 +22,7 @@
 
 #import "NavLocalizerFactory.h"
 #import "KDTreeLocalization.h"
+#import "OneDLocalizer.h"
 #import "TwoDLocalizer.h"
 #import "TwoDFloorLocalizer.h"
 #import "NavEdgeLocalizer.h"
@@ -70,6 +71,9 @@ static const NSMutableDictionary *edgeLocalizers = [[NSMutableDictionary alloc] 
         if (edgeInfo.edgeID) {
             NavEdgeLocalizer *nel = [[NavEdgeLocalizer alloc] initWithLocalizer:nl withEdgeInfo:edgeInfo];
             [edgeLocalizers setObject:nel forKey:edgeInfo.edgeID];
+            if (options[@"beacons"]) {
+                [nel setBeacons:options[@"beacons"]];
+            }
             return nel;
         }
         return nl;
@@ -110,6 +114,17 @@ static const NSMutableDictionary *edgeLocalizers = [[NSMutableDictionary alloc] 
     [loc initializeWithAbsolutePath:path];
     
     if (idStr) {
+        [navLocalizers setObject:loc forKey:idStr];
+    }
+    return loc;
+}
+
++ (NavLocalizer*) create1D_PF_PDR_LocalizerForID:(NSString*) idStr FromFile:(NSString*)path
+{
+    OneDLocalizer *loc = [[OneDLocalizer alloc] initWithID:idStr];
+    [loc initializeWithFile: path];
+    
+    if (idStr && loc) {
         [navLocalizers setObject:loc forKey:idStr];
     }
     return loc;

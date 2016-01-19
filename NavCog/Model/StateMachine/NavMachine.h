@@ -55,6 +55,7 @@
 - (void)announceAccessibilityInfo;
 - (NSArray *)getPathNodes;
 - (NavState*)getWalkingState;
+- (NavState*)getCurrentState;
 - (NavCurrentLocationManager*) getCurrentLocationManager;
 
 @property (strong, nonatomic) id <NavMachineDelegate> delegate;

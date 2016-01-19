@@ -50,6 +50,8 @@ UIKIT_EXTERN float TopoMapUnit; // base unit is feet (1 = 1 foot = 0.3048 meter)
 
 + (float) unit2feet:(float)value;
 + (float) feet2unit:(float)value;
++ (float) unit2meter:(float)value;
++ (float) meter2unit:(float)value;
 
 - (NavNode *)getNodeFromLayer:(NSString *)layerID withNodeID:(NSString *)nodeID;
 - (NavEdge *)getEdgeFromLayer:(NSString *)layerID withEdgeID:(NSString *)edgeID;

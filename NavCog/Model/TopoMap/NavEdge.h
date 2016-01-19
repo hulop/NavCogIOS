@@ -75,8 +75,8 @@ enum EdgeType {EDGE_NORMAL, EDGE_NON_NAVIGATIONAL};
 - (NavNode *)checkValidEndNodeAtLocation:(NavLocation *)location;
 - (NavEdge *)clone;
 
-- (void) inputAcceleration: (NSDictionary*) data;
-- (void) inputMotion: (NSDictionary*) data;
+//- (void) inputAcceleration: (NSDictionary*) data;
+//- (void) inputMotion: (NSDictionary*) data;
 
 
 @end

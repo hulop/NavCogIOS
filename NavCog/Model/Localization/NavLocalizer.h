@@ -28,6 +28,10 @@
 
 @interface NavLocalizer : NSObject
 
+@property (readonly) NSString *idStr;
+
+- (instancetype) initWithID:(NSString*) idStr;
+
 - (void) initializeState:(NSDictionary*) options;
 - (void) inputBeacons: (NSArray *) beacons;
 - (void) inputAcceleration: (NSDictionary*) data;

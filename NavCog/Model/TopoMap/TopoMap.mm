@@ -46,7 +46,8 @@
 
 @implementation TopoMap
 
-float TopoMapUnit = 1.0;
+float TopoMapUnit = 1.0;  // 1 = 1 foot
+static const float FEET_IN_METER = 0.3048;
 
 
 + (float)unit2feet:(float)value
@@ -57,6 +58,16 @@ float TopoMapUnit = 1.0;
 + (float)feet2unit:(float)value
 {
     return value/TopoMapUnit;
+}
+
++ (float)unit2meter:(float)value
+{
+    return value*TopoMapUnit*FEET_IN_METER;
+}
+
++ (float)meter2unit:(float)value
+{
+    return value/TopoMapUnit/FEET_IN_METER;
 }
 
 - (NSString *)getUUIDString {
@@ -89,6 +100,11 @@ float TopoMapUnit = 1.0;
     if ([mapDataJson[@"unit"] isEqualToString:UNIT_METER]) {
         TopoMapUnit = 1.0/0.3048;
     } // otherwise 1.0
+    
+    BOOL advanced = false;
+    if (mapDataJson[@"isAdvanced"]) {
+        advanced = [mapDataJson[@"isAdvanced"] boolValue];
+    }
     
     NSString *language = [NavI18nUtil getPreferredLanguage:[mapDataJson objectForKey:@"languages"]];
     NSLog(@"%@ is selected", language);
@@ -126,6 +142,9 @@ float TopoMapUnit = 1.0;
             [node.infoFromEdges addEntriesFromDictionary:[nodeJson objectForKey:@"infoFromEdges"]];
             node.transitInfo = [nodeJson objectForKey:@"transitInfo"];
             node.transitKnnDistThres = ((NSNumber *)[nodeJson objectForKey:@"knnDistThres"]).floatValue;
+            if (advanced) {
+                node.transitKnnDistThres = 1.0;
+            }
             node.transitPosThres = ((NSNumber *)[nodeJson objectForKey:@"posDistThres"]).floatValue;
 //            node.transitKnnDistThres = MAX(1.0, node.transitKnnDistThres);
 //            node.transitPosThres = MAX(10, node.transitPosThres);
@@ -159,14 +178,16 @@ float TopoMapUnit = 1.0;
             NavLightEdge* edgeInfo = [[NavLightEdge alloc] initWithEdge:edge];
             [[NavLightEdgeHolder sharedInstance] appendNavLightEdge:edgeInfo];
             
-            if (!idStr) {
+            NSMutableDictionary *temp = [edgeJson mutableCopy];
+            temp[@"beacons"] = layerJson[@"beacons"]; // for 1D PDR
+            if (!idStr || !advanced) {
                 NSString *path = [NavUtil createTempFile:[edgeJson objectForKey:@"dataFile"] forID:&idStr];
                 [NavLocalizerFactory create1D_KNN_LocalizerForID:idStr FromFile:path];
-            } else {
+            } else { // for localizers with PDR
                 edge.minKnnDist = 0;
                 edge.maxKnnDist = 1;                
             }
-            [NavLocalizerFactory localizerForID:idStr withEdgeInfo:edgeInfo andOptions:edgeJson];
+            [NavLocalizerFactory localizerForID:idStr withEdgeInfo:edgeInfo andOptions:temp];
             
             
             edge.info1 = [edgeJson objectForKey:[NavI18nUtil key:@"infoFromNode1" lang:language]];

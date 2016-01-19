@@ -32,4 +32,6 @@
 
 - (NavEdgeLocalizer*) cloneWithEdgeInfo: (NavLightEdge*) edgeInfo;
 
+- (void) setBeacons: (NSDictionary*) beacons;
+
 @end

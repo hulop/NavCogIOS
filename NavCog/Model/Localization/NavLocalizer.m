@@ -25,6 +25,13 @@
 
 @implementation NavLocalizer
 
+- (instancetype) initWithID: (NSString*) idStr
+{
+    self = [super init];
+    _idStr = idStr;
+    return self;
+}
+
 - (void)initializeState:(NSDictionary*) options
 {
     [NSException raise:NSInternalInconsistencyException

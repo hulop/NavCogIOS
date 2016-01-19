@@ -69,7 +69,7 @@
     r2.y = p2.y;
     r2.knndist = r.knndist;
     
-    NSLog(@"%@ %f %f %f %f %f", _edgeInfo.edgeID, r.x, r.y, r2.x, r2.y, r2.knndist);
+    //NSLog(@"%@ %f %f %f %f %f", _edgeInfo.edgeID, r.x, r.y, r2.x, r2.y, r2.knndist);
     
     return r2;
 }
@@ -96,5 +96,26 @@
     return [_parent computeDistanceScoreWithOptions:newDict];
 }
 
+- (void) setBeacons:(NSDictionary *)beacons
+{
+    if (!beacons) return;
+    if ([_parent respondsToSelector:@selector(setBeacons:)]) {
+        NSMutableDictionary *beaconsCopy = [@{} mutableCopy];
+        for (NSString* key in beacons) {
+            NSDictionary *beacon = beacons[key];
+            if (beacon[@"infoFromEdges"] && beacon[@"infoFromEdges"][_edgeInfo.edgeID]) {
+                NSDictionary *info = beacon[@"infoFromEdges"][_edgeInfo.edgeID];
+                [beaconsCopy setObject:@{
+                                         @"uuid": beacon[@"uuid"],
+                                         @"major": beacon[@"major"],
+                                         @"minor": beacon[@"minor"],
+                                         @"x": info[@"x"],
+                                         @"y": info[@"y"]
+                                         } forKey:key];
+            }
+        }
+        [_parent performSelector:@selector(setBeacons:) withObject:beaconsCopy];
+    }
+}
 
 @end

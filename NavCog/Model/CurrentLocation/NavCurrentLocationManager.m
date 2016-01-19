@@ -370,15 +370,20 @@ static const float GyroDriftLimit = 3;
 
 - (void)triggerAccelerationWithData: (NSMutableDictionary*) data {
     [NavLog logAcc:data];
-    for(NavLocalizer *localizer in [NavLocalizerFactory allCoreLocalizers]) {
-        [localizer inputAcceleration:data];
+    if ([_currentMachine getCurrentState]) {
+        NSString *edgeID = [[[_currentMachine getCurrentState] walkingEdge] edgeID];
+        NavEdgeLocalizer *nel = [NavLocalizerFactory localizerForEdge:edgeID];
+        [nel inputAcceleration:data];
     }
 }
 
 - (void)triggerMotionWithData: (NSMutableDictionary*) data {
     [NavLog logMotion:data];
-    for(NavLocalizer *localizer in [NavLocalizerFactory allCoreLocalizers]) {
-        [localizer inputMotion:data];
+    
+    if ([_currentMachine getCurrentState]) {
+        NSString *edgeID = [[[_currentMachine getCurrentState] walkingEdge] edgeID];
+                NavEdgeLocalizer *nel = [NavLocalizerFactory localizerForEdge:edgeID];
+        [nel inputMotion:data];
     }
     
     NSNumber* yaw = [data objectForKey:@"yaw"];    
