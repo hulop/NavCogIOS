@@ -27,6 +27,8 @@
 #import "NavMapManager.h"
 #define NAVCOG_ROOT @"https://navcog.mybluemix.net"
 
+#define NAVCOG_ERROR_URL_NOT_FOUND 1
+
 @interface NavMapManager ()
 
 @property (strong, nonatomic) NSMutableDictionary *mapDict;
@@ -160,6 +162,7 @@
             [_mapDict setObject:mapJson forKey:mapName];
             [_mapNameList addObject:mapName];
         }
+        [self loadMapListWithName:@"PrivateMapList"];
         
         [_delegate mapListUpdated:_mapNameList withError:nil];
     }];
@@ -173,6 +176,14 @@
     }
     NSFileManager *fm = [NSFileManager defaultManager];
     if (![fm fileExistsAtPath:[self getPathInDocumentDirForMapWithName:mapName]]) {
+        if (!mapJson[@"url"]) {
+            NSError *error = [NSError errorWithDomain:@"NavCogError"
+                                                 code:NAVCOG_ERROR_URL_NOT_FOUND
+                                             userInfo:@{NSLocalizedDescriptionKey:NSLocalizedString(@"urlNotFoundError",@"error message when map url is not specified")}];
+            [_delegate topoMapLoaded:nil withMapDataString:nil withError:error];
+            return;
+        }
+        
         NSURL *mapURL = [NSURL URLWithString:[mapJson objectForKey:@"url"]];
         NSURLSession *session =
         [NSURLSession
@@ -243,6 +254,12 @@ didFinishDownloadingToURL:(NSURL *)location
     TopoMap *topoMap = [[TopoMap alloc] init];
     NSString *dataStr = [topoMap initializaWithFile:[self getPathInDocumentDirForMapWithName:_loadingMapName]];
     [_delegate topoMapLoaded:topoMap withMapDataString:dataStr withError:nil];
+}
+
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
+{
+    NSLog(@"downloading has error");
+    [_delegate topoMapLoaded:nil withMapDataString:nil withError:error];
 }
 
 
