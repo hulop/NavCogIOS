@@ -1,0 +1,36 @@
+/* Class = "UISwitch"; accessibilityLabel = "Speech"; ObjectID = "3fn-P2-Sz5"; */
+"3fn-P2-Sz5.accessibilityLabel" = "読上げ";
+
+/* Class = "UILabel"; text = "/   Click:"; ObjectID = "8d3-Bj-pJV"; */
+"8d3-Bj-pJV.text" = "/ 効果音:";
+
+/* Class = "UIButton"; normalTitle = "Choose Map"; ObjectID = "FR2-U3-EB5"; */
+"FR2-U3-EB5.normalTitle" = "地図選択";
+
+/* Class = "UILabel"; text = "Options"; ObjectID = "LtO-iw-2hi"; */
+"LtO-iw-2hi.text" = "オプション";
+
+/* Class = "UIButton"; normalTitle = "Get Data"; ObjectID = "P9j-yz-NDt"; */
+"P9j-yz-NDt.normalTitle" = "データ取得";
+
+/* Class = "UIButton"; normalTitle = "Replay log"; ObjectID = "zFh-rv-7Em"; */
+"zFh-rv-7Em.normalTitle" = "ログ再生";
+
+/* Class = "UISegmentedControl"; PK7-RU-nau.segmentTitles[0] = "Normal"; ObjectID = "PK7-RU-nau"; */
+"PK7-RU-nau.segmentTitles[0]" = "通常";
+
+/* Class = "UISegmentedControl"; PK7-RU-nau.segmentTitles[1] = "Fast"; ObjectID = "PK7-RU-nau"; */
+"PK7-RU-nau.segmentTitles[1]" = "高速";
+
+/* Class = "UILabel"; text = "Speech Rate:"; ObjectID = "VHu-cc-MQa"; */
+"VHu-cc-MQa.text" = "読上げ速度:";
+
+/* Class = "UILabel"; text = "Speech:"; ObjectID = "ZuU-l0-l4h"; */
+"ZuU-l0-l4h.text" = "読上げ:";
+
+/* Class = "UISwitch"; accessibilityLabel = "Click "; ObjectID = "hCQ-P5-x8I"; */
+"hCQ-P5-x8I.accessibilityLabel" = "効果音 ";
+
+/* Class = "UIButton"; normalTitle = "Help"; ObjectID = "vgl-0E-SXC"; */
+"vgl-0E-SXC.normalTitle" = "ヘルプ";
+

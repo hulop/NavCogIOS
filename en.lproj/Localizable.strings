@@ -1,0 +1,181 @@
+/*******************************************************************************
+ * Copyright (c) 2014, 2015  IBM Corporation, Carnegie Mellon University and others
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *******************************************************************************/
+
+/* Alert that an accessibility notification is available */
+"accessNotif" = "Accessibily Notification!";
+
+/* HTML Label for accessibility instruction button in view */
+"accessibilityInstructionButton" = "Accessbility
+Instruction";
+
+/* Simple and used to join two nodes. */
+"and" = "and ";
+
+/* Used to join two instructions */
+"andFormat" = "%@ and %@";
+
+/* Spoken when approaching specific nodes */
+"approaching" = "approaching";
+
+/* Format string to tell the user they are approaching a turn */
+"approachingToTurnFormat" = "Approaching to %@";
+
+/* Spoken when you arrive at a destination */
+"arrived" = "You Arrived!";
+
+/* Format string describes the floor you are currently on */
+"currentlyOnFormat" = ".. you are currently on %@";
+
+/* Current Location */
+"currentLocation" = "Current Location";
+
+/* Destination alert */
+"destination" = "That's your destination.. ";
+
+/* Format string for destination alert */
+"destinationFormat" = "%@.. That's your destination.. ";
+
+/* Label shown when map list is downloading */
+"downloadingMapList" = "Downloading Map List";
+
+/* Spoken when entering a location */
+"enteringFormat" = ".. Entering %@..";
+
+/* A unit of distance in feet */
+"feet" = "feet";
+
+/* Use to express a distance in feet */
+"feetFormat" = "%d feet";
+
+/* Use to express a distance in feet with a pause */
+"feetPauseFormat" = "%d feet ..";
+
+/* format string describing the number of feet left to a named location */
+"feetToNameFormat" = "%d feet to %@..";
+
+/* (No Commment) */
+"feetWithPauseFormat" = "%d feet..";
+
+/* A unit of distance in meter */
+"meter" = "meters";
+
+/* Use to express a distance in meter */
+"meterFormat" = "%d meters";
+
+/* Use to express a distance in meter with a pause */
+"meterPauseFormat" = "%d meters ..";
+
+/* format string describing the number of meter left to a named location */
+"meterToNameFormat" = "%d meters to %@..";
+
+/* Format string for a floor that takes an ordinal number */
+"floorFormat" = "the %@ floor.. ";
+
+/* Label for the source location picker */
+"fromLabel" = "From:";
+
+/* Short command telling the user to go downstairs */
+"goDownstairs" = "Go downstairs..";
+
+/* Command telling the user to go downstairs using the elevator */
+"goDownstairsElevator" = "Go downstairs by elevator";
+
+/* Command telling the user to go down the stairs using the stair case */
+"goDownstairsStairCase" = "Go downstairs using the stair case.. ";
+
+/* Short command telling the user to go upstairs */
+"goUpstairs" = "Go upstairs..";
+
+/* Command telling the user to go upstairs using the elevator */
+"goUpstairsElevator" = "Go upstairs by elevator";
+
+/* Command telling the user to go up the stairs using the stair case */
+"goUpstairsStairCase" = "Go upstairs using the stair case.. ";
+
+/* Button to initialize orientation */
+"initOrientationButton" = "Initialize Orientation";
+
+/* Instruction to keep straight */
+"keepStraight" = "keep straight.. ";
+
+/* Indicator text shown while a map is loading */
+"loadingMap" = "Loading Map...";
+
+/* Format string for map downloading progress indicator */
+"mapProgressFormat" = "%.0f%% loaded";
+
+/* Spoken when no information is available */
+"noInformation" = "No information available";
+
+/* HTML Label for previous instruction button in view */
+"previousInstructionButton" = "Previous
+Instruction";
+
+/* Indication text shown while a map is being processed */
+"processingMap" = "Processing Map...";
+
+/* Instruction to turn slightly left */
+"slightLeft" = "slight left.. ";
+
+/* Instruction to turn slightly right */
+"slightRight" = "slight right.. ";
+
+/* Button to start navigation */
+"startNavigationButton" = "Start Navigation";
+
+/* HTML Label for stop navigation button in view */
+"stopNavigationButton" = "Stop
+Navigation";
+
+/* HTML Label for surrounding information button in view */
+"surroundingInformationButton" = "Surrounding
+Information";
+
+/* Command telling the user take the elevator downstairs */
+"takeDownstairsElevator" = "Take the elevator to downstairs.. ";
+
+/* Format string for taking the elevator */
+"takeElevatorFormat" = ".. Take the elevator to %@";
+
+/* Format string for taking the stairs */
+"takeStairsFormat" = ".. Take stairs to %@";
+
+/* Command telling the user take the elevator upstairs */
+"takeUpstairsElevator" = "Take the elevator to upstairs.. ";
+
+/* Label for the destination location picker */
+"toLabel" = "To:";
+
+/* Instruction to turn left */
+"turnLeft" = "turn left.. ";
+
+/* Format string to turn left in degrees */
+"turnLeftDegreeFormat" = "turn left for %d degrees.. ";
+
+/* Instruction to turn right */
+"turnRight" = "turn right.. ";
+
+/* Format string to turn right in degrees */
+"turnRightDegreeFormat" = "turn right for %d degrees.. ";
+
+/* URL of help page */
+"helpPageURL" = "https://navcog.mybluemix.net/help/index.html";

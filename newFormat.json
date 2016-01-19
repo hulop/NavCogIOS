@@ -1,0 +1,246 @@
+{
+  "uiinfo-comment": "data for the map editor user interface",
+  "uiinfo": {
+    "centerLat": 40.44362291606071,
+    "centerLng": -79.94512259960175,
+    "zoom": 21
+  },
+
+  "uuidmap-comment": "for human readability. uuid(name) should be replaced",
+  "uuidmap": {
+    "LYR1": "54badb1c-fdcd-44d0-a82b-64c4e43d6c4f",
+    "BLD1": "4d20fcd1-f858-4c20-af44-21b26edda134",
+    "RGN1": "dfb14e4d-e3ea-4946-8359-9e4c0ccfe2da",
+    "LOC1": "de7c868d-b381-47be-974c-a0e80b134b32",
+    "LOC2": "21535b64-2160-44e5-b7fd-706a0e60a436",
+    "NOD1": "74e3fcc8-8259-4f1d-a591-de3715938115",
+    "NOD2": "d2c9e774-861f-4268-8650-452b5aa1a202",
+    "NOD3": "1a78d13e-dd15-4114-827e-086b3dd1ea27",
+    "EDG1": "85950df1-ece2-4678-89aa-c7c3ba36f232",
+    "EDG2": "c45e9dbe-3d05-4068-9c8a-2606682a0b77",
+    "BCN1": "371c13a4-837d-4826-b532-73909261649b",
+    "POI1": "8fe347a1-22d5-4c39-baee-cf893f263d0b",
+    "DAT1": "8c991767-5f5f-44e4-9525-4afd35fe2b8b",
+    "DAT2": "0c89d4da-4ff0-482f-8a04-c5bec1a18ffe",
+    "DAT3": "7e327798-7fae-45cf-b41f-f794fd862897"
+  },
+
+  "general-comment1": "Properties are flat. Hierarchy is represented by ID refs.
+  layers
+  buildings
+  regions(layer, [building])
+  nodes(layer, [region])
+  edges(node1, node2, localization)
+  localizations(layer, [region], data)
+  beacons(layer, [region])
+  pois(layer, [region])
+  data
+  ",
+  "layers": [
+    {
+      "id": "uuid(LYR1)",
+      "name": "name",
+      "z-index": "1"
+    }
+  ],
+  "buildings": [
+    {
+      "id": "uuid(BLD1)",
+      "name": "main"
+    }
+  ],
+  "regions-comment": "a region has a floor plan image",
+  "regions": [
+    {
+      "layerID": "uuid(LYR1)",
+      "buildingID": "uuid(BLD1)",
+      "floor": 0,
+      "id": "uuid(RGN1)",
+      "name": "test",
+      "image": "data(DAT1)",
+      "lat": 35.66279617738784,
+      "lng": 139.7979636490345,
+      "ppm": 16,
+      "rotate": 0
+    }
+  ],
+  "localizations": [
+    {
+      "layerID": "uuid(LYR1)",
+      "id": "uuid(LOC1)",
+      "type": "1D-KNN",
+      "data": "data(DAT2)",
+      "minKnnDist": 0,
+      "maxKnnDist": 0,
+      "uuid": "d947e459-63d8-47a5-9654-534850af97bd",
+      "major": 1
+    },
+    {
+      "id": "uuid(LOC2)",
+      "type": "1D-KNN",
+      "data": "data(DAT3)",
+      "minKnnDist": 0,
+      "maxKnnDist": 0,
+      "uuid": "d947e459-63d8-47a5-9654-534850af97bd",
+      "major": 1
+    }
+  ],
+  "nodes": [
+    {
+      "layerID": "uuid(LYR1)",
+      "regionID": "uuid(RGN1)",
+      "floor": 0,
+      "id": "uuid(NOD1)",
+      "name": "",
+      "type": 0,
+      "lat": 40.44343052507256,
+      "lng": -79.94537808001041,
+      "infoFromEdges": [
+        {
+          "edgeID": "UUID(EDG1)",
+          "info": "",
+          "destInfo": "",
+          "beTricky": false,
+          "trickyInfo": ""
+        }
+      ],
+      "transitInfo": [
+        {
+          "nodeID": "uuid(NOD3)",
+          "info": "",
+          "knnDistThres": 0.1,
+          "posDistThres": 5
+        }
+      ]
+    },
+    {
+      "layerID": "uuid(LYR1)",
+      "regionID": "uuid(RGN1)",
+      "floor": 0,
+      "id": "uuid(NOD2)",
+      "name": "",
+      "type": 0,
+      "lat": 40.44344277279112,
+      "lng": -79.9451856315136,
+      "infoFromEdges": [
+        {
+          "edgeID": "uuid(EDG1)",
+          "info": "",
+          "destInfo": "",
+          "beTricky": false,
+          "trickyInfo": ""
+        },
+        {
+          "edgeID": "uuid(EDG2)",
+          "info": "",
+          "destInfo": "",
+          "beTricky": false,
+          "trickyInfo": ""
+        }
+      ],
+      "transitInfo": [
+      ]
+    },
+    {
+      "layerID": "uuid(LYR1)",
+      "regionID": "uuid(RGN1)",
+      "floor": 0,
+      "id": "uuid(NOD3)",
+      "name": "",
+      "type": 0,
+      "lat": 40.44357443562489,
+      "lng": -79.945213124156,
+      "infoFromEdges": [
+        {
+          "edgeID": "uuid(EDG2)",
+          "info": "",
+          "destInfo": "",
+          "beTricky": false,
+          "trickyInfo": ""
+        }
+      ],
+      "transitInfo": [
+        {
+          "nodeID": "uuid(NOD1)",
+          "info": "",
+          "knnDistThres": 0.1,
+          "posDistThres": 5
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "node1ID": "uuid(NOD1)",
+      "node2ID": "uuid(NOD2)",
+      "localizationID": "uuid(LOC1)",
+      "id": "uuid(EDG1)",
+      "path": [
+        [0,0], [10,0]
+      ],
+      "orientation": [
+        0
+      ],
+      "infoFromNode1": "",
+      "infoFromNode2": ""
+    },
+    {
+      "layerID": "uuid(LYR1)",
+      "node1ID": "uuid(NOD2)",
+      "node2ID": "uuid(NOD3)",
+      "localizationID": "uuid(LOC2)",
+      "id": "uuid(EDG2)",
+      "path":[
+        [10, 0], [10, 5], [7.5, 10]
+      ],
+      "orientation":[
+        -90, -60
+      ],
+      "infoFromNode1": "",
+      "infoFromNode2": ""
+    }
+  ],
+
+  "beacons": [
+    {
+      "layerID": "uuid(LYR1)",
+      "regionID": "uuid(RGN1)",
+      "id": "uuid(BCN1)",
+      "uuid": "d947e459-63d8-47a5-9654-534850af97bd",
+      "major": 1,
+      "minor": 1,
+      "lat": 40.44369231957116,
+      "lng": -79.94524262845516,
+      "note": "",
+    }
+  ],
+
+  "pois": [
+      {
+        "layerID": "uuid(LYR1)",
+        "regionID": "uuid(RGN1)",
+        "id": "uuid(POI1)",
+        "name": "",
+        "info": ""
+      }
+  ],
+
+  "data-comment": "for data separation",
+  "data": [
+    {
+      "id": "uuid(DAT1)",
+      "type": "image/png",
+      "data": ""
+    },
+    {
+      "id": "uuid(DAT2)",
+      "type": "text",
+      "data": ""
+    },
+    {
+      "id": "uuid(DAT3)",
+      "type": "text",
+      "data": ""
+    }
+  ]
+}
