@@ -56,23 +56,16 @@
 
 @property (nonatomic) TopoMap *topoMap;
 @property (nonatomic) NavMachine* currentMachine;
-//@property (atomic, readonly) NavLocation *currentLocation; // private
 @property (atomic, readonly) NSValue *locationUpdated;
 @property (atomic, readonly) NSValue *orientationUpdated;
 @property (atomic, readonly) NavLocation *debugCurrentLocation;
 @property (atomic, readonly) NavLocation *debugCurrentLocation2;
-//@property (atomic, readonly) NavState* currentState; // removed
-//@property (atomic, readonly) NavEdge* currentEdge; // private
-//@property (atomic, readonly) NavNode* currentNode; // private
-//@property (atomic, readonly) enum NavigationState navState; // removed
 @property (atomic, readonly) NavLocalizer *currentLocalizer;
 @property (atomic, readonly) float currentOrientation;
 
 
 - (instancetype)initWithTopoMap:(TopoMap*)topoMap withUUID: (NSString*) uuidStr;
 - (void)simulateSensorFromLogFile:(NavLogFile*) logFile;
-- (void)setCurrentState:(NavState *)currentState;
-- (void)setNavState:(enum NavigationState)navState;
 
 - (void) startMotionSensor;
 - (void) startAccSensor;
@@ -84,6 +77,7 @@
 - (void) stopBeaconSensor;
 - (void) reset;
 
+- (void) initLocalizaion;
 - (void) initLocalizationOnEdge:(NSString*) edgeID withOptions:(NSDictionary*) options;
 - (NavLocation *)getCurrentLocationWithInit:(BOOL) init;
 - (NavLocation *)getLocationOnEdge:(NSString*) edgeID;

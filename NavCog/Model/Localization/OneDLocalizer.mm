@@ -131,6 +131,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     
     if (loc.p2pDebug == true && loc == activeLocalizer) {
         [[P2PManager sharedInstance] send:data withType:@"2d-position" ];
+        [loc sendStatusByP2P: *loc.localizer->getStatus()];
     }
     
     NSLog(@"1D %f, %f, %f, %f, %f\n", loc.d1meanLoc->x(), loc.d1meanLoc->y(), loc.d1meanLoc->floor(), loc.d1meanPose->orientation(), loc.d1meanPose->velocity());
@@ -451,7 +452,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     }
     
     _localizer->putBeacons(cbeacons);
-    [self sendStatusByP2P: *_localizer->getStatus()];
+    //[self sendStatusByP2P: *_localizer->getStatus()];
     
     if (_d1meanLoc) {
         r.x = Meter2Feet(_d1meanLoc->x());
