@@ -216,7 +216,6 @@
             }
         }
         
-        dist += _extraEdgeLength;
         NSString *distFormat = NSLocalizedString([self isMeter]?@"meterFormat":@"feetFormat", @"Use to express a distance in feet");
         dist += _extraEdgeLength; // dist is distance to the target node
         // if you're walking, check distance to target node
