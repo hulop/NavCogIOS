@@ -72,7 +72,8 @@ typedef struct LocalizerData {
 @property std::shared_ptr<BeaconFilterChain> beaconFilter;
 @property std::shared_ptr<StatusInitializerImpl> statusInitializer;
 @property Beacons cbeacons;
-@property int minNBeacon;
+@property int minCountKnownBeacons;
+@property double alphaObsModel;
 
 @property BOOL transiting;
 
@@ -168,6 +169,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     _userData.localizer = self;
     _localizer->updateHandler(d1calledWhenUpdated, &_userData);
     _localizer->numStates(1000);
+    _alphaObsModel = 0.3;
     _localizer->alphaWeaken(0.3);
     
     _dataStore = std::shared_ptr<DataStoreImpl>(new DataStoreImpl());
@@ -331,7 +333,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     std::shared_ptr<StrongestBeaconFilter> strongestBeaconFilter(new StrongestBeaconFilter());
     
     int nStrongest = 10; // The number of the strongest RSSI beacons used to evaluate likelihoods in a localizer.
-    _minNBeacon = 3;
+    _minCountKnownBeacons = 3;
     strongestBeaconFilter->nStrongest(nStrongest);
     _beaconFilter.reset(new BeaconFilterChain());
     _beaconFilter->addFilter(cleansingBeaconFilter);
@@ -468,14 +470,13 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     _result = r;
 }
 
+int nEvalPoint = 1000;
+double cumProba = 0.99;
 
 - (void) inputBeaconsTransit: (Beacons) beacons{
     
-    int nEvalPoint = 1000;
     States states = _statusInitializer->initializeStates(nEvalPoint);
-    
-    double cumProba = 0.99;
-    cumProba = 0.67;
+
     State maxLLState = [self findMaximumLikelihoodLocation:beacons Given:states With: cumProba];
     NavLocalizeResult *r = [[NavLocalizeResult alloc] init];
     
@@ -514,8 +515,8 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     State stateMinMD;
     for(int i=0; i<states.size(); i++){
         std::vector<double> logLLAndMahaDist = logLLAndMahaDists.at(i);
-        double logLikelihood = logLLAndMahaDist.at(0);
-        double mahaDist = logLLAndMahaDist.at(1);
+        double logLikelihood = _alphaObsModel * logLLAndMahaDist.at(0);
+        double mahaDist = _alphaObsModel * logLLAndMahaDist.at(1);
         countKnown = logLLAndMahaDist.at(2);
         countUnknown = logLLAndMahaDist.at(3);
         if(mahaDist < minMahaDist){
@@ -526,7 +527,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     
     int dof = 0;
     double quantile = 0.0;
-    if(self.minNBeacon<=countKnown){
+    if(self.minCountKnownBeacons<=countKnown){
         dof = countKnown;
         quantile = MathUtils::quantileChiSquaredDistribution(dof, cumulative);
     }else{
@@ -535,9 +536,10 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
         quantile = 1; // small value
     }
     
-    if(minMahaDist<1000){
-        //NSLog(@"Mahalanobis distance: dof=%d, distance=%.2f, quantile=%.2f, #known=%.0f, #unknown=%.0f", dof, minMahaDist, quantile, countKnown, countUnknown);
-    }
+//    if(minMahaDist<1000){
+//        NSLog(@"Mahalanobis distance: dof=%d, distance=%.2f, quantile=%.2f, #known=%.0f, #unknown=%.0f", dof, minMahaDist, quantile, countKnown, countUnknown);
+//    }
+    
     double normalizedMD = minMahaDist/quantile;
     stateMinMD.mahalanobisDistance(normalizedMD);
     return stateMinMD;
