@@ -27,6 +27,8 @@
 
 @interface NavLocalizerFactory : NSObject
 
++ (void) reset;
+
 + (NSArray*) allCoreLocalizers;
 + (NSArray*) allEdgeLocalizers;
 

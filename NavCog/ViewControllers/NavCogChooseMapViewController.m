@@ -150,16 +150,27 @@
 
     // need to update from main queue
     dispatch_async(dispatch_get_main_queue(), ^{
+        [_downloadingView.view removeFromSuperview];
+        _downloadingView.progress.hidden = YES;
+        _downloadingView.progress.progress = 0;
+        
         if (error != nil) {
-            [self.view removeFromSuperview];
+            NSString *message = [error localizedDescription];
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Error",@"Title for error alert") message:message preferredStyle:UIAlertControllerStyleAlert];
+            [alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                [self okButtonPushed];
+            }]];
+            [self presentViewController:alertController animated:YES completion:nil];
             return;
         }
         [_downloadingView.view removeFromSuperview];
         [self.view removeFromSuperview];
+        [_delegate topoMapLoaded:topoMap withMapDataString:dataStr];
     });
-    [_delegate topoMapLoaded:topoMap withMapDataString:dataStr];
 }
 
-
+- (void)okButtonPushed
+{
+}
 
 @end

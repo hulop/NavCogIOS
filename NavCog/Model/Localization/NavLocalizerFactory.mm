@@ -34,6 +34,12 @@ static const NSMutableDictionary *navLocalizers = [[NSMutableDictionary alloc] i
 static const NSMutableDictionary *floorLocalizers = [[NSMutableDictionary alloc] init];
 static const NSMutableDictionary *edgeLocalizers = [[NSMutableDictionary alloc] init];
 
++ (void) reset
+{
+    [navLocalizers removeAllObjects];
+    [floorLocalizers removeAllObjects];
+    [edgeLocalizers removeAllObjects];
+}
 
 + (NSArray*) allCoreLocalizers
 {

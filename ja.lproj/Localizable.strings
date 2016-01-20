@@ -178,3 +178,9 @@
 
 /* URL of help page */
 "helpPageURL" = "https://navcog.mybluemix.net/help/ja/index.html";
+
+/* Title for error alert */
+"Error" = "エラー";
+
+/* Error message when map url is not specified */
+"urlNotFoundError" = "この地図のURLが指定されていません";

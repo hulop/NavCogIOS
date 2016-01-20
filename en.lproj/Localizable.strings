@@ -179,3 +179,9 @@ Information";
 
 /* URL of help page */
 "helpPageURL" = "https://navcog.mybluemix.net/help/index.html";
+
+/* Title for error alert */
+"Error" = "Error";
+
+/* Error message when map url is not specified */
+"urlNotFoundError" = "URL is not specified for this map";
