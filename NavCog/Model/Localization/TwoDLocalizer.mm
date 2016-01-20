@@ -296,6 +296,9 @@ typedef struct LocalizerData2 {
     NavLightEdge* edge = [holder getNavLightEdgeByEdgeID:edgeID];
     
     double distanceSum = 0;
+    if (!_states) {
+        return 100 * 1000; // return far distance if not ready
+    }
     assert(_states);
     
     loc::Location stdloc = loc::Location::standardDeviation(*_states);
