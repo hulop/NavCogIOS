@@ -241,7 +241,14 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     PedometerWalkingStateParameters pedometerWSParams;
     // TODO
     pedometerWSParams.updatePeriod(0.1);
-    pedometerWSParams.walkDetectSigmaThreshold(0.1);
+    //pedometerWSParams.walkDetectSigmaThreshold(0.1);
+    
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"wheelmode_preference"]) {
+        NSString *tstr = [[NSUserDefaults standardUserDefaults] objectForKey:@"wheelmode_threthold_preference"];
+        double t = tstr?[tstr doubleValue]:0.05;
+        pedometerWSParams.walkDetectSigmaThreshold(t);
+    }
+    
     // END TODO
     std::shared_ptr<Pedometer> pedometer(new PedometerWalkingState(pedometerWSParams));
     
