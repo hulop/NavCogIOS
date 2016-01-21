@@ -321,6 +321,8 @@ static const float FEET_IN_METER = 0.3048;
         [[NavLightEdgeHolder sharedInstance] appendNavLightEdge:edgeInfo2];
         NavEdgeLocalizer *nl2 = [NavLocalizerFactory cloneLocalizerForEdge:curEdge.edgeID withEdgeInfo:edgeInfo2];
 
+        [tmpEdge1.node1.infoFromEdges setObject:[tmpEdge1.node1.infoFromEdges objectForKey:curEdge.edgeID] forKey:tmpEdge1.edgeID];
+        [tmpEdge2.node2.infoFromEdges setObject:[tmpEdge2.node2.infoFromEdges objectForKey:curEdge.edgeID] forKey:tmpEdge2.edgeID];
 
         
         // add info from tmp edges for node1 and node2
