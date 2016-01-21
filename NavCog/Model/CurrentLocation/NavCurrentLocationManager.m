@@ -351,7 +351,12 @@ static const float GyroDriftLimit = 3;
 - (void)triggerAccelerationWithData: (NSMutableDictionary*) data {
     [NavLog logAcc:data];
     if ([_currentMachine getCurrentState]) {
-        NSString *edgeID = [[[_currentMachine getCurrentState] walkingEdge] edgeID];
+        NSString *edgeID;
+        if ([[_currentMachine getCurrentState] walkingEdge]) {
+            edgeID = [[[_currentMachine getCurrentState] walkingEdge] edgeID];
+        } else {
+            edgeID = [[[_currentMachine getCurrentState] targetEdge] edgeID];
+        }
         NavEdgeLocalizer *nel = [NavLocalizerFactory localizerForEdge:edgeID];
         [nel inputAcceleration:data];
     }
@@ -361,8 +366,13 @@ static const float GyroDriftLimit = 3;
     [NavLog logMotion:data];
     
     if ([_currentMachine getCurrentState]) {
-        NSString *edgeID = [[[_currentMachine getCurrentState] walkingEdge] edgeID];
-                NavEdgeLocalizer *nel = [NavLocalizerFactory localizerForEdge:edgeID];
+        NSString *edgeID;
+        if ([[_currentMachine getCurrentState] walkingEdge]) {
+            edgeID = [[[_currentMachine getCurrentState] walkingEdge] edgeID];
+        } else {
+            edgeID = [[[_currentMachine getCurrentState] targetEdge] edgeID];
+        }
+        NavEdgeLocalizer *nel = [NavLocalizerFactory localizerForEdge:edgeID];
         [nel inputMotion:data];
     }
     
