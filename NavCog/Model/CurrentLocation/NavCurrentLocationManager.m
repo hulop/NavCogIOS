@@ -521,5 +521,10 @@ static const float GyroDriftLimit = 3;
     _logReplay = false;
 }
 
+- (NSString *)getLocalizerNameForEdge:(NSString *)edgeID
+{
+    NavEdgeLocalizer *nel = [NavLocalizerFactory localizerForEdge:edgeID];
+    return NSStringFromClass([nel.parent class]);
+}
 
 @end;

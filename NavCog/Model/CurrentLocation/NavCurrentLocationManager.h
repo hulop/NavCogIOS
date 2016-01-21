@@ -82,6 +82,7 @@
 - (NavLocation *)getCurrentLocationWithInit:(BOOL) init;
 - (NavLocation *)getLocationOnEdge:(NSString*) edgeID;
 - (NavLocation *)getLocationInEdges:(NSArray *)edges withKNNThreshold:(float)knnThreshold withInit:(BOOL) init;
+- (NSString*) getLocalizerNameForEdge:(NSString*)edgeID;
 
 @end;
 

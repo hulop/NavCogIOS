@@ -508,18 +508,20 @@
         }
         if (_navState == NAV_STATE_TURNING && _currentState != _initialState) {
             // check if user keep moving to destination without turn
-            NavLocation *pos = [_currentLocationManager getLocationOnEdge:_currentState.walkingEdge.edgeID];
-            
-            NavEdge *edge = _currentState.walkingEdge;
-            
-            double dist = (pos.knndist - edge.minKnnDist) / (edge.maxKnnDist - edge.minKnnDist);
-            
-            float startDist = [_currentState getStartDistance:pos];
-            float startRatio = [_currentState getStartRatio:pos];
-            if (dist <= 1 && (startDist > 20 || (startDist > 10 && startRatio > 0.25))) {
-                NSLog(@"ForceTurn,%f,%f",startDist, startRatio);
-                [NavSoundEffects playSuccessSound];
-                _navState = NAV_STATE_WALKING;
+            if ([@"KDTreeLocalization" isEqualToString:[_currentLocationManager getLocalizerNameForEdge:_currentState.walkingEdge.edgeID]]) {
+                NavLocation *pos = [_currentLocationManager getLocationOnEdge:_currentState.walkingEdge.edgeID];
+//                
+//                NavEdge *edge = _currentState.walkingEdge;
+//                
+//                double dist = (pos.knndist - edge.minKnnDist) / (edge.maxKnnDist - edge.minKnnDist);
+//                
+                float startDist = [_currentState getStartDistance:pos];
+                float startRatio = [_currentState getStartRatio:pos];
+                if (/*dist <= 1 &&*/ (startDist > 20 || (startDist > 10 && startRatio > 0.25))) {
+                    NSLog(@"ForceTurn,%f,%f",startDist, startRatio);
+                    [NavSoundEffects playSuccessSound];
+                    _navState = NAV_STATE_WALKING;
+                }
             }
         }
         if (_navState == NAV_STATE_WALKING) {

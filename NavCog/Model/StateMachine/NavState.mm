@@ -203,6 +203,9 @@
         [NavNotificationSpeaker speakImmediatelyAndSlowly:NSLocalizedString(@"accessNotif", @"Alert that an accessibility notification is available")];
     }
     float threshold = 5;
+    if (edge.len < 10 + 7) {
+        threshold = MAX(0, (edge.len - 7) / 2); // Adjust threshold for very short edge
+    }
     if (_type == STATE_TYPE_WALKING) {
         // snap y within edge
         float targetDist = [self getTargetDistance:pos];
@@ -215,15 +218,17 @@
         if(dist > 0 && _didApproaching && _nextState != nil && _nextState.type == STATE_TYPE_WALKING) {
             // check if we already on the next edge
             NavEdge *nextEdge = _nextState.walkingEdge;
-            NavLocation *nextPos = [man getLocationOnEdge:nextEdge.edgeID];
-
-            double norm_dist = (nextPos.knndist - nextEdge.minKnnDist) / (nextEdge.maxKnnDist - nextEdge.minKnnDist);
-            
-            float nextStartDist = [_nextState getStartDistance:nextPos];
-            float nextStartRatio = [_nextState getStartRatio:nextPos];
-            if (norm_dist <= 1 && (nextStartDist > 25 || (nextStartDist > 10 && nextStartRatio > 0.25))) {
-                NSLog(@"ForceNextState,%f,%f,%f,%f",_closestDist, pos.knndist, nextStartDist, nextPos.knndist);
-                dist = 0;
+            if ([@"KDTreeLocalization" isEqualToString:[man getLocalizerNameForEdge:nextEdge.edgeID]]) {
+                NavLocation *nextPos = [man getLocationOnEdge:nextEdge.edgeID];
+//                
+//                double norm_dist = (nextPos.knndist - nextEdge.minKnnDist) / (nextEdge.maxKnnDist - nextEdge.minKnnDist);
+//                
+                float nextStartDist = [_nextState getStartDistance:nextPos];
+                float nextStartRatio = [_nextState getStartRatio:nextPos];
+                if (/*norm_dist <= 1 &&*/ (nextStartDist > 25 || (nextStartDist > 10 && nextStartRatio > 0.25))) {
+                    NSLog(@"ForceNextState,%f,%f,%f,%f",_closestDist, pos.knndist, nextStartDist, nextPos.knndist);
+                    dist = 0;
+                }
             }
         }
         
