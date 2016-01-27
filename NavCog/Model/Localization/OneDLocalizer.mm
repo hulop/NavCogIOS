@@ -265,9 +265,10 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     // The initial velocity of a particle is sampled from a truncated normal distribution defined by a mean, a standard deviation, a lower bound and an upper bound.
     poseProperty.meanVelocity(1.0); // mean
     poseProperty.stdVelocity(0.3); // standard deviation
+    
+    // if no effective beacon information, the average speed will be stable aroud (min+max)/2
     poseProperty.minVelocity(0.1); // lower bound
     poseProperty.maxVelocity(1.5); // upper bound
-
     poseProperty.diffusionVelocity(0.1); // standard deviation of a noise added to the velocity of a particle [m/s/s]
     
     poseProperty.stdOrientation(3.0/180.0*M_PI); // standard deviation of a noise added to the orientation obtained from the smartphone sensor.
