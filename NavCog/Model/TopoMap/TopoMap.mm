@@ -120,6 +120,8 @@ static const double FEET_IN_METER = 0.3048;
         [NavLocalizerFactory createLocalizer:loc];
     }
     
+    NSObject *buildings = mapDataJson[@"buildings"];
+    
     NSDictionary *layersJson = (NSDictionary *)[mapDataJson objectForKey:@"layers"];
     for (NSString *zIndex in [layersJson allKeys]) {
         NSDictionary *layerJson = [layersJson objectForKey:zIndex];
@@ -135,7 +137,13 @@ static const double FEET_IN_METER = 0.3048;
             node.nodeID = [nodeJson objectForKey:@"id"];
             node.name = [nodeJson objectForKey:[NavI18nUtil key:@"name" lang:language]];
             node.type = NodeType(((NSNumber *)[nodeJson objectForKey:@"type"]).intValue);
-            node.buildingName = [nodeJson objectForKey:@"building"];
+            
+            if ([buildings isKindOfClass:NSDictionary.class]) {
+                NSDictionary *building = [(NSDictionary*)buildings objectForKey:[nodeJson objectForKey:@"building"]];
+                node.buildingName = [building objectForKey:[NavI18nUtil key:@"name" lang:language]];
+            } else { // backward compati
+                node.buildingName = [nodeJson objectForKey:@"building"];
+            }
             node.floor = ((NSNumber *)[nodeJson objectForKey:@"floor"]).intValue;
             node.layerZIndex = zIndex;
             node.lat = ((NSNumber *)[nodeJson objectForKey:@"lat"]).doubleValue;
