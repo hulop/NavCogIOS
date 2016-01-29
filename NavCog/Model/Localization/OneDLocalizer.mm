@@ -128,7 +128,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     [[P2PManager sharedInstance] send:data withType:@"2d-position" ];
     [loc sendStatusByP2P: *loc.localizer->getStatus()];
     
-    NSLog(@"1D %f, %f, %f, %f, %f\n", loc.d1meanLoc->x(), loc.d1meanLoc->y(), loc.d1meanLoc->floor(), loc.d1meanPose->orientation(), loc.d1meanPose->velocity());
+    NSLog(@"%@ 1D %f, %f, %f, %f, %f\n", loc, loc.d1meanLoc->x(), loc.d1meanLoc->y(), loc.d1meanLoc->floor(), loc.d1meanPose->orientation(), loc.d1meanPose->velocity());
     //std::cout << meanLoc->toString() << std::endl;
     
     

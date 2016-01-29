@@ -300,6 +300,9 @@
                 }
                 NSString *cmd = [NSString stringWithFormat:@"updateBlueDot({lat:%f, lng:%f})", _targetNode.lat, _targetNode.lng];
                 [[NavCogFuncViewController sharedNavCogFuntionViewController] runCmdWithString:cmd];
+                
+                // send init to localizer when the user is reached to the taret
+                [man initLocalizationOnEdge:_walkingEdge.edgeID withOptions:@{@"allreset":@(true)}];
                 return true;
             }
         }
