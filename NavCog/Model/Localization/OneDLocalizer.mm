@@ -356,6 +356,11 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
         self.localizer->resetStatus();
         return;
     }
+    if ([options[@"type"] isEqualToString:@"end"]) {
+        NSLog(@"1D localizer is all reset for end");
+        self.localizer->resetStatus();
+        return;
+    }
     if (options[@"allreset"]) {
         NSLog(@"1D localizer is all reset");
         self.localizer->resetStatus();

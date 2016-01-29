@@ -302,7 +302,7 @@
                 [[NavCogFuncViewController sharedNavCogFuntionViewController] runCmdWithString:cmd];
                 
                 // send init to localizer when the user is reached to the taret
-                [man initLocalizationOnEdge:_walkingEdge.edgeID withOptions:@{@"allreset":@(true)}];
+                [man initLocalizationOnEdge:_walkingEdge.edgeID withOptions:@{@"type":@"end"}];
                 return true;
             }
         }
