@@ -443,17 +443,18 @@ static const float GyroDriftLimit = 3;
     dispatch_async(queue, ^{
         
         NSDate* time = startTime;
+        NSTimeInterval waitFix = 0; // Adjust waitTime according to last processing time
         
         for (int i=0; i < arraySize; i++) {
             if (!_logReplay) {
                 return;
             }
 
+            NSTimeInterval waitTime = MAX([timesArray[i] timeIntervalSinceDate:time] + waitFix, 0);
+            NSDate *startProcess = [NSDate date];
+
             if ([objectsArray[i] isKindOfClass: [NSArray class]]) {
-                //create
-                NSTimeInterval waitTime = [timesArray[i] timeIntervalSinceDate:time];
-                
-                NSArray* beacons = objectsArray[i];
+                NSArray* beacons = objectsArray[i]; // = start processing time
                 
                 //call beacons
                 [NSThread sleepForTimeInterval:waitTime*timeMultiplier];
@@ -461,15 +462,10 @@ static const float GyroDriftLimit = 3;
                     
                     [self receivedBeaconsArray: beacons];
                 });
-                
-                time = timesArray[i];
-                
             } else if ([objectsArray[i] isKindOfClass: [NSMutableDictionary class]]) {
-                
-                NSTimeInterval waitTime = [timesArray[i] timeIntervalSinceDate:time];
-                
                 NSMutableDictionary* data = objectsArray[i];
                 
+                //call motion
                 if ([data[@"type"] isEqualToString:@"acceleration"]) {
                     [NSThread sleepForTimeInterval:waitTime*timeMultiplier];
                     dispatch_sync(dispatch_get_main_queue(), ^{
@@ -480,14 +476,13 @@ static const float GyroDriftLimit = 3;
                     dispatch_sync(dispatch_get_main_queue(), ^{
                         [self triggerMotionWithData:data];
                     });
-                    
                 }
-                //call motion
-                
-                time = timesArray[i];
-                
+            } else {
+                continue;
             }
-            
+
+            waitFix = [startProcess timeIntervalSinceNow]; // = - (processing time)
+            time = timesArray[i];
         }
         
         dispatch_sync(dispatch_get_main_queue(), ^{
