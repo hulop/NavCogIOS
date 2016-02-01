@@ -57,4 +57,6 @@
 - (void) stopBrowse;
 - (void) invite;
 
+- (bool) isActive;
+
 @end

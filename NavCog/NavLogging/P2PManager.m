@@ -122,13 +122,17 @@ static P2PManager* sharedP2PManager = nil;
 - (void) send: (NSDictionary*) content withType: (NSString*) type{
     NSDictionary *dic = @{@"type":type, @"content":content};
     //NSData *jdata = [NSJSONSerialization dataWithJSONObject:dic options:0 error:nil];
-    NSData *jdata = [NSKeyedArchiver archivedDataWithRootObject:dic];
+    NSError *error = nil;
+    NSArray *peerIDs = self.mSession.connectedPeers;
     
+    if(! [self isActive]){
+        return;
+    }
+    
+    NSData *jdata = [NSKeyedArchiver archivedDataWithRootObject:dic];
     //jdata = [NavUtil compressByGzip:jdata];
     
     //NSLog(@"send %@ data %ld bytes", type, (unsigned long)[jdata length]);
-    NSError *error = nil;
-    NSArray *peerIDs = self.mSession.connectedPeers;
     
     [self.mSession sendData:jdata
                     toPeers:peerIDs
@@ -235,7 +239,14 @@ static P2PManager* sharedP2PManager = nil;
     NSLog(@"didNotStartBrowsingForPeers");
 }
 
-
+- (bool) isActive{
+    NSArray *peerIDs = self.mSession.connectedPeers;
+    if(peerIDs==nil || peerIDs.count==0){
+        return false;
+    }else{
+        return true;
+    }
+}
 
 @end
 

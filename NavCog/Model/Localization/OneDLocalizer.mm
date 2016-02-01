@@ -75,6 +75,8 @@ typedef struct LocalizerData {
 @property double alphaObsModel;
 
 @property BOOL transiting;
+@property int nEvalPoint;
+@property double cumProba;
 
 @end
 
@@ -158,6 +160,8 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     NSLog(@"%@", [_beaconIDs componentsJoinedByString:@","]);
     
     
+    _nEvalPoint = 1000;
+    _cumProba = 0.99;
     
     _localizer = new StreamParticleFilter();
     _userData.localizer = self;
@@ -484,15 +488,12 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     
     _result = r;
 }
-
-int nEvalPoint = 1000;
-double cumProba = 0.99;
-
+ 
 - (void) inputBeaconsTransit: (Beacons) beacons{
     
-    States states = _statusInitializer->initializeStates(nEvalPoint);
+    States states = _statusInitializer->initializeStates(self.nEvalPoint);
 
-    State maxLLState = [self findMaximumLikelihoodLocation:beacons Given:states With: cumProba];
+    State maxLLState = [self findMaximumLikelihoodLocation:beacons Given:states With: self.cumProba];
     NavLocalizeResult *r = [[NavLocalizeResult alloc] init];
     
     r.x = Meter2Feet(maxLLState.x());
@@ -523,20 +524,29 @@ double cumProba = 0.99;
     Beacons beaconsFiltered = _beaconFilter->filter(beacons);
     
     _obsModel->fillsUnknownBeaconRssi(false);
-    std::vector<std::vector<double>> logLLAndMahaDists = _obsModel->computeLogLikelihoodRelatedValues(states, beaconsFiltered);
     
     double countKnown = 0, countUnknown = 0;
     double minMahaDist = std::numeric_limits<double>::max();
     State stateMinMD;
-    for(int i=0; i<states.size(); i++){
-        std::vector<double> logLLAndMahaDist = logLLAndMahaDists.at(i);
-        double logLikelihood = _alphaObsModel * logLLAndMahaDist.at(0);
-        double mahaDist = _alphaObsModel * logLLAndMahaDist.at(1);
-        countKnown = logLLAndMahaDist.at(2);
-        countUnknown = logLLAndMahaDist.at(3);
-        if(mahaDist < minMahaDist){
-            minMahaDist = mahaDist;
-            stateMinMD = states.at(i);
+    // Count how many beacons the observation model knows
+    std::vector<double> logLLAndMahaDistsFor1stState = _obsModel->computeLogLikelihoodRelatedValues(states.at(0), beaconsFiltered);
+    countKnown = logLLAndMahaDistsFor1stState.at(2);
+    countUnknown = logLLAndMahaDistsFor1stState.at(3);
+    // If the observation model knows no beacon, likelihood evaluation for all the states is skipped.
+    if(countKnown==0){
+        stateMinMD = states.at(0);
+    }else{
+        std::vector<std::vector<double>> logLLAndMahaDists = _obsModel->computeLogLikelihoodRelatedValues(states, beaconsFiltered);
+        for(int i=0; i<states.size(); i++){
+            std::vector<double> logLLAndMahaDist = logLLAndMahaDists.at(i);
+            double logLikelihood = _alphaObsModel * logLLAndMahaDist.at(0);
+            double mahaDist = _alphaObsModel * logLLAndMahaDist.at(1);
+            countKnown = logLLAndMahaDist.at(2);
+            countUnknown = logLLAndMahaDist.at(3);
+            if(mahaDist < minMahaDist){
+                minMahaDist = mahaDist;
+                stateMinMD = states.at(i);
+            }
         }
     }
     
@@ -585,8 +595,10 @@ double cumProba = 0.99;
     if (self != activeLocalizer) {
         return;
     }
-    NSDictionary* data = [self statusToNSData: status];
-    [[P2PManager sharedInstance] send:data withType:@"2d-status" ];
+    if([[P2PManager sharedInstance] isActive]){
+        NSDictionary* data = [self statusToNSData: status];
+        [[P2PManager sharedInstance] send:data withType:@"2d-status" ];
+    }
 }
 
 - (void) sendStatesByP2P: (States) states{
@@ -686,7 +698,6 @@ double cumProba = 0.99;
 
 - (double) computeBeaconBasedDistanceScoreWithOptions: (NSDictionary*) options{
     double intervalInFeet = 1;
-    double cumDensity = 0.99;
     NSString* edgeID = options[@"edgeID"];
     NavLightEdgeHolder* holder = [NavLightEdgeHolder sharedInstance];
     NavLightEdge* edge = [holder getNavLightEdgeByEdgeID:edgeID];
@@ -698,7 +709,7 @@ double cumProba = 0.99;
     int dof = static_cast<int>(beaconsFiltered.size());
     
     if(_cbeacons.size()>0){
-        v = [self computeNormalizedMahalanobisDistance:beaconsFiltered Given:states With: cumDensity];
+        v = [self computeNormalizedMahalanobisDistance:beaconsFiltered Given:states With: self.cumProba];
     }
     //double v = _normalizedMahalanobisDistance;
     //NSLog(@"2D knnDist: eid=%@, dist=%.2f, dof=%d", edgeID, v, dof);
