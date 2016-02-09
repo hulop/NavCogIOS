@@ -524,13 +524,13 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
 - (State) findMaximumLikelihoodLocation: (Beacons) beacons Given: (States) states With:(double) cumulative{
     _obsModel->fillsUnknownBeaconRssi(false);
     Beacons beaconsFiltered = _beaconFilter->filter(beacons);
-    /*
+    
     StrongestBeaconFilter sbf;
-    double cutoffRssiForCurrentLocation = -90;
-    sbf.cutoffRssi(cutoffRssiForCurrentLocation);
-    sbf.nStrongest(10);
+//    double cutoffRssiForCurrentLocation = -100;
+//    sbf.cutoffRssi(cutoffRssiForCurrentLocation);
+    sbf.nStrongest(2*self.minCountKnownBeacons);
     beaconsFiltered = sbf.filter(beaconsFiltered);
-    */
+    
     double countKnown = 0, countUnknown = 0;
     double minMahaDist = std::numeric_limits<double>::max();
     State stateMinMD;
