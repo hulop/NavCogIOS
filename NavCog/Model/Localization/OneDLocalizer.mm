@@ -167,8 +167,9 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     _userData.localizer = self;
     _localizer->updateHandler(d1calledWhenUpdated, &_userData);
     _localizer->numStates(1000);
-    _alphaObsModel = 0.3;
     _localizer->alphaWeaken(0.3);
+    
+    _alphaObsModel = 1.0;
     
     _dataStore = std::shared_ptr<DataStoreImpl>(new DataStoreImpl());
     
@@ -521,10 +522,15 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
 }
 
 - (State) findMaximumLikelihoodLocation: (Beacons) beacons Given: (States) states With:(double) cumulative{
-    Beacons beaconsFiltered = _beaconFilter->filter(beacons);
-    
     _obsModel->fillsUnknownBeaconRssi(false);
-    
+    Beacons beaconsFiltered = _beaconFilter->filter(beacons);
+    /*
+    StrongestBeaconFilter sbf;
+    double cutoffRssiForCurrentLocation = -90;
+    sbf.cutoffRssi(cutoffRssiForCurrentLocation);
+    sbf.nStrongest(10);
+    beaconsFiltered = sbf.filter(beaconsFiltered);
+    */
     double countKnown = 0, countUnknown = 0;
     double minMahaDist = std::numeric_limits<double>::max();
     State stateMinMD;
@@ -706,7 +712,6 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     double v = 100;
     
     Beacons beaconsFiltered = _beaconFilter->filter(_cbeacons);
-    int dof = static_cast<int>(beaconsFiltered.size());
     
     if(_cbeacons.size()>0){
         v = [self computeNormalizedMahalanobisDistance:beaconsFiltered Given:states With: self.cumProba];

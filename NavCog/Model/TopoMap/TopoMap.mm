@@ -102,8 +102,15 @@ static const double FEET_IN_METER = 0.3048;
     } // otherwise 1.0
     
     BOOL advanced = false;
+    BOOL usesTransitKnnDistThres = true;
     if (mapDataJson[@"isAdvanced"]) {
         advanced = [mapDataJson[@"isAdvanced"] boolValue];
+    }
+    if(advanced){
+        usesTransitKnnDistThres = false;
+        if([mapDataJson.allKeys containsObject:@"usesTransitKnnDistThres"]){
+            usesTransitKnnDistThres = [mapDataJson[@"usesTransitKnnDistThres"] boolValue];
+        }
     }
     
     NSString *language = [NavI18nUtil getPreferredLanguage:[mapDataJson objectForKey:@"languages"]];
@@ -151,7 +158,7 @@ static const double FEET_IN_METER = 0.3048;
             [node.infoFromEdges addEntriesFromDictionary:[nodeJson objectForKey:@"infoFromEdges"]];
             node.transitInfo = [nodeJson objectForKey:@"transitInfo"];
             node.transitKnnDistThres = ((NSNumber *)[nodeJson objectForKey:@"knnDistThres"]).floatValue;
-            if (advanced) {
+            if (advanced && !usesTransitKnnDistThres) {
                 node.transitKnnDistThres = 1.0;
             }
             node.transitPosThres = ((NSNumber *)[nodeJson objectForKey:@"posDistThres"]).floatValue;
@@ -210,7 +217,7 @@ static const double FEET_IN_METER = 0.3048;
             if (!idStr || !advanced) {
                 NSString *path = [NavUtil createTempFile:[edgeJson objectForKey:@"dataFile"] forID:&idStr];
                 [NavLocalizerFactory create1D_KNN_LocalizerForID:idStr FromFile:path];
-            } else { // for localizers with PDR
+            }else{ // for localizers with PDR
                 edge.minKnnDist = 0;
                 edge.maxKnnDist = 1;                
             }
