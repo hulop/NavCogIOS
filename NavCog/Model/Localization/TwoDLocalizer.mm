@@ -54,6 +54,9 @@
 
 #include <bleloc/StrongestBeaconFilter.hpp>
 
+#include <bleloc/MetropolisAlgorithm.hpp>
+#include <bleloc/DataLogger.hpp>
+
 #import "NavLineSegment.h"
 
 using namespace loc;
@@ -62,6 +65,10 @@ typedef struct LocalizerData2 {
     TwoDLocalizer* localizer;
 } LocalizerData;
 
+enum ResetMode{
+    reset,
+    allReset
+};
 
 @interface TwoDLocalizer ()
 @property NavEdge *currentEdge;
@@ -80,6 +87,7 @@ typedef struct LocalizerData2 {
 @property NavLocalizeResult *result;
 
 @property long previousTimestamp;
+@property ResetMode resetMode;
 
 @end
 
@@ -110,12 +118,14 @@ typedef struct LocalizerData2 {
 
 - (void)initializeState:(NSDictionary *)options;
 {
+    _resetMode = ResetMode::reset;
     self.currentOptions = options;
     if (options == nil) {
         return;
     }
     if (options[@"allreset"]) {
         NSLog(@"2D localizer is all reset");
+        _resetMode = ResetMode::allReset;
         self.localizer->resetStatus();
         return;
     }
@@ -201,8 +211,8 @@ typedef struct LocalizerData2 {
         return;
     }
 
+    // convert NSArray* to loc::Beacons to input it into the localizer
     Beacons cbeacons;
-    
     for(int i = 0; i < [beacons count]; i++) {
         CLBeacon *b = [beacons objectAtIndex: i];
         int rssi = -100;
@@ -212,11 +222,15 @@ typedef struct LocalizerData2 {
         Beacon cb(b.major.intValue, b.minor.intValue, rssi);
         cbeacons.push_back(cb);
     }
-    
     cbeacons.timestamp([[NSDate date] timeIntervalSince1970]*1000);
-    _localizer->putBeacons(cbeacons);
     
-
+    // reset status with observed beacons during allReset mode.
+    if(_resetMode==allReset){
+        std::cout << "resetMode=allReset" << std::endl;
+        _localizer->resetStatus(cbeacons);
+    }
+    
+    _localizer->putBeacons(cbeacons);
     if (_meanLoc) {
         r.x = Meter2Feet(_meanLoc->x());
         r.y = Meter2Feet(_meanLoc->y());
@@ -226,7 +240,6 @@ typedef struct LocalizerData2 {
         r.x = 0;
         r.y = 0;
     }
-    
     std::cout << "meanPose=" << *_meanPose << std::endl;
     
     //[self sendStatusByP2P: *_localizer->getStatus()];
@@ -291,32 +304,101 @@ typedef struct LocalizerData2 {
 
 
 - (double) computeDistanceScoreWithOptions: (NSDictionary*) options{
+    if(_resetMode==allReset){
+        return [self computeDistanceScoreWithOptionsMeanLocation:options];
+    }else{
+        return [self computeDistanceScoreWithOptionsTransit:options];
+    }
+    //return [self computeDistanceScoreWithOptionsAvgDist:options];
+}
+
+// Parameters to compute distance score
+double largeDistance = 100*100;
+double distanceByFloorDiff = 10;
+double floorDifferenceTolerance = 0.1;
+
+- (double) computeDistanceScoreWithOptionsMeanLocation: (NSDictionary*) options{
+    NSString* edgeID = options[@"edgeID"];
+    NavLightEdgeHolder* holder = [NavLightEdgeHolder sharedInstance];
+    NavLightEdge* edge = [holder getNavLightEdgeByEdgeID:edgeID];
+    
+    if (!_states) {
+        return largeDistance; // return far distance if not ready
+    }
+    assert(_states);
+    
+    double distance = [self computeDistanceBetweenLocation:*_meanLoc AndEdge:edge];
+    distance = Feet2Meter(distance); // in meter
+    loc::Location stdloc = loc::Location::standardDeviation(*_states); //in meter
+
+    double distThresh95percentile = 5.1;
+    double v = fmax(distance, sqrt(pow(stdloc.x(),2) + pow(stdloc.y(),2)))/distThresh95percentile;
+    NSLog(@"2D knnDist: %@, %.2f, %.2f, %.2f, %.2f", edgeID, v, distance, stdloc.x(), stdloc.y());
+    return v;
+}
+
+- (double) computeDistanceScoreWithOptionsAvgDist: (NSDictionary*) options{
     NSString* edgeID = options[@"edgeID"];
     NavLightEdgeHolder* holder = [NavLightEdgeHolder sharedInstance];
     NavLightEdge* edge = [holder getNavLightEdgeByEdgeID:edgeID];
     
     double distanceSum = 0;
     if (!_states) {
-        return 100 * 1000; // return far distance if not ready
+        return largeDistance; // return far distance if not ready
+    }
+    assert(_states);
+    
+    double x = Meter2Feet(_meanLoc->x());
+    double y = Meter2Feet(_meanLoc->y());
+    Nav2DPoint* meanPoint = [[Nav2DPoint alloc] initWithX:x Y:y];
+    Nav2DPoint* pointOnSeg = [[edge getNearestSegmentFromPoint:meanPoint] getNearestPointOnLineSegmentFromPoint:meanPoint];
+    
+    x = Feet2Meter(pointOnSeg.x);
+    y = Feet2Meter(pointOnSeg.y);
+    double z = 0;
+    double floor = edge.floor - 1; // floor field in Edge class starts from 1.
+    Location meanLocOnSeg(x,y,z,floor);
+    
+    // in meter
+    distanceSum = 0;
+    std::stringstream ss;
+    for(State state: *_states){
+        double distance = [self computeDistanceBetweenPoint:meanLocOnSeg And:state];
+        distanceSum += distance;
+        ss << distance << ",";
+    }
+    distanceSum/=(_states->size());
+    // in feet
+    double threshold = 6.0; // feet
+    double v = Meter2Feet(distanceSum)/threshold;
+    NSLog(@"2D distance: edgeID=%@, dist=%.2f", edgeID, v);
+    return v;
+}
+
+
+- (double) computeDistanceScoreWithOptionsTransit: (NSDictionary*) options{
+    NSString* edgeID = options[@"edgeID"];
+    NavLightEdgeHolder* holder = [NavLightEdgeHolder sharedInstance];
+    NavLightEdge* edge = [holder getNavLightEdgeByEdgeID:edgeID];
+    
+    if(!_states){
+        return largeDistance; // return far distance if not ready
     }
     assert(_states);
     
     loc::Location stdloc = loc::Location::standardDeviation(*_states);
-    
+    double distanceSum = 0;
     for(State state: *_states){
-        double distance = [self computeDistanceBetweenState:state AndEdge:edge];
+        double distance = [self computeDistanceBetweenLocation:state AndEdge:edge];
         distanceSum += distance;
     }
     double distanceMean = distanceSum/_states->size();
     double v = fmax(distanceMean, sqrt(pow(stdloc.x(),2) + pow(stdloc.y(),2)))/6.0;
-    
     NSLog(@"2D knnDist: %@, %.2f, %.2f, %.2f, %.2f", edgeID, v, distanceMean, stdloc.x(), stdloc.y());
     return v;
 }
 
-- (double) computeDistanceBetweenState: (State) state AndEdge:(NavLightEdge*) edge{
-    static double distanceByFloorDiff = 10;
-    static double floorDifferenceTolerance = 0.1;
+- (double) computeDistanceBetweenLocation: (Location) state AndEdge:(NavLightEdge*) edge{
     
     double distance = 0;
     double x = Meter2Feet(state.x());
@@ -331,6 +413,18 @@ typedef struct LocalizerData2 {
     
     distance += [[edge getNearestSegmentFromPoint:point] getDistanceNearestPointOnLineSegmentFromPoint:point];
                  
+    return distance;
+}
+
+- (double) computeDistanceBetweenPoint: (Location) point1 And: (Location) point2{
+
+    double distance = 0;
+    double floorDifference = std::abs(point1.floor()-point2.floor());
+    if(floorDifference>floorDifferenceTolerance){
+        distance += floorDifference*distanceByFloorDiff;
+    }
+    distance += Location::distance2D(point1, point2);
+    
     return distance;
 }
 
@@ -571,11 +665,18 @@ void calledWhenUpdated(void *userData, Status * pStatus){
     beaconFilter->nStrongest(10);
     _localizer->beaconFilter(beaconFilter);
     
-    
     // Set standard deviation of Pose
     double stdevX = 0.25;
     double stdevY = 0.25;
     _stdevPose.x(stdevX).y(stdevY);
+    
+    // ObservationDependentInitializer
+    std::shared_ptr<MetropolisSampler<State, Beacons>> obsDepInitializer(new MetropolisSampler<State, Beacons>());
+    obsDepInitializer->observationModel(deserializedModel);
+    obsDepInitializer->statusInitializer(statusInitializer);
+    //obsDepInitializer->burnIn(2500);
+    obsDepInitializer->radius2D(10); // 10[m]
+    _localizer->observationDependentInitializer(obsDepInitializer);
     
 }
 
