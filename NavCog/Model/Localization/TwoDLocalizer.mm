@@ -54,8 +54,7 @@
 
 #include <bleloc/StrongestBeaconFilter.hpp>
 
-#include <bleloc/MetropolisAlgorithm.hpp>
-#include <bleloc/DataLogger.hpp>
+#include <bleloc/MetropolisSampler.hpp>
 
 #import "NavLineSegment.h"
 
@@ -333,7 +332,10 @@ double floorDifferenceTolerance = 0.1;
 
     double distThresh95percentile = 5.1;
     double v = fmax(distance, sqrt(pow(stdloc.x(),2) + pow(stdloc.y(),2)))/distThresh95percentile;
-    NSLog(@"2D knnDist: %@, %.2f, %.2f, %.2f, %.2f", edgeID, v, distance, stdloc.x(), stdloc.y());
+    NSLog(@"2D dist for current loc: %@, %.2f, %.2f, %.2f, %.2f", edgeID, v, distance, stdloc.x(), stdloc.y());
+    if(v<=1.0){
+        std::cout << "2D dist for initialization < 1." << std::endl;
+    }
     return v;
 }
 
@@ -610,14 +612,17 @@ void calledWhenUpdated(void *userData, Status * pStatus){
     poseProperty.diffusionVelocity(0.1);
     poseProperty.minVelocity(0.1);
     poseProperty.maxVelocity(1.5);
-    poseProperty.stdOrientation(3.0/180.0*M_PI);
+//    poseProperty.stdOrientation(3.0/180.0*M_PI);
+    poseProperty.stdOrientation(10.0/180.0*M_PI);
     poseProperty.stdX(2.0);
     poseProperty.stdY(2.0);
     
     stateProperty.meanRssiBias(0.0);
     stateProperty.stdRssiBias(0.2);
     stateProperty.diffusionRssiBias(0.2);
-    stateProperty.diffusionOrientationBias(1.0/180*M_PI);
+//    stateProperty.diffusionOrientationBias(1.0/180*M_PI);
+    stateProperty.diffusionOrientationBias(3.0/180*M_PI);
+
     // END TODO
     
     // Build poseRandomWalker
@@ -674,9 +679,15 @@ void calledWhenUpdated(void *userData, Status * pStatus){
     std::shared_ptr<MetropolisSampler<State, Beacons>> obsDepInitializer(new MetropolisSampler<State, Beacons>());
     obsDepInitializer->observationModel(deserializedModel);
     obsDepInitializer->statusInitializer(statusInitializer);
-    //obsDepInitializer->burnIn(2500);
+    obsDepInitializer->burnIn(1000);
     obsDepInitializer->radius2D(10); // 10[m]
     _localizer->observationDependentInitializer(obsDepInitializer);
+    
+    // Mixture settings
+    double mixProba = 0.001;
+    StreamParticleFilter::MixtureParameters mixParams;
+    mixParams.mixtureProbability = mixProba;
+    _localizer->mixtureParameters(mixParams);
     
 }
 
