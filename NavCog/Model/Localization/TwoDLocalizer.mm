@@ -313,7 +313,7 @@ enum ResetMode{
 
 // Parameters to compute distance score
 double largeDistance = 100*100;
-double distanceByFloorDiff = 10;
+double distanceByFloorDiff = 5;
 double floorDifferenceTolerance = 0.1;
 
 - (double) computeDistanceScoreWithOptionsMeanLocation: (NSDictionary*) options{
@@ -677,10 +677,13 @@ void calledWhenUpdated(void *userData, Status * pStatus){
     
     // ObservationDependentInitializer
     std::shared_ptr<MetropolisSampler<State, Beacons>> obsDepInitializer(new MetropolisSampler<State, Beacons>());
+    MetropolisSampler<State, Beacons>::Parameters msParams;
     obsDepInitializer->observationModel(deserializedModel);
     obsDepInitializer->statusInitializer(statusInitializer);
-    obsDepInitializer->burnIn(1000);
-    obsDepInitializer->radius2D(10); // 10[m]
+    msParams.burnIn = 1000;
+    msParams.radius2D = 10; // 10[m]
+    msParams.interval = 1;
+    obsDepInitializer->parameters(msParams);
     _localizer->observationDependentInitializer(obsDepInitializer);
     
     // Mixture settings
