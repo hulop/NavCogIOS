@@ -384,7 +384,9 @@
     }
     
     [_fromPicker reloadAllComponents];
+    [_fromPicker selectRow:0 inComponent:0 animated:false];
     [_toPicker reloadAllComponents];
+    [_toPicker selectRow:0 inComponent:0 animated:false];
     if (_isWebViewLoaded) {
         NSString *cmd = [NSString stringWithFormat:@"setMapData(%@)", dataStr];
         [_navFuncViewCtrl runCmdWithString:cmd];
