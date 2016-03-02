@@ -77,6 +77,7 @@ typedef struct LocalizerData {
 @property BOOL transiting;
 @property int nEvalPoint;
 @property double cumProba;
+@property BOOL readyForBeacons;
 
 @end
 
@@ -150,6 +151,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
 
 - (void)initializeWithFile:(NSString *)path
 {
+    _readyForBeacons = false;
     NSString *data = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
     NSArray *lines = [data componentsSeparatedByString:@"\n"];
     
@@ -424,6 +426,9 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
 
 - (void) inputBeacons:(NSArray*) beacons
 {
+    if (!_readyForBeacons) {
+        return;
+    }
     if (beacons == _previousBeaconInput) {
         return;
     }
@@ -837,6 +842,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
         }
     }
     obsModel->fillsUnknownBeaconRssi(false);
+    _readyForBeacons = true;
 }
 
 @end
