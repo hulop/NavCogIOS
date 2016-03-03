@@ -329,10 +329,12 @@ double floorDifferenceTolerance = 0.1;
     double distance = [self computeDistanceBetweenLocation:*_meanLoc AndEdge:edge];
     distance = Feet2Meter(distance); // in meter
     loc::Location stdloc = loc::Location::standardDeviation(*_states); //in meter
-
+    loc::State meanState = loc::State::mean(*_states);
+    
     double distThresh95percentile = 5.1;
     double v = fmax(distance, sqrt(pow(stdloc.x(),2) + pow(stdloc.y(),2)))/distThresh95percentile;
-    NSLog(@"2D dist for current loc: %@, %.2f, %.2f, %.2f, %.2f", edgeID, v, distance, stdloc.x(), stdloc.y());
+    NSLog(@"2D dist for current loc: eid=%@, val=%.2f, dist=%.2f, stdX=%.2f, stdY=%.2f", edgeID, v, distance, stdloc.x(), stdloc.y());
+    std::cout << "meanState=" << meanState << std::endl;
     if(v<=1.0){
         std::cout << "2D dist for initialization < 1." << std::endl;
     }
@@ -478,21 +480,6 @@ void calledWhenUpdated(void *userData, Status * pStatus){
     NSLog(@"observation model: %@", ObservationModelParametersPath);
     std::string serializedModelPath = [ObservationModelParametersPath UTF8String];
     std::cout << serializedModelPath << std::endl;
-//    bool doTraining = false;
-//    if(doTraining){
-//        // Train observation model
-//        std::shared_ptr<GaussianProcessLDPLMultiModelTrainer<State, Beacons>>obsModelTrainer( new GaussianProcessLDPLMultiModelTrainer<State, Beacons>());
-//        obsModelTrainer->dataStore(dataStore);
-//        std::shared_ptr<GaussianProcessLDPLMultiModel<State, Beacons>> obsModel( obsModelTrainer->train());
-//        //localizer->observationModel(obsModel);
-//        
-//        // Seriealize observation model
-//        std::cout << "Serializing observationModel" <<std::endl;
-//        {
-//            std::ofstream ofs(serializedModelPath);
-//            obsModel->save(ofs);
-//        }
-//    }
     
     // De-serialize observation model
     std::cout << "De-serializing observationModel" <<std::endl;
@@ -581,7 +568,22 @@ void calledWhenUpdated(void *userData, Status * pStatus){
     }
     dataStore->bleBeacons(bleBeacons);
     
-    
+    // Train model if needed.
+    bool doTraining = false;
+    if(doTraining){
+        // Train observation model
+        std::shared_ptr<GaussianProcessLDPLMultiModelTrainer<State, Beacons>>obsModelTrainer( new GaussianProcessLDPLMultiModelTrainer<State, Beacons>());
+        obsModelTrainer->dataStore(dataStore);
+        std::shared_ptr<GaussianProcessLDPLMultiModel<State, Beacons>> obsModel( obsModelTrainer->train());
+        //localizer->observationModel(obsModel);
+        
+        // Seriealize observation model
+        std::cout << "Serializing observationModel at" << serializedModelPath << std::endl;
+        {
+            std::ofstream ofs(serializedModelPath);
+            obsModel->save(ofs);
+        }
+    }
     
     // Instantiate sensor data processors
     // Orientation
@@ -612,16 +614,15 @@ void calledWhenUpdated(void *userData, Status * pStatus){
     poseProperty.diffusionVelocity(0.1);
     poseProperty.minVelocity(0.1);
     poseProperty.maxVelocity(1.5);
-//    poseProperty.stdOrientation(3.0/180.0*M_PI);
-    poseProperty.stdOrientation(10.0/180.0*M_PI);
+    poseProperty.stdOrientation(3.0/180.0*M_PI);
     poseProperty.stdX(2.0);
     poseProperty.stdY(2.0);
     
-    stateProperty.meanRssiBias(0.0);
-    stateProperty.stdRssiBias(0.2);
+//    stateProperty.meanRssiBias(0.0);
+    stateProperty.meanRssiBias(-2.0);
+    stateProperty.stdRssiBias(2.0);
     stateProperty.diffusionRssiBias(0.2);
-//    stateProperty.diffusionOrientationBias(1.0/180*M_PI);
-    stateProperty.diffusionOrientationBias(3.0/180*M_PI);
+    stateProperty.diffusionOrientationBias(1.0/180*M_PI);
 
     // END TODO
     
@@ -683,6 +684,7 @@ void calledWhenUpdated(void *userData, Status * pStatus){
     msParams.burnIn = 1000;
     msParams.radius2D = 10; // 10[m]
     msParams.interval = 1;
+    msParams.withOrdering = true;
     obsDepInitializer->parameters(msParams);
     _localizer->observationDependentInitializer(obsDepInitializer);
     
