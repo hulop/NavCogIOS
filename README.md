@@ -8,8 +8,7 @@
 
 1. Install [CocoaPods](https://cocoapods.org/).
 2. In the project directory, run `pod install`.
-3. Build blelocpp project with xcode in a sibling `blelocpp` folder.
-4. Build NavCog2 project with xcode.
+3. Build NavCog2 project with xcode.
 
 ----
 ## About
