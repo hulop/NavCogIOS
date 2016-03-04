@@ -77,6 +77,7 @@ typedef struct LocalizerData {
 @property BOOL transiting;
 @property int nEvalPoint;
 @property double cumProba;
+@property BOOL readyForBeacons;
 
 @end
 
@@ -150,6 +151,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
 
 - (void)initializeWithFile:(NSString *)path
 {
+    _readyForBeacons = false;
     NSString *data = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
     NSArray *lines = [data componentsSeparatedByString:@"\n"];
     
@@ -269,12 +271,12 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
     StateProperty stateProperty;
     // The initial velocity of a particle is sampled from a truncated normal distribution defined by a mean, a standard deviation, a lower bound and an upper bound.
     poseProperty.meanVelocity(1.0); // mean
-    poseProperty.stdVelocity(0.3); // standard deviation
+    poseProperty.stdVelocity(0.6); // standard deviation
     
     // if no effective beacon information, the average speed will be stable aroud (min+max)/2
     poseProperty.minVelocity(0.1); // lower bound
-    poseProperty.maxVelocity(1.5); // upper bound
-    poseProperty.diffusionVelocity(0.1); // standard deviation of a noise added to the velocity of a particle [m/s/s]
+    poseProperty.maxVelocity(3.0); // upper bound
+    poseProperty.diffusionVelocity(0.30); // standard deviation of a noise added to the velocity of a particle [m/s/s]
     
     poseProperty.stdOrientation(3.0/180.0*M_PI); // standard deviation of a noise added to the orientation obtained from the smartphone sensor.
 
@@ -424,6 +426,9 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
 
 - (void) inputBeacons:(NSArray*) beacons
 {
+    if (!_readyForBeacons) {
+        return;
+    }
     if (beacons == _previousBeaconInput) {
         return;
     }
@@ -837,6 +842,7 @@ void d1calledWhenUpdated(void *userData, Status * pStatus){
         }
     }
     obsModel->fillsUnknownBeaconRssi(false);
+    _readyForBeacons = true;
 }
 
 @end
