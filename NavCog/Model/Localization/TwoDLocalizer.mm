@@ -266,8 +266,10 @@ enum ResetMode{
 }
 
 - (void) sendStatusByP2P: (Status) status{
-    NSDictionary* data = [self statusToNSData: status];
-    [[P2PManager sharedInstance] send:data withType:@"2d-status" ];
+    if([[P2PManager sharedInstance] isActive]){
+        NSDictionary* data = [self statusToNSData: status];
+        [[P2PManager sharedInstance] send:data withType:@"2d-status" ];
+    }
 }
 
 - (void)inputAcceleration:(NSDictionary *)data
