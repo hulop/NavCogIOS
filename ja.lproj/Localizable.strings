@@ -196,3 +196,12 @@
 
 /* Error message when map url is not specified */
 "urlNotFoundError" = "この地図のURLが指定されていません";
+
+/* message label for waiting current location */
+"waitCurrentLocation" = "現在地を取得中";
+
+/* alert message when route is not found*/
+"noRouteError" = "ルートが見つかりませんでした";
+
+/* alert message when locating is timeout */
+"noCurrentLocationError" = "現在地を取得できませんでした";

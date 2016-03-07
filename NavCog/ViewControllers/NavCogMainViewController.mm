@@ -36,6 +36,7 @@
 @property (strong, nonatomic) NavCogChooseLogViewController *navLogViewCtrl;
 @property (strong, nonatomic) NavCogDataSamplingViewController *dataSamplingViewCtrl;
 @property (strong, nonatomic) NavCogHelpPageViewController *helpPageViewCtrl;
+@property (strong, nonatomic) NavDownloadingViewController *waitViewCtrl;
 @property (strong, nonatomic) TopoMap *topoMap;
 @property (strong, nonatomic) NSString *mapDataString;
 @property (strong, nonatomic) NavMachine *navMachine;
@@ -51,6 +52,8 @@
 @property (nonatomic) Boolean isSpeechFast;
 @property (weak, nonatomic) IBOutlet UIButton *getDataBtn;
 @property (weak, nonatomic) IBOutlet UIButton *logReplayBtn;
+@property (strong, nonatomic) NSTimer *currentLocationTimeoutTimer;
+
 
 @end
 
@@ -63,6 +66,7 @@
     _helpPageViewCtrl = [[NavCogHelpPageViewController alloc] init];
     _navFuncViewCtrl = [NavCogFuncViewController sharedNavCogFuntionViewController];
     _navFuncViewCtrl.delegate = self;
+    _waitViewCtrl = [[NavDownloadingViewController alloc] init];
     //_navMachine = [[NavMachine alloc] init];
     //_navMachine.delegate = self;
     _isWebViewLoaded = false;
@@ -196,7 +200,33 @@
         return;
     }
     
-    [_navMachine startNavigationOnTopoMap:_topoMap fromNodeWithName:_fromNodeName toNodeWithName:_toNodeName usingBeaconsWithUUID:[_topoMap getUUIDString] andMajorID:[_topoMap getMajorIDString].intValue withSpeechOn:_isSpeechEnabled withClickOn:_isClickEnabled withFastSpeechOn:_isSpeechFast];
+    if ([_navMachine startNavigationOnTopoMap:_topoMap fromNodeWithName:_fromNodeName toNodeWithName:_toNodeName usingBeaconsWithUUID:[_topoMap getUUIDString] andMajorID:[_topoMap getMajorIDString].intValue withSpeechOn:_isSpeechEnabled withClickOn:_isClickEnabled withFastSpeechOn:_isSpeechFast]) {
+        [self.view addSubview:_waitViewCtrl.view];
+        _waitViewCtrl.label.text = NSLocalizedString(@"waitCurrentLocation", @"message label for waiting current location");
+        _waitViewCtrl.progress.hidden = YES;
+        _waitViewCtrl.label.hidden = NO;
+        _currentLocationTimeoutTimer = [NSTimer scheduledTimerWithTimeInterval:10 target:self selector:@selector(stopCurrentLocation:) userInfo:nil repeats:NO];
+    } else {
+        [self didTriggerStopNavigation];
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Error",@"Title for error alert") message:NSLocalizedString(@"noRouteError", @"alert message when route is not found") preferredStyle:UIAlertControllerStyleAlert];
+        [alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
+}
+
+- (void) stopCurrentLocation:(NSTimer*) timer
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self didTriggerStopNavigation];
+        [_waitViewCtrl.view removeFromSuperview];
+        
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Error",@"Title for error alert") message:NSLocalizedString(@"noCurrentLocationError", @"alert message when locating is timeout") preferredStyle:UIAlertControllerStyleAlert];
+        [alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+    });
+    
 }
 
 // picker delegate's methods
@@ -238,6 +268,11 @@
 }
 
 - (void)navigationReadyToGo {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [_waitViewCtrl.view removeFromSuperview];
+        [_currentLocationTimeoutTimer invalidate];
+    });
+    
     [self.view addSubview:_navFuncViewCtrl.view];
     if (_isWebViewLoaded) {
         _pathNodes = [_navMachine getPathNodes];
@@ -409,7 +444,20 @@
     NavLogFile *logFile = [[NavLogFile alloc] initFromFileAtPath: [documentsPath stringByAppendingPathComponent:logName] withUUIDStr:[_topoMap getUUIDString]];
     
     
-    [_navMachine simulateNavigationOnTopoMap:_topoMap usingLogFile:logFile withSpeechOn:_isSpeechEnabled withClickOn:_isClickEnabled withFastSpeechOn:_isSpeechFast];
+    if ([_navMachine simulateNavigationOnTopoMap:_topoMap usingLogFile:logFile withSpeechOn:_isSpeechEnabled withClickOn:_isClickEnabled withFastSpeechOn:_isSpeechFast]) {
+        [self.view addSubview:_waitViewCtrl.view];
+        _waitViewCtrl.label.text = NSLocalizedString(@"waitCurrentLocation", @"message label for waiting current location");
+        _waitViewCtrl.progress.hidden = YES;
+        _waitViewCtrl.label.hidden = NO;
+        _currentLocationTimeoutTimer = [NSTimer scheduledTimerWithTimeInterval:10 target:self selector:@selector(stopCurrentLocation:) userInfo:nil repeats:NO];
+    } else {
+        [self didTriggerStopNavigation];
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Error",@"Title for error alert") message:NSLocalizedString(@"noRouteError", @"alert message when route is not found") preferredStyle:UIAlertControllerStyleAlert];
+        [alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        }]];
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
+
 }
 
 @end

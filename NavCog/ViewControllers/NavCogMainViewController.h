@@ -31,6 +31,7 @@
 #import "NavCogChooseLogViewController.h"
 #import "NavCogDataSamplingViewController.h"
 #import "NavCogHelpPageViewController.h"
+#import "NavDownloadingViewController.h"
 
 enum UIType {SpeechForAll, SpeechForStartAndTurnSoundForDistance, SpeechForAllAndSoundForDistance, SpeechForStartSoundForDistanceAndTurn};
 

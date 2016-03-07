@@ -197,3 +197,12 @@ Information";
 
 /* Error message when map url is not specified */
 "urlNotFoundError" = "URL is not specified for this map";
+
+/* message label for waiting current location */
+"waitCurrentLocation" = "Locating...";
+
+/* alert message when route is not found*/
+"noRouteError" = "Route could not be found";
+
+/* alert message when locating is timeout */
+"noCurrentLocationError" = "Fail Locating";

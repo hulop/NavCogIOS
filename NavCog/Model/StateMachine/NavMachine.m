@@ -349,7 +349,7 @@
 }
 
 
-- (void)startNavigationOnTopoMap:(TopoMap *)topoMap fromNodeWithName:(NSString *)fromNodeName toNodeWithName:(NSString *)toNodeName usingBeaconsWithUUID:(NSString *)uuidstr andMajorID:(CLBeaconMajorValue)majorID withSpeechOn:(Boolean)speechEnabled withClickOn:(Boolean)clickEnabled withFastSpeechOn:(Boolean)fastSpeechEnabled {
+- (BOOL)startNavigationOnTopoMap:(TopoMap *)topoMap fromNodeWithName:(NSString *)fromNodeName toNodeWithName:(NSString *)toNodeName usingBeaconsWithUUID:(NSString *)uuidstr andMajorID:(CLBeaconMajorValue)majorID withSpeechOn:(Boolean)speechEnabled withClickOn:(Boolean)clickEnabled withFastSpeechOn:(Boolean)fastSpeechEnabled {
     [NavLog startLog];
     [NavLog logArray:@[fromNodeName,toNodeName] withType:@"Route"];
 
@@ -373,6 +373,9 @@
     _navState = NAV_STATE_INIT;
     if (![fromNodeName isEqualToString:NSLocalizedString(@"currentLocation", @"Current Location")]) {
         _pathNodes = [_topoMap findShortestPathFromNodeWithName:fromNodeName toNodeWithName:toNodeName];
+        if (_pathNodes == nil) {
+            return NO;
+        }
         [self initializeWithPathNodes:_pathNodes];
         _isStartFromCurrentLocation = false;
         _isNavigationStarted = true;
@@ -383,6 +386,7 @@
         _isNavigationStarted = false;
     }
     
+    return YES;
 }
 
 
@@ -402,7 +406,7 @@
 
 }
 
-- (void)simulateNavigationOnTopoMap:(TopoMap *)topoMap usingLogFile:(NavLogFile *)logFile withSpeechOn:(Boolean)speechEnabled withClickOn:(Boolean)clickEnabled withFastSpeechOn:(Boolean)fastSpeechEnabled
+- (BOOL)simulateNavigationOnTopoMap:(TopoMap *)topoMap usingLogFile:(NavLogFile *)logFile withSpeechOn:(Boolean)speechEnabled withClickOn:(Boolean)clickEnabled withFastSpeechOn:(Boolean)fastSpeechEnabled
 {
     //_currentLocationManager = [[NavCurrentLocationManager alloc] initWithTopoMap:topoMap withUUID:logFile.uuidStr];
     //_currentLocationManager.currentMachine = self;
@@ -426,11 +430,15 @@
     _navState = NAV_STATE_INIT;
     
     [_currentLocationManager simulateSensorFromLogFile:logFile];
+    _pathNodes = [_topoMap findShortestPathFromNodeWithName:logFile.fromNodeName toNodeWithName:logFile.toNodeName];
     
+    if (_pathNodes == nil) {
+        return NO;
+    }
     // wait a short period for motion sensor data (initial _curOri should be updated from log)
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (![logFile.fromNodeName isEqualToString:NSLocalizedString(@"currentLocation", @"Current Location")]) {
-            _pathNodes = [_topoMap findShortestPathFromNodeWithName:logFile.fromNodeName toNodeWithName:logFile.toNodeName];
+
             [self initializeWithPathNodes:_pathNodes];
             _isStartFromCurrentLocation = false;
             _isNavigationStarted = true;
@@ -441,6 +449,7 @@
             _isNavigationStarted = false;
         }
     });
+    return YES;
 }
 
 - (void)stopNavigation {

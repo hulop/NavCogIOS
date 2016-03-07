@@ -46,8 +46,8 @@
 
 - (instancetype) initWithTopoMap:(TopoMap*) topoMap withUUID:(NSString *)uuidStr;
 
-- (void)startNavigationOnTopoMap:(TopoMap *)topoMap fromNodeWithName:(NSString *)fromNodeName toNodeWithName:(NSString *)toNodeName usingBeaconsWithUUID:(NSString *)uuidstr andMajorID:(CLBeaconMajorValue)majorID withSpeechOn:(Boolean)speechEnabled withClickOn:(Boolean)clickEnabled withFastSpeechOn:(Boolean)fastSpeechEnabled;
-- (void)simulateNavigationOnTopoMap:(TopoMap *)topoMap usingLogFile:(NavLogFile *)logFile withSpeechOn:(Boolean)speechEnabled withClickOn:(Boolean)clickEnabled withFastSpeechOn:(Boolean)fastSpeechEnabled;
+- (BOOL)startNavigationOnTopoMap:(TopoMap *)topoMap fromNodeWithName:(NSString *)fromNodeName toNodeWithName:(NSString *)toNodeName usingBeaconsWithUUID:(NSString *)uuidstr andMajorID:(CLBeaconMajorValue)majorID withSpeechOn:(Boolean)speechEnabled withClickOn:(Boolean)clickEnabled withFastSpeechOn:(Boolean)fastSpeechEnabled;
+- (BOOL)simulateNavigationOnTopoMap:(TopoMap *)topoMap usingLogFile:(NavLogFile *)logFile withSpeechOn:(Boolean)speechEnabled withClickOn:(Boolean)clickEnabled withFastSpeechOn:(Boolean)fastSpeechEnabled;
 - (void)initializeOrientation;
 - (void)stopNavigation;
 - (void)repeatInstruction;
