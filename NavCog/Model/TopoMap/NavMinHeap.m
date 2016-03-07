@@ -103,18 +103,28 @@
         } else {
             minIndex = leftIndex;
         }
-//    } else {
-        NavNode *node = [_dataArray objectAtIndex:nodeIndex];
-        NavNode *child = [_dataArray objectAtIndex:minIndex];
-        if (node.distFromStartNode > child.distFromStartNode) {
-            node.indexInHeap = minIndex;
-            child.indexInHeap = nodeIndex;
-            NavNode *tmp = node;
-            [_dataArray replaceObjectAtIndex:nodeIndex withObject:child];
-            [_dataArray replaceObjectAtIndex:minIndex withObject:tmp];
-            [self siftDown:minIndex];
+    } else {
+        if (leftIndex >= _curSize) {
+            minIndex = rightIndex;
+        } else {
+            if ([[_dataArray objectAtIndex:leftIndex] distFromStartNode] < [[_dataArray objectAtIndex:rightIndex] distFromStartNode]) {
+                minIndex = leftIndex;
+            } else {
+                minIndex = rightIndex;
+            }
         }
     }
+    NavNode *node = [_dataArray objectAtIndex:nodeIndex];
+    NavNode *child = [_dataArray objectAtIndex:minIndex];
+    if (node.distFromStartNode > child.distFromStartNode) {
+        node.indexInHeap = minIndex;
+        child.indexInHeap = nodeIndex;
+        NavNode *tmp = node;
+        [_dataArray replaceObjectAtIndex:nodeIndex withObject:child];
+        [_dataArray replaceObjectAtIndex:minIndex withObject:tmp];
+        [self siftDown:minIndex];
+    }
+    
 }
 
 - (void)siftAndUpdateNode:(NavNode *)node withNewDist:(int)newDist {
