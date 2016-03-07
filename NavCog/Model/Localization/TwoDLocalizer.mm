@@ -87,6 +87,7 @@ enum ResetMode{
 
 @property long previousTimestamp;
 @property ResetMode resetMode;
+@property double minDistAfterAllReset;
 
 @end
 
@@ -125,6 +126,7 @@ enum ResetMode{
     if (options[@"allreset"]) {
         NSLog(@"2D localizer is all reset");
         _resetMode = ResetMode::allReset;
+        _minDistAfterAllReset = std::numeric_limits<double>::max();
         self.localizer->resetStatus();
         return;
     }
@@ -225,8 +227,10 @@ enum ResetMode{
     
     // reset status with observed beacons during allReset mode.
     if(_resetMode==allReset){
-        std::cout << "resetMode=allReset" << std::endl;
-        _localizer->resetStatus(cbeacons);
+        if(1.0<_minDistAfterAllReset){
+            std::cout << "resetMode=allReset" << std::endl;
+            _localizer->resetStatus(cbeacons);
+        }
     }
     
     _localizer->putBeacons(cbeacons);
@@ -335,6 +339,9 @@ double floorDifferenceTolerance = 0.1;
     double v = fmax(distance, sqrt(pow(stdloc.x(),2) + pow(stdloc.y(),2)))/distThresh95percentile;
     NSLog(@"2D dist for current loc: eid=%@, val=%.2f, dist=%.2f, stdX=%.2f, stdY=%.2f", edgeID, v, distance, stdloc.x(), stdloc.y());
     std::cout << "meanState=" << meanState << std::endl;
+    if(v <= _minDistAfterAllReset){
+        _minDistAfterAllReset = v;
+    }
     if(v<=1.0){
         std::cout << "2D dist for initialization < 1." << std::endl;
     }
