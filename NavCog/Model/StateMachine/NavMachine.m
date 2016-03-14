@@ -236,6 +236,9 @@
         } else { //straight
             _navState = NAV_STATE_WALKING;
         }
+    } else if (_initialState.type == STATE_TYPE_TRANSITION) {
+        // current location brings this state in certain situation
+        _navState = NAV_STATE_WALKING;
     }
     [self setHintTexts];
 
