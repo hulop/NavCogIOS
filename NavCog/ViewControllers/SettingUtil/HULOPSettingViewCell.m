@@ -30,6 +30,25 @@
 // TODO
 // customize accessibility
 
+- (instancetype)initWithCoder:(NSCoder *)aDecoder
+{
+    self = [super initWithCoder:aDecoder];
+    
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center addObserver:self
+               selector:@selector(userDefaultsDidChange:)
+                   name:NSUserDefaultsDidChangeNotification
+                 object:nil];
+    return self;
+}
+
+- (void) userDefaultsDidChange:(NSNotification*) notification
+{
+    if (self.setting) {
+        [self update:self.setting];
+    }
+}
+
 - (void) update:(HULOPSetting *)setting
 {
     
@@ -38,6 +57,8 @@
     [self addGestureRecognizer:recognizer];
     
     self.setting = setting;
+    
+    
     self.title.text = self.setting.label;
 
     if (self.slider) {
