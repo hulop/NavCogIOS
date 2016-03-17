@@ -64,6 +64,7 @@
 {
     if (self.switchView) {
         [self.switchView setOn:!self.switchView.on animated:YES];
+        [self switchChanged:self.switchView];
     }
 }
 
