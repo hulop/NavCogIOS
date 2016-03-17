@@ -1,3 +1,4 @@
+
 /* Class = "UISwitch"; accessibilityLabel = "Speech"; ObjectID = "3fn-P2-Sz5"; */
 "3fn-P2-Sz5.accessibilityLabel" = "Speech";
 
@@ -13,9 +14,6 @@
 /* Class = "UIButton"; normalTitle = "Get Data"; ObjectID = "P9j-yz-NDt"; */
 "P9j-yz-NDt.normalTitle" = "Get Data";
 
-/* Class = "UIButton"; normalTitle = "Replay log"; ObjectID = "zFh-rv-7Em"; */
-"zFh-rv-7Em.normalTitle" = "Replay Log";
-
 /* Class = "UISegmentedControl"; PK7-RU-nau.segmentTitles[0] = "Normal"; ObjectID = "PK7-RU-nau"; */
 "PK7-RU-nau.segmentTitles[0]" = "Normal";
 
@@ -24,6 +22,9 @@
 
 /* Class = "UILabel"; text = "Speech Rate:"; ObjectID = "VHu-cc-MQa"; */
 "VHu-cc-MQa.text" = "Speech Rate:";
+
+/* Class = "UIButton"; accessibilityLabel = "more options"; ObjectID = "Wy5-F9-lfl"; */
+"Wy5-F9-lfl.accessibilityLabel" = "more options";
 
 /* Class = "UILabel"; text = "Speech:"; ObjectID = "ZuU-l0-l4h"; */
 "ZuU-l0-l4h.text" = "Speech:";
@@ -34,3 +35,5 @@
 /* Class = "UIButton"; normalTitle = "Help"; ObjectID = "vgl-0E-SXC"; */
 "vgl-0E-SXC.normalTitle" = "Help";
 
+/* Class = "UIButton"; normalTitle = "Replay Log"; ObjectID = "zFh-rv-7Em"; */
+"zFh-rv-7Em.normalTitle" = "Replay Log";

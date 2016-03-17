@@ -37,6 +37,7 @@
 @property (strong, nonatomic) NavCogDataSamplingViewController *dataSamplingViewCtrl;
 @property (strong, nonatomic) NavCogHelpPageViewController *helpPageViewCtrl;
 @property (strong, nonatomic) NavDownloadingViewController *waitViewCtrl;
+@property (strong, nonatomic) NavCogSettingViewController *settingPageViewCtrl;
 @property (strong, nonatomic) TopoMap *topoMap;
 @property (strong, nonatomic) NSString *mapDataString;
 @property (strong, nonatomic) NavMachine *navMachine;
@@ -67,6 +68,7 @@
     _navFuncViewCtrl = [NavCogFuncViewController sharedNavCogFuntionViewController];
     _navFuncViewCtrl.delegate = self;
     _waitViewCtrl = [[NavDownloadingViewController alloc] init];
+    _settingPageViewCtrl = [[NavCogSettingViewController alloc] init];
     //_navMachine = [[NavMachine alloc] init];
     //_navMachine.delegate = self;
     _isWebViewLoaded = false;
@@ -384,6 +386,11 @@
 // go to help page
 - (IBAction)switchToHelpPage:(id)sender {
     [self.view addSubview:_helpPageViewCtrl.view];
+}
+
+// go to more options page
+- (IBAction)switchToSettingPage:(id)sender {
+    [self.view addSubview:_settingPageViewCtrl.view];
 }
 
 // change speech rate

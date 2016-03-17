@@ -26,6 +26,18 @@
 		7ED823111C201AF30003841D /* NavLocalizeResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 7ED823101C201AF30003841D /* NavLocalizeResult.m */; };
 		7ED823141C201F3C0003841D /* NavLogFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 7ED823131C201F3C0003841D /* NavLogFile.m */; };
 		7ED823171C205DD60003841D /* NavEdgeLocalizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7ED823161C205DD60003841D /* NavEdgeLocalizer.m */; };
+		7EDB601E1C9A1DC9005772B2 /* NavCogSettingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EDB601C1C9A1DC9005772B2 /* NavCogSettingViewController.m */; };
+		7EDB60321C9A2C5F005772B2 /* NavCogSettingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7EDB60341C9A2C5F005772B2 /* NavCogSettingViewController.xib */; };
+		7EDB60441C9A34A0005772B2 /* HULOPSettingViewTextCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7EDB60431C9A34A0005772B2 /* HULOPSettingViewTextCell.xib */; };
+		7EDB60581C9A356A005772B2 /* HULOPSetting.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EDB604F1C9A356A005772B2 /* HULOPSetting.m */; };
+		7EDB60591C9A356A005772B2 /* HULOPSettingHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EDB60511C9A356A005772B2 /* HULOPSettingHelper.m */; };
+		7EDB605A1C9A356A005772B2 /* HULOPSettingViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EDB60531C9A356A005772B2 /* HULOPSettingViewCell.m */; };
+		7EDB605B1C9A356A005772B2 /* HULOPSettingViewSwitchCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7EDB60541C9A356A005772B2 /* HULOPSettingViewSwitchCell.xib */; };
+		7EDB60631C9A3616005772B2 /* HULOPSettingTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EDB60621C9A3616005772B2 /* HULOPSettingTableView.m */; };
+		7EDB60661C9A36D0005772B2 /* HULOPSettingView.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7EDB60681C9A36D0005772B2 /* HULOPSettingView.strings */; };
+		7EDB606C1C9A386B005772B2 /* HULOPSettingViewSliderCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7EDB606B1C9A386B005772B2 /* HULOPSettingViewSliderCell.xib */; };
+		7EDB606E1C9A388E005772B2 /* HULOPSettingViewSubtitleCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7EDB606D1C9A388E005772B2 /* HULOPSettingViewSubtitleCell.xib */; };
+		7EDB60721C9A3DB3005772B2 /* HULOPSettingViewPickerCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7EDB60711C9A3DB3005772B2 /* HULOPSettingViewPickerCell.xib */; };
 		7EDED7861C04ACC800D5EEB9 /* NavLocalizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 7EDED7851C04ACC800D5EEB9 /* NavLocalizer.m */; };
 		7EDED7891C04AD0C00D5EEB9 /* NavLocalizerFactory.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7EDED7881C04AD0C00D5EEB9 /* NavLocalizerFactory.mm */; };
 		7EEB5E531C2302F000914FD4 /* OneDLocalizer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7EEB5E521C2302F000914FD4 /* OneDLocalizer.mm */; };
@@ -66,7 +78,6 @@
 		161D696F1BFC68B0004A2E73 /* NavLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NavLog.h; path = NavCog/NavLogging/NavLog.h; sourceTree = SOURCE_ROOT; };
 		161D69701BFC68B0004A2E73 /* NavLog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NavLog.m; path = NavCog/NavLogging/NavLog.m; sourceTree = SOURCE_ROOT; };
 		233BF0C91BE3EC5E00D4BF31 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/NavCogHelpPageViewController.strings; sourceTree = "<group>"; };
-		233BF0CA1BE3EC5E00D4BF31 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/NavCogMainViewController.strings; sourceTree = "<group>"; };
 		233BF0CB1BE3EC5E00D4BF31 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/NavCogChooseMapViewController.strings; sourceTree = "<group>"; };
 		233BF0CD1BE3EC5F00D4BF31 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/NavCogDataSamplingViewController.strings; sourceTree = "<group>"; };
 		233BF0CE1BE3EC5F00D4BF31 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -78,7 +89,6 @@
 		23B433E81BF17CC700EAD413 /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = SOURCE_ROOT; };
 		23E77D431BE1A89E00625020 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/NavCogDataSamplingViewController.strings; sourceTree = "<group>"; };
 		23E77D441BE1A89E00625020 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/NavCogChooseMapViewController.strings; sourceTree = "<group>"; };
-		23E77D451BE1A89E00625020 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/NavCogMainViewController.strings; sourceTree = "<group>"; };
 		23E77D461BE1A89E00625020 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/NavCogHelpPageViewController.strings; sourceTree = "<group>"; };
 		23E77D501BE1ADB600625020 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		7218BF5DC24270857B84DDB7 /* Pods-NavCog.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NavCog.debug.xcconfig"; path = "Pods/Target Support Files/Pods-NavCog/Pods-NavCog.debug.xcconfig"; sourceTree = "<group>"; };
@@ -99,6 +109,29 @@
 		7ED823131C201F3C0003841D /* NavLogFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NavLogFile.m; path = NavCog/NavLogging/NavLogFile.m; sourceTree = SOURCE_ROOT; };
 		7ED823151C205DD60003841D /* NavEdgeLocalizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NavEdgeLocalizer.h; path = NavCog/Model/Localization/NavEdgeLocalizer.h; sourceTree = SOURCE_ROOT; };
 		7ED823161C205DD60003841D /* NavEdgeLocalizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NavEdgeLocalizer.m; path = NavCog/Model/Localization/NavEdgeLocalizer.m; sourceTree = SOURCE_ROOT; };
+		7EDB601B1C9A1DC9005772B2 /* NavCogSettingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NavCogSettingViewController.h; path = NavCog/ViewControllers/NavCogSettingViewController.h; sourceTree = SOURCE_ROOT; };
+		7EDB601C1C9A1DC9005772B2 /* NavCogSettingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NavCogSettingViewController.m; path = NavCog/ViewControllers/NavCogSettingViewController.m; sourceTree = SOURCE_ROOT; };
+		7EDB602F1C9A2AA3005772B2 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/NavCogMainViewController.strings; sourceTree = "<group>"; };
+		7EDB60311C9A2AC8005772B2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/NavCogMainViewController.strings; sourceTree = "<group>"; };
+		7EDB60331C9A2C5F005772B2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/NavCogSettingViewController.xib; sourceTree = "<group>"; };
+		7EDB60361C9A2C63005772B2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/NavCogSettingViewController.strings; sourceTree = "<group>"; };
+		7EDB60381C9A2C64005772B2 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/NavCogSettingViewController.strings; sourceTree = "<group>"; };
+		7EDB60431C9A34A0005772B2 /* HULOPSettingViewTextCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = HULOPSettingViewTextCell.xib; path = NavCog/ViewControllers/SettingUtil/HULOPSettingViewTextCell.xib; sourceTree = SOURCE_ROOT; };
+		7EDB604E1C9A356A005772B2 /* HULOPSetting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HULOPSetting.h; path = NavCog/ViewControllers/SettingUtil/HULOPSetting.h; sourceTree = SOURCE_ROOT; };
+		7EDB604F1C9A356A005772B2 /* HULOPSetting.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HULOPSetting.m; path = NavCog/ViewControllers/SettingUtil/HULOPSetting.m; sourceTree = SOURCE_ROOT; };
+		7EDB60501C9A356A005772B2 /* HULOPSettingHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HULOPSettingHelper.h; path = NavCog/ViewControllers/SettingUtil/HULOPSettingHelper.h; sourceTree = SOURCE_ROOT; };
+		7EDB60511C9A356A005772B2 /* HULOPSettingHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HULOPSettingHelper.m; path = NavCog/ViewControllers/SettingUtil/HULOPSettingHelper.m; sourceTree = SOURCE_ROOT; };
+		7EDB60521C9A356A005772B2 /* HULOPSettingViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HULOPSettingViewCell.h; path = NavCog/ViewControllers/SettingUtil/HULOPSettingViewCell.h; sourceTree = SOURCE_ROOT; };
+		7EDB60531C9A356A005772B2 /* HULOPSettingViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HULOPSettingViewCell.m; path = NavCog/ViewControllers/SettingUtil/HULOPSettingViewCell.m; sourceTree = SOURCE_ROOT; };
+		7EDB60541C9A356A005772B2 /* HULOPSettingViewSwitchCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = HULOPSettingViewSwitchCell.xib; path = NavCog/ViewControllers/SettingUtil/HULOPSettingViewSwitchCell.xib; sourceTree = SOURCE_ROOT; };
+		7EDB60611C9A3616005772B2 /* HULOPSettingTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HULOPSettingTableView.h; path = NavCog/ViewControllers/SettingUtil/HULOPSettingTableView.h; sourceTree = SOURCE_ROOT; };
+		7EDB60621C9A3616005772B2 /* HULOPSettingTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HULOPSettingTableView.m; path = NavCog/ViewControllers/SettingUtil/HULOPSettingTableView.m; sourceTree = SOURCE_ROOT; };
+		7EDB60671C9A36D0005772B2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/HULOPSettingView.strings; sourceTree = "<group>"; };
+		7EDB60691C9A36D5005772B2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/HULOPSettingView.strings; sourceTree = "<group>"; };
+		7EDB606A1C9A36D7005772B2 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/HULOPSettingView.strings; sourceTree = "<group>"; };
+		7EDB606B1C9A386B005772B2 /* HULOPSettingViewSliderCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = HULOPSettingViewSliderCell.xib; path = NavCog/ViewControllers/SettingUtil/HULOPSettingViewSliderCell.xib; sourceTree = SOURCE_ROOT; };
+		7EDB606D1C9A388E005772B2 /* HULOPSettingViewSubtitleCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = HULOPSettingViewSubtitleCell.xib; path = NavCog/ViewControllers/SettingUtil/HULOPSettingViewSubtitleCell.xib; sourceTree = SOURCE_ROOT; };
+		7EDB60711C9A3DB3005772B2 /* HULOPSettingViewPickerCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = HULOPSettingViewPickerCell.xib; path = NavCog/ViewControllers/SettingUtil/HULOPSettingViewPickerCell.xib; sourceTree = SOURCE_ROOT; };
 		7EDED7821C04AA1E00D5EEB9 /* NavLocalizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NavLocalizer.h; path = NavCog/Model/Localization/NavLocalizer.h; sourceTree = SOURCE_ROOT; };
 		7EDED7851C04ACC800D5EEB9 /* NavLocalizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NavLocalizer.m; path = NavCog/Model/Localization/NavLocalizer.m; sourceTree = SOURCE_ROOT; };
 		7EDED7871C04AD0C00D5EEB9 /* NavLocalizerFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NavLocalizerFactory.h; path = NavCog/Model/Localization/NavLocalizerFactory.h; sourceTree = SOURCE_ROOT; };
@@ -217,6 +250,27 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		7EDB60421C9A3444005772B2 /* SettingUtils */ = {
+			isa = PBXGroup;
+			children = (
+				7EDB604E1C9A356A005772B2 /* HULOPSetting.h */,
+				7EDB604F1C9A356A005772B2 /* HULOPSetting.m */,
+				7EDB60501C9A356A005772B2 /* HULOPSettingHelper.h */,
+				7EDB60511C9A356A005772B2 /* HULOPSettingHelper.m */,
+				7EDB60521C9A356A005772B2 /* HULOPSettingViewCell.h */,
+				7EDB60531C9A356A005772B2 /* HULOPSettingViewCell.m */,
+				7EDB60541C9A356A005772B2 /* HULOPSettingViewSwitchCell.xib */,
+				7EDB60431C9A34A0005772B2 /* HULOPSettingViewTextCell.xib */,
+				7EDB606B1C9A386B005772B2 /* HULOPSettingViewSliderCell.xib */,
+				7EDB606D1C9A388E005772B2 /* HULOPSettingViewSubtitleCell.xib */,
+				7EDB60711C9A3DB3005772B2 /* HULOPSettingViewPickerCell.xib */,
+				7EDB60611C9A3616005772B2 /* HULOPSettingTableView.h */,
+				7EDB60621C9A3616005772B2 /* HULOPSettingTableView.m */,
+				7EDB60681C9A36D0005772B2 /* HULOPSettingView.strings */,
+			);
+			name = SettingUtils;
+			sourceTree = "<group>";
+		};
 		A0147B111BBF0222004BF457 /* NavNotificationSpeaker */ = {
 			isa = PBXGroup;
 			children = (
@@ -249,6 +303,10 @@
 				B4048C521C11DBA800634A15 /* NavCogChooseLogViewController.h */,
 				B4048C531C11DCA600634A15 /* NavCogChooseLogViewController.m */,
 				B4048C591C11DEE500634A15 /* NavCogChooseLogViewController.xib */,
+				7EDB601B1C9A1DC9005772B2 /* NavCogSettingViewController.h */,
+				7EDB601C1C9A1DC9005772B2 /* NavCogSettingViewController.m */,
+				7EDB60341C9A2C5F005772B2 /* NavCogSettingViewController.xib */,
+				7EDB60421C9A3444005772B2 /* SettingUtils */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -470,7 +528,13 @@
 			files = (
 				A02EFF811BBC41740026DC98 /* click.wav in Resources */,
 				7E28AF5D1BC38A6B00F122D0 /* Settings.bundle in Resources */,
+				7EDB60661C9A36D0005772B2 /* HULOPSettingView.strings in Resources */,
 				23E77D4F1BE1ADB600625020 /* Localizable.strings in Resources */,
+				7EDB606E1C9A388E005772B2 /* HULOPSettingViewSubtitleCell.xib in Resources */,
+				7EDB606C1C9A386B005772B2 /* HULOPSettingViewSliderCell.xib in Resources */,
+				7EDB605B1C9A356A005772B2 /* HULOPSettingViewSwitchCell.xib in Resources */,
+				7EDB60321C9A2C5F005772B2 /* NavCogSettingViewController.xib in Resources */,
+				7EDB60441C9A34A0005772B2 /* HULOPSettingViewTextCell.xib in Resources */,
 				2365BC791BE1802D007F14C3 /* NavCogChooseMapViewController.xib in Resources */,
 				A06736B81BC577050008B818 /* Images.xcassets in Resources */,
 				7EEB5E7A1C2390D900914FD4 /* white.png in Resources */,
@@ -480,6 +544,7 @@
 				2365BC741BE17ECC007F14C3 /* NavCogMainViewController.xib in Resources */,
 				2365BC7C1BE18079007F14C3 /* NavCogDataSamplingViewController.xib in Resources */,
 				A06736781BC575360008B818 /* NavCogMapView in Resources */,
+				7EDB60721C9A3DB3005772B2 /* HULOPSettingViewPickerCell.xib in Resources */,
 				23B433E91BF17CC700EAD413 /* LaunchScreen.xib in Resources */,
 				A06736B11BC576CF0008B818 /* NavDownloadingViewController.xib in Resources */,
 			);
@@ -540,6 +605,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7EDB60581C9A356A005772B2 /* HULOPSetting.m in Sources */,
 				7ED8230E1C1FF5690003841D /* NavState.mm in Sources */,
 				7EEB5E531C2302F000914FD4 /* OneDLocalizer.mm in Sources */,
 				7E78834E1C15042E00AB19A9 /* NavCogChooseLogViewController.m in Sources */,
@@ -548,6 +614,7 @@
 				7ED823141C201F3C0003841D /* NavLogFile.m in Sources */,
 				7EEFB5591C1E430F00822E14 /* NavI18nUtil.m in Sources */,
 				7ED823111C201AF30003841D /* NavLocalizeResult.m in Sources */,
+				7EDB605A1C9A356A005772B2 /* HULOPSettingViewCell.m in Sources */,
 				A067367B1BC576130008B818 /* NavNotificationSpeaker.m in Sources */,
 				7E908E321C16FB9D00CD7F36 /* P2PManager.m in Sources */,
 				A06736871BC576820008B818 /* KDTreeLocalization.mm in Sources */,
@@ -557,9 +624,11 @@
 				7EDED7891C04AD0C00D5EEB9 /* NavLocalizerFactory.mm in Sources */,
 				A06736B41BC576CF0008B818 /* NavCogFuncViewController.mm in Sources */,
 				A067369B1BC576960008B818 /* NavNode.m in Sources */,
+				7EDB601E1C9A1DC9005772B2 /* NavCogSettingViewController.m in Sources */,
 				A06736981BC576960008B818 /* NavMapManager.m in Sources */,
 				7E908E221C1674C400CD7F36 /* TwoDFloorLocalizer.mm in Sources */,
 				A083F7751BC5B2BE001A1A1B /* NavCogHelpPageViewController.m in Sources */,
+				7EDB60631C9A3616005772B2 /* HULOPSettingTableView.m in Sources */,
 				A06736BE1BC577340008B818 /* main.m in Sources */,
 				161D69711BFC68B0004A2E73 /* NavLog.m in Sources */,
 				A06736971BC576960008B818 /* NavLayer.m in Sources */,
@@ -576,6 +645,7 @@
 				A06736961BC576960008B818 /* NavEdge.m in Sources */,
 				ED4451C31C1B621400B4AEFA /* NavLocation.m in Sources */,
 				A06736991BC576960008B818 /* NavMinHeap.m in Sources */,
+				7EDB60591C9A356A005772B2 /* HULOPSettingHelper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -586,8 +656,8 @@
 			isa = PBXVariantGroup;
 			children = (
 				2365BC751BE17ECC007F14C3 /* Base */,
-				23E77D451BE1A89E00625020 /* en */,
-				233BF0CA1BE3EC5E00D4BF31 /* ja */,
+				7EDB602F1C9A2AA3005772B2 /* ja */,
+				7EDB60311C9A2AC8005772B2 /* en */,
 			);
 			name = NavCogMainViewController.xib;
 			path = NavCog/ViewControllers;
@@ -643,6 +713,28 @@
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
+		};
+		7EDB60341C9A2C5F005772B2 /* NavCogSettingViewController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7EDB60331C9A2C5F005772B2 /* Base */,
+				7EDB60361C9A2C63005772B2 /* en */,
+				7EDB60381C9A2C64005772B2 /* ja */,
+			);
+			name = NavCogSettingViewController.xib;
+			path = NavCog/ViewControllers;
+			sourceTree = SOURCE_ROOT;
+		};
+		7EDB60681C9A36D0005772B2 /* HULOPSettingView.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7EDB60671C9A36D0005772B2 /* Base */,
+				7EDB60691C9A36D5005772B2 /* en */,
+				7EDB606A1C9A36D7005772B2 /* ja */,
+			);
+			name = HULOPSettingView.strings;
+			path = NavCog/ViewControllers/SettingUtil;
+			sourceTree = SOURCE_ROOT;
 		};
 		B4048C591C11DEE500634A15 /* NavCogChooseLogViewController.xib */ = {
 			isa = PBXVariantGroup;
