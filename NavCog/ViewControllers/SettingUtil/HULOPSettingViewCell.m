@@ -51,7 +51,12 @@
         self.switchView.on = [self.setting boolValue];
     }
     if (self.subtitle) {
-        self.subtitle.text = [self.setting stringValue];
+        if (self.setting.type == OPTION) {
+            self.accessoryType = [self.setting boolValue]?UITableViewCellAccessoryCheckmark:UITableViewCellAccessoryNone;
+            self.subtitle.text = nil;
+        } else {
+            self.subtitle.text = [self.setting stringValue];
+        }
     }
     if (self.textInput) {
         self.textInput.secureTextEntry = (setting.type == PASSINPUT);
@@ -65,6 +70,9 @@
     if (self.switchView) {
         [self.switchView setOn:!self.switchView.on animated:YES];
         [self switchChanged:self.switchView];
+    }
+    if (self.setting.type == OPTION) {
+        [self.setting.group checkOption:self.setting];
     }
 }
 

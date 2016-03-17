@@ -30,9 +30,11 @@
 @interface HULOPSettingHelper : NSObject <UITableViewDataSource, UITableViewDelegate>
 
 @property NSMutableArray *settings;
+@property NSMutableDictionary *groups;
 
 
 - (HULOPSetting*) addSettingWithType: (NavCogSettingType) type Label: (NSString*) label Name:(NSString*) name DefaultValue:(NSObject*) defaultValue Accept:(NSObject*(^)(NSObject *value)) handler;
+- (HULOPSetting*) addSettingWithType: (NavCogSettingType) type Label: (NSString*) label Name:(NSString*) name Group:(NSString*)group DefaultValue:(NSObject*) defaultValue Accept:(NSObject*(^)(NSObject *value)) handler;
 - (HULOPSetting*) addSettingWithType: (NavCogSettingType) type Label: (NSString*) label Name:(NSString*) name DefaultValue:(NSObject*) defaultValue Min: (double) min Max: (double) max Interval: (double) interval;
 
 - (void) addSectionTitle: (NSString*) title;

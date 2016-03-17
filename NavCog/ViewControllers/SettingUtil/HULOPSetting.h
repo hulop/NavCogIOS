@@ -25,6 +25,14 @@
 
 #import <Foundation/Foundation.h>
 
+@class HULOPSetting;
+
+@interface HULOPOptionGroup : NSObject
+@property NSMutableArray *options;
+- (void) addOption:(HULOPSetting*)setting;
+- (void) checkOption:(HULOPSetting*)setting;
+@end
+
 typedef NS_ENUM (NSUInteger, NavCogSettingType) {
     SECTION,
     UUID_TYPE,
@@ -34,7 +42,8 @@ typedef NS_ENUM (NSUInteger, NavCogSettingType) {
     DOUBLE,
     BOOLEAN,
     TEXTINPUT,
-    PASSINPUT
+    PASSINPUT,
+    OPTION
 };
 
 @interface HULOPSetting: NSObject {
@@ -57,6 +66,7 @@ typedef NS_ENUM (NSUInteger, NavCogSettingType) {
 @property NavCogSettingType type;
 @property NSString *label;
 @property NSString *name;
+@property HULOPOptionGroup *group;
 @property NSObject *defaultValue;
 @property NSObject *currentValue;
 @property NSObject *selectedValue;

@@ -132,6 +132,7 @@
         case HOST_PORT:
         case SUBTITLE:
         case STRING:
+        case OPTION:
             return @"subtitleCell";
         case BOOLEAN:
             return @"switchCell";
@@ -247,6 +248,20 @@
     s.min = min;
     s.max = max;
     s.interval = interval;
+    return s;
+}
+
+- (HULOPSetting*)addSettingWithType:(NavCogSettingType)type Label:(NSString*) label Name:(NSString *)name Group:(NSString*)group DefaultValue:(NSObject*) defaultValue Accept:(NSObject *(^)(NSObject *))handler
+{
+    HULOPSetting *s = [self addSettingWithType:type Label:label Name:name DefaultValue:defaultValue Accept:handler];
+    if (!self.groups) {
+        self.groups = [@{} mutableCopy];
+    }
+    if (!self.groups[group]) {
+        self.groups[group] = [[HULOPOptionGroup alloc] init];
+    }
+    [self.groups[group] addOption:s];
+    
     return s;
 }
 

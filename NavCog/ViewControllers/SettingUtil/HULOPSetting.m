@@ -25,6 +25,34 @@
 
 #import "HULOPSetting.h"
 
+@implementation  HULOPOptionGroup
+- (instancetype)init
+{
+    self = [super init];
+    self.options = [@[] mutableCopy];
+    return self;
+}
+- (void)addOption:(HULOPSetting *)setting
+{
+    if ([self.options containsObject:setting]) {
+        return;
+    }
+    [self.options addObject:setting];
+    setting.group = self;
+}
+- (void)checkOption:(HULOPSetting *)setting
+{
+    for(HULOPSetting *option in self.options) {
+        if (option == setting) {
+            [option setCurrentValue:@(YES)];
+        } else {
+            [option setCurrentValue:@(NO)];
+        }
+        [option save];
+    }
+}
+@end
+
 @implementation HULOPSetting
 
 - (id) init
