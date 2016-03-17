@@ -310,41 +310,39 @@ enum ResetMode{
 
 - (double) computeDistanceScoreWithOptions: (NSDictionary*) options{
     if(_resetMode==allReset){
-        return [self computeDistanceScoreWithOptionsMeanLocation:options];
+        return [self computeDistanceScoreWithOptionsAllReset:options];
     }else{
         return [self computeDistanceScoreWithOptionsTransit:options];
     }
     //return [self computeDistanceScoreWithOptionsAvgDist:options];
 }
 
+
 // Parameters to compute distance score
 double largeDistance = 100*100;
-double distThresh95percentile = 5.1; // [m]
+double distThresh95percentile = 5.1; //[m]
 double distThreshCurrentLoc = distThresh95percentile;
+double distThresholdForTransit = 2.0; //[m]
 double distanceByFloorDiff = Meter2Feet(distThreshCurrentLoc);
 //double distanceByFloorDiff = Meter2Feet(0.1);
 double floorDifferenceTolerance = 0.5;
 
-- (double) computeDistanceScoreWithOptionsMeanLocation: (NSDictionary*) options{
-    NSString* edgeID = options[@"edgeID"];
-    NavLightEdgeHolder* holder = [NavLightEdgeHolder sharedInstance];
-    NavLightEdge* edge = [holder getNavLightEdgeByEdgeID:edgeID];
+- (double) computeDistanceScoreWithOptionsAllReset: (NSDictionary*) options{
     
     if (!_states) {
         return largeDistance; // return far distance if not ready
     }
     assert(_states);
     
-    double distance = [self computeDistanceBetweenLocation:*_meanLoc AndEdge:edge];
-    
-    distance = Feet2Meter(distance); // in meter
+    NSString* edgeID = options[@"edgeID"];
+    NavLightEdgeHolder* holder = [NavLightEdgeHolder sharedInstance];
+    NavLightEdge* edge = [holder getNavLightEdgeByEdgeID:edgeID];
+    double distance = Feet2Meter([self computeDistanceBetweenLocation:*_meanLoc AndEdge:edge]); // in meter;
     loc::Location stdloc = loc::Location::standardDeviation(*_states); //in meter
-    loc::State meanState = loc::State::mean(*_states);
     
     double distThreshold = distThresh95percentile;
     double v = fmax(distance, sqrt(pow(stdloc.x(),2) + pow(stdloc.y(),2)))/distThreshold;
     NSLog(@"2D dist for current loc: eid=%@, val=%.2f, dist=%.2f, stdX=%.2f, stdY=%.2f", edgeID, v, distance, stdloc.x(), stdloc.y());
-    std::cout << "meanState=" << meanState << std::endl;
     if(v <= _minDistAfterAllReset){
         _minDistAfterAllReset = v;
     }
@@ -354,70 +352,31 @@ double floorDifferenceTolerance = 0.5;
     return v;
 }
 
-- (double) computeDistanceScoreWithOptionsAvgDist: (NSDictionary*) options{
-    NSString* edgeID = options[@"edgeID"];
-    NavLightEdgeHolder* holder = [NavLightEdgeHolder sharedInstance];
-    NavLightEdge* edge = [holder getNavLightEdgeByEdgeID:edgeID];
-    
-    double distanceSum = 0;
-    if (!_states) {
-        return largeDistance; // return far distance if not ready
-    }
-    assert(_states);
-    
-    double x = Meter2Feet(_meanLoc->x());
-    double y = Meter2Feet(_meanLoc->y());
-    Nav2DPoint* meanPoint = [[Nav2DPoint alloc] initWithX:x Y:y];
-    Nav2DPoint* pointOnSeg = [[edge getNearestSegmentFromPoint:meanPoint] getNearestPointOnLineSegmentFromPoint:meanPoint];
-    
-    x = Feet2Meter(pointOnSeg.x);
-    y = Feet2Meter(pointOnSeg.y);
-    double z = 0;
-    double floor = edge.floor - 1; // floor field in Edge class starts from 1.
-    Location meanLocOnSeg(x,y,z,floor);
-    
-    // in meter
-    distanceSum = 0;
-    std::stringstream ss;
-    for(State state: *_states){
-        double distance = [self computeDistanceBetweenPoint:meanLocOnSeg And:state];
-        distanceSum += distance;
-        ss << distance << ",";
-    }
-    distanceSum/=(_states->size());
-    // in feet
-    double threshold = 6.0; // feet
-    double v = Meter2Feet(distanceSum)/threshold;
-    NSLog(@"2D distance: edgeID=%@, dist=%.2f", edgeID, v);
-    return v;
-}
-
-
 - (double) computeDistanceScoreWithOptionsTransit: (NSDictionary*) options{
-    NSString* edgeID = options[@"edgeID"];
-    NavLightEdgeHolder* holder = [NavLightEdgeHolder sharedInstance];
-    NavLightEdge* edge = [holder getNavLightEdgeByEdgeID:edgeID];
     
     if(!_states){
         return largeDistance; // return far distance if not ready
     }
     assert(_states);
     
+    NSString* edgeID = options[@"edgeID"];
+    NavLightEdgeHolder* holder = [NavLightEdgeHolder sharedInstance];
+    NavLightEdge* edge = [holder getNavLightEdgeByEdgeID:edgeID];
+    double distance = Feet2Meter([self computeDistanceBetweenLocation:*_meanPose AndEdge:edge]); // in meter
     loc::Location stdloc = loc::Location::standardDeviation(*_states);
-    double distanceSum = 0;
-    for(State state: *_states){
-        double distance = [self computeDistanceBetweenLocation:state AndEdge:edge];
-        distanceSum += distance;
-    }
-    double distanceMean = distanceSum/_states->size();
-    double v = fmax(distanceMean, sqrt(pow(stdloc.x(),2) + pow(stdloc.y(),2)))/6.0;
-    NSLog(@"2D knnDist: %@, %.2f, %.2f, %.2f, %.2f", edgeID, v, distanceMean, stdloc.x(), stdloc.y());
+    
+    double distThreshold = distThresholdForTransit; // meter
+    double v = distance/distThreshold;
+    
+    NSLog(@"2D knnDist for transit: %@, %.2f, %.2f, %.2f, %.2f", edgeID, v, distance, stdloc.x(), stdloc.y());
+    
     return v;
 }
 
 - (double) computeDistanceBetweenLocation: (Location) state AndEdge:(NavLightEdge*) edge{
     
     double distance = 0;
+    // Convert state to Nav2DPoint (in feet)
     double x = Meter2Feet(state.x());
     double y = Meter2Feet(state.y());
     double floor = state.floor() + 1;
@@ -442,19 +401,6 @@ double floorDifferenceTolerance = 0.5;
     
     return distance;
 }
-
-- (double) computeDistanceBetweenPoint: (Location) point1 And: (Location) point2{
-    
-    double distance = 0;
-    double floorDifference = std::abs(point1.floor()-point2.floor());
-    if(floorDifference>floorDifferenceTolerance){
-        distance += floorDifference*distanceByFloorDiff;
-    }
-    distance += Location::distance2D(point1, point2);
-    
-    return distance;
-}
-
 
 void calledWhenUpdated(void *userData, Status * pStatus){
     //NSLog(@"location updated");
