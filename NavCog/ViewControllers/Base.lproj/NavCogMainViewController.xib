@@ -127,14 +127,6 @@
                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                     <nil key="highlightedColor"/>
                                 </label>
-                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Wy5-F9-lfl">
-                                    <rect key="frame" x="317" y="26" width="20" height="20"/>
-                                    <accessibility key="accessibilityConfiguration" label="more options"/>
-                                    <state key="normal" image="gear"/>
-                                    <connections>
-                                        <action selector="switchToSettingPage:" destination="-1" eventType="touchUpInside" id="rAN-XC-vgf"/>
-                                    </connections>
-                                </button>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Speech:" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZuU-l0-l4h">
                                     <rect key="frame" x="31" y="26" width="71" height="21"/>
                                     <accessibility key="accessibilityConfiguration">
@@ -151,6 +143,14 @@
                                         <action selector="speechOnAndOff:" destination="-1" eventType="valueChanged" id="rbv-hf-PkN"/>
                                     </connections>
                                 </switch>
+                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Wy5-F9-lfl">
+                                    <rect key="frame" x="313" y="19" width="36" height="36"/>
+                                    <accessibility key="accessibilityConfiguration" label="more options"/>
+                                    <state key="normal" image="gear"/>
+                                    <connections>
+                                        <action selector="switchToSettingPage:" destination="-1" eventType="touchUpInside" id="rAN-XC-vgf"/>
+                                    </connections>
+                                </button>
                             </subviews>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                             <constraints>

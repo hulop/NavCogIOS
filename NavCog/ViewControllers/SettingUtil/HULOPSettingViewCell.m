@@ -32,6 +32,11 @@
 
 - (void) update:(HULOPSetting *)setting
 {
+    
+    self.selectionStyle = UITableViewCellSelectionStyleNone;
+    UITapGestureRecognizer *recognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapped:)];
+    [self addGestureRecognizer:recognizer];
+    
     self.setting = setting;
     self.title.text = self.setting.label;
 
@@ -53,6 +58,13 @@
         self.textInput.text = [self.setting stringValue];
     }
     [self refresh];
+}
+
+- (void) tapped:(id)sender
+{
+    if (self.switchView) {
+        [self.switchView setOn:!self.switchView.on animated:YES];
+    }
 }
 
 -(NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView
