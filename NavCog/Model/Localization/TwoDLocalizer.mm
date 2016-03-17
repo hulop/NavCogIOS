@@ -174,10 +174,10 @@ enum ResetMode{
         std::cout << "Sending reset request to the localizer.";
         std::cout << ", resetPose = " << pose << std::endl;
         self.localizer->resetStatus();
-//        self.localizer->resetStatus(pose);
+        //        self.localizer->resetStatus(pose);
         self.localizer->resetStatus(pose, _stdevPose);
         NSLog(@"Reset %f %f %f %f", pose.x(), pose.y(), pose.floor(), pose.orientation());
-    
+        
         [timer invalidate];
     }
 }
@@ -211,7 +211,7 @@ enum ResetMode{
         _result = r;
         return;
     }
-
+    
     // convert NSArray* to loc::Beacons to input it into the localizer
     Beacons cbeacons;
     for(int i = 0; i < [beacons count]; i++) {
@@ -278,14 +278,14 @@ enum ResetMode{
     long timestamp = [data[@"timestamp"] doubleValue]*1000;
     
     if(timestamp!=_previousTimestamp){
-    
-    Acceleration acc = Acceleration([data[@"timestamp"] doubleValue]*1000,
-                                    [data[@"x"] doubleValue ],
-                                    [data[@"y"] doubleValue ],
-                                    [data[@"z"] doubleValue ]);
-
-    //NSLog(@"input acc");
-    _localizer->putAcceleration(acc);
+        
+        Acceleration acc = Acceleration([data[@"timestamp"] doubleValue]*1000,
+                                        [data[@"x"] doubleValue ],
+                                        [data[@"y"] doubleValue ],
+                                        [data[@"z"] doubleValue ]);
+        
+        //NSLog(@"input acc");
+        _localizer->putAcceleration(acc);
     }
     _previousTimestamp = timestamp;
 }
@@ -296,13 +296,13 @@ enum ResetMode{
     long timestamp = [data[@"timestamp"] doubleValue]*1000;
     
     if(timestamp!=previousTimestamp){
-    Attitude att = Attitude([data[@"timestamp"] doubleValue]*1000,
-                                    [data[@"pitch"] doubleValue ],
-                                    [data[@"roll"] doubleValue ],
-                                    [data[@"yaw"] doubleValue ]);
-
-    //NSLog(@"input att");
-    _localizer->putAttitude(att);
+        Attitude att = Attitude([data[@"timestamp"] doubleValue]*1000,
+                                [data[@"pitch"] doubleValue ],
+                                [data[@"roll"] doubleValue ],
+                                [data[@"yaw"] doubleValue ]);
+        
+        //NSLog(@"input att");
+        _localizer->putAttitude(att);
     }
     previousTimestamp = timestamp;
 }
@@ -319,8 +319,11 @@ enum ResetMode{
 
 // Parameters to compute distance score
 double largeDistance = 100*100;
-double distanceByFloorDiff = 5;
-double floorDifferenceTolerance = 0.1;
+double distThresh95percentile = 5.1; // [m]
+double distThreshCurrentLoc = distThresh95percentile;
+double distanceByFloorDiff = Meter2Feet(distThreshCurrentLoc);
+//double distanceByFloorDiff = Meter2Feet(0.1);
+double floorDifferenceTolerance = 0.5;
 
 - (double) computeDistanceScoreWithOptionsMeanLocation: (NSDictionary*) options{
     NSString* edgeID = options[@"edgeID"];
@@ -333,12 +336,13 @@ double floorDifferenceTolerance = 0.1;
     assert(_states);
     
     double distance = [self computeDistanceBetweenLocation:*_meanLoc AndEdge:edge];
+    
     distance = Feet2Meter(distance); // in meter
     loc::Location stdloc = loc::Location::standardDeviation(*_states); //in meter
     loc::State meanState = loc::State::mean(*_states);
     
-    double distThresh95percentile = 5.1;
-    double v = fmax(distance, sqrt(pow(stdloc.x(),2) + pow(stdloc.y(),2)))/distThresh95percentile;
+    double distThreshold = distThresh95percentile;
+    double v = fmax(distance, sqrt(pow(stdloc.x(),2) + pow(stdloc.y(),2)))/distThreshold;
     NSLog(@"2D dist for current loc: eid=%@, val=%.2f, dist=%.2f, stdX=%.2f, stdY=%.2f", edgeID, v, distance, stdloc.x(), stdloc.y());
     std::cout << "meanState=" << meanState << std::endl;
     if(v <= _minDistAfterAllReset){
@@ -424,13 +428,23 @@ double floorDifferenceTolerance = 0.1;
         distance += floorDifference*distanceByFloorDiff;
     }
     
-    distance += [[edge getNearestSegmentFromPoint:point] getDistanceNearestPointOnLineSegmentFromPoint:point];
-                 
+    Nav2DPoint* nearestPointOnEdge = [[edge getNearestSegmentFromPoint:point] getNearestPointOnLineSegmentFromPoint:point];
+    
+    // in meter
+    double xOnE = Feet2Meter(nearestPointOnEdge.x);
+    double yOnE = Feet2Meter(nearestPointOnEdge.y);
+    double zOnE = 0;
+    double floorOnE = edge.floor - 1;
+    Location nearestPointOnEdgeAsLoc = Location(xOnE, yOnE, zOnE, floorOnE);
+    double distMeter3D = Location::distance(state, nearestPointOnEdgeAsLoc);
+    
+    distance += Meter2Feet(distMeter3D);
+    
     return distance;
 }
 
 - (double) computeDistanceBetweenPoint: (Location) point1 And: (Location) point2{
-
+    
     double distance = 0;
     double floorDifference = std::abs(point1.floor()-point2.floor());
     if(floorDifference>floorDifferenceTolerance){
@@ -459,11 +473,11 @@ void calledWhenUpdated(void *userData, Status * pStatus){
                            @"orientation": @(loc.meanPose->orientation()),
                            @"velocity":@(loc.meanPose->velocity())
                            };
-
+    
     [[P2PManager sharedInstance] send:data withType:@"2d-position" ];
     [loc sendStatusByP2P: *loc.localizer->getStatus()];
     
-   // printf("2D %f, %f, %f, %f, %f\n", meanLoc->x(), meanLoc->y(), meanLoc->floor(), meanPose->orientation(), meanPose->velocity());
+    // printf("2D %f, %f, %f, %f, %f\n", meanLoc->x(), meanLoc->y(), meanLoc->floor(), meanPose->orientation(), meanPose->velocity());
     //std::cout << meanLoc->toString() << std::endl;
 }
 
@@ -484,7 +498,7 @@ void calledWhenUpdated(void *userData, Status * pStatus){
         [sample setObject:path forKey:@"dataPath"];
     }
     // end
-
+    
     // observation model
     NSLog(@"observation model: %@", ObservationModelParametersPath);
     std::string serializedModelPath = [ObservationModelParametersPath UTF8String];
@@ -509,6 +523,8 @@ void calledWhenUpdated(void *userData, Status * pStatus){
     double alphaWeaken = 0.3;
     //double alphaWeaken = 0.01;
     _localizer->alphaWeaken(alphaWeaken);
+    Location locLB(0.5, 0.5, 0,0);
+    _localizer->locationStandardDeviationLowerBound(locLB);
     
     // Create data store
     std::shared_ptr<DataStoreImpl> dataStore(new DataStoreImpl());
@@ -627,12 +643,12 @@ void calledWhenUpdated(void *userData, Status * pStatus){
     poseProperty.stdX(2.0);
     poseProperty.stdY(2.0);
     
-//    stateProperty.meanRssiBias(0.0);
+    //    stateProperty.meanRssiBias(0.0);
     stateProperty.meanRssiBias(-2.0);
     stateProperty.stdRssiBias(2.0);
     stateProperty.diffusionRssiBias(0.2);
-    stateProperty.diffusionOrientationBias(1.0/180*M_PI);
-
+    stateProperty.diffusionOrientationBias(10.0/180*M_PI);
+    
     // END TODO
     
     // Build poseRandomWalker
@@ -683,7 +699,7 @@ void calledWhenUpdated(void *userData, Status * pStatus){
     // Set standard deviation of Pose
     double stdevX = 0.25;
     double stdevY = 0.25;
-    _stdevPose.x(stdevX).y(stdevY);
+    _stdevPose.x(stdevX).y(stdevY).orientation(30.0/180.0*M_PI);
     
     // ObservationDependentInitializer
     std::shared_ptr<MetropolisSampler<State, Beacons>> obsDepInitializer(new MetropolisSampler<State, Beacons>());
