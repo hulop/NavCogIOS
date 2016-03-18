@@ -69,6 +69,7 @@ enum StateType {STATE_TYPE_WALKING, STATE_TYPE_TRANSITION};
 @property (nonatomic) float floor;
 @property (nonatomic) BOOL isFirst;
 @property (nonatomic) float currentEdgeori;
+@property (nonatomic) BOOL isCurrentEdgeoriInitialized;
 @property (nonatomic) BOOL isCombined;      // state is connected from previous state
 @property (nonatomic) int extraEdgeLength;  // extra edge length to target
 @property (copy, nonatomic) NSString *distMsg; // msg: distance to target

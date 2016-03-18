@@ -380,7 +380,7 @@ static const float GyroDriftLimit = 3;
     _curOri = - [yaw doubleValue] / M_PI * 180;
     
     NavState* _currentState = [_currentMachine getWalkingState];
-    if (_currentState) {
+    if (_currentState && _currentState.isCurrentEdgeoriInitialized) {
         double edgeori = _currentState.currentEdgeori;
         /*
         if (_currentState.startNode == _currentState.walkingEdge.node1)

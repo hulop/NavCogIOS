@@ -145,6 +145,7 @@
         // pos has latitude, longitude
         pos = [man getLocationOnEdge:_walkingEdge.edgeID];
         _currentEdgeori = [_walkingEdge.node1 isEqual:_startNode]?pos.ori1:pos.ori2;
+        _isCurrentEdgeoriInitialized = YES;
         
         NSString *cmd = [NSString stringWithFormat:@"updateBlueDot({lat:%f, lng:%f})", pos.lat, pos.lng];
         [[NavCogFuncViewController sharedNavCogFuntionViewController] runCmdWithString:cmd];
