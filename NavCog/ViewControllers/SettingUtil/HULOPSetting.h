@@ -20,22 +20,60 @@
  * THE SOFTWARE.
  *
  * Contributors:
- *  Chengxiong Ruan (CMU) - initial API and implementation
+ *  IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-#import <UIKit/UIKit.h>
-#import "TopoMap.h"
-#import "NavMachine.h"
-#import "NavCogFuncViewController.h"
-#import "NavCogChooseMapViewController.h"
-#import "NavCogChooseLogViewController.h"
-#import "NavCogDataSamplingViewController.h"
-#import "NavCogHelpPageViewController.h"
-#import "NavDownloadingViewController.h"
-#import "NavCogSettingViewController.h"
+#import <Foundation/Foundation.h>
 
-enum UIType {SpeechForAll, SpeechForStartAndTurnSoundForDistance, SpeechForAllAndSoundForDistance, SpeechForStartSoundForDistanceAndTurn};
+@class HULOPSetting;
 
-@interface NavCogMainViewController : UIViewController <UIPickerViewDataSource, UIPickerViewDelegate, NavMachineDelegate, NavCogFuncViewControllerDelegate, NavCogChooseMapViewControllerDelegate, NavCogChooseLogViewControllerDelegate>
+@interface HULOPOptionGroup : NSObject
+@property NSMutableArray *options;
+- (void) addOption:(HULOPSetting*)setting;
+- (void) checkOption:(HULOPSetting*)setting;
+@end
+
+typedef NS_ENUM (NSUInteger, NavCogSettingType) {
+    SECTION,
+    UUID_TYPE,
+    HOST_PORT,
+    STRING,
+    SUBTITLE,
+    DOUBLE,
+    BOOLEAN,
+    TEXTINPUT,
+    PASSINPUT,
+    OPTION
+};
+
+@interface HULOPSetting: NSObject {
+    NSObject*(^handler)(NSObject *value);
+}
+
+- (void) setHandler:(NSObject*(^)(NSObject* value)) _handler;
+- (NSInteger) numberOfRows;
+- (NSInteger) selectedRow;
+- (NSString*) titleForRow: (NSInteger) row;
+- (NSObject*) checkValue: (NSObject*) value;
+- (void) addObject: (NSObject*) object;
+- (void) removeSelected;
+- (void) select:(NSInteger) row;
+- (void) save;
+- (float) floatValue;
+- (BOOL) boolValue;
+- (NSString*) stringValue;
+
+@property NavCogSettingType type;
+@property NSString *label;
+@property NSString *name;
+@property HULOPOptionGroup *group;
+@property NSObject *defaultValue;
+@property NSObject *currentValue;
+@property NSObject *selectedValue;
+@property BOOL isList;
+@property float min;
+@property float max;
+@property float interval;
+@property BOOL visible;
 
 @end

@@ -20,22 +20,28 @@
  * THE SOFTWARE.
  *
  * Contributors:
- *  Chengxiong Ruan (CMU) - initial API and implementation
+ *  IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-#import <UIKit/UIKit.h>
-#import "TopoMap.h"
-#import "NavMachine.h"
-#import "NavCogFuncViewController.h"
-#import "NavCogChooseMapViewController.h"
-#import "NavCogChooseLogViewController.h"
-#import "NavCogDataSamplingViewController.h"
-#import "NavCogHelpPageViewController.h"
-#import "NavDownloadingViewController.h"
-#import "NavCogSettingViewController.h"
+#import "HULOPSettingTableView.h"
 
-enum UIType {SpeechForAll, SpeechForStartAndTurnSoundForDistance, SpeechForAllAndSoundForDistance, SpeechForStartSoundForDistanceAndTurn};
+@implementation HULOPSettingTableView
 
-@interface NavCogMainViewController : UIViewController <UIPickerViewDataSource, UIPickerViewDelegate, NavMachineDelegate, NavCogFuncViewControllerDelegate, NavCogChooseMapViewControllerDelegate, NavCogChooseLogViewControllerDelegate>
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+    self = [super initWithCoder:aDecoder];
+    
+    NSDictionary *cells = @{@"HULOPSettingViewSwitchCell": @"switchCell",
+                            @"HULOPSettingViewTextCell": @"textCell",
+                            @"HULOPSettingViewSliderCell": @"sliderCell",
+                            @"HULOPSettingViewSubtitleCell": @"subtitleCell",
+                            @"HULOPSettingViewPickerCell": @"pickerCell"};
+    
+    for(NSString *nibName in cells) {
+        UINib *nib = [UINib nibWithNibName:nibName bundle:[NSBundle mainBundle]];
+        [self registerNib:nib forCellReuseIdentifier:cells[nibName]];
+    }
+    
+    return self;
+}
 
 @end

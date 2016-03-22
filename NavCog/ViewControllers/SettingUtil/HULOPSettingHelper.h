@@ -20,22 +20,36 @@
  * THE SOFTWARE.
  *
  * Contributors:
- *  Chengxiong Ruan (CMU) - initial API and implementation
+ *  IBM Corporation - initial API and implementation
  *******************************************************************************/
 
+#import <Foundation/Foundation.h>
+#import "HULOPSetting.h"
 #import <UIKit/UIKit.h>
-#import "TopoMap.h"
-#import "NavMachine.h"
-#import "NavCogFuncViewController.h"
-#import "NavCogChooseMapViewController.h"
-#import "NavCogChooseLogViewController.h"
-#import "NavCogDataSamplingViewController.h"
-#import "NavCogHelpPageViewController.h"
-#import "NavDownloadingViewController.h"
-#import "NavCogSettingViewController.h"
 
-enum UIType {SpeechForAll, SpeechForStartAndTurnSoundForDistance, SpeechForAllAndSoundForDistance, SpeechForStartSoundForDistanceAndTurn};
+@interface HULOPSettingHelper : NSObject <UITableViewDataSource, UITableViewDelegate>
 
-@interface NavCogMainViewController : UIViewController <UIPickerViewDataSource, UIPickerViewDelegate, NavMachineDelegate, NavCogFuncViewControllerDelegate, NavCogChooseMapViewControllerDelegate, NavCogChooseLogViewControllerDelegate>
+@property NSMutableArray *settings;
+@property NSMutableDictionary *groups;
+
+
+- (HULOPSetting*) addSettingWithType: (NavCogSettingType) type Label: (NSString*) label Name:(NSString*) name DefaultValue:(NSObject*) defaultValue Accept:(NSObject*(^)(NSObject *value)) handler;
+- (HULOPSetting*) addSettingWithType: (NavCogSettingType) type Label: (NSString*) label Name:(NSString*) name Group:(NSString*)group DefaultValue:(NSObject*) defaultValue Accept:(NSObject*(^)(NSObject *value)) handler;
+- (HULOPSetting*) addSettingWithType: (NavCogSettingType) type Label: (NSString*) label Name:(NSString*) name DefaultValue:(NSObject*) defaultValue Min: (double) min Max: (double) max Interval: (double) interval;
+
+- (void) addSectionTitle: (NSString*) title;
+
+
+- (NSInteger) numberOfSections;
+- (NSInteger) numberOfRowsInSection:(NSInteger)section;
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath;
+
+- (NSString*) titleForSection: (NSInteger) row;
+
+- (void) setVisible:(BOOL) visible Section: (NSInteger) section;
 
 @end
+

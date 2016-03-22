@@ -205,3 +205,9 @@
 
 /* alert message when locating is timeout */
 "noCurrentLocationError" = "現在地を取得できませんでした";
+
+/* label for setting view navigation section */
+"Navigation" = "ナビゲーション";
+
+/* label for play surround info automatically setting */
+"PlaySurroundInfoAutomatically" = "自動的に周辺情報を読み上げる";

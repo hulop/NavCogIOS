@@ -203,7 +203,10 @@
                 [startInfo appendString:NSLocalizedString(@"destination", @"Destination alert")];
             }
             newState.plusMsg = startInfo; [startInfo setString:@""];
-            [startInfo appendString:newState.surroundInfo];
+            
+            if ([[NSUserDefaults standardUserDefaults] boolForKey:@"playSurroundInfoAutomatically"]) {
+                [startInfo appendString:newState.surroundInfo];
+            }
         }
 
         if (![node1.buildingName isEqualToString:node2.buildingName] && node2.buildingName) {

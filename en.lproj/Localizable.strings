@@ -206,3 +206,9 @@ Information";
 
 /* alert message when locating is timeout */
 "noCurrentLocationError" = "Fail Locating";
+
+/* label for setting view navigation section */
+"Navigation" = "Navigation";
+
+/* label for play surround info automatically setting */
+"PlaySurroundInfoAutomatically" = "Automatically play surrounding info.";

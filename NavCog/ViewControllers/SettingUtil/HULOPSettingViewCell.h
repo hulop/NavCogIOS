@@ -20,22 +20,29 @@
  * THE SOFTWARE.
  *
  * Contributors:
- *  Chengxiong Ruan (CMU) - initial API and implementation
+ *  IBM Corporation - initial API and implementation
  *******************************************************************************/
 
 #import <UIKit/UIKit.h>
-#import "TopoMap.h"
-#import "NavMachine.h"
-#import "NavCogFuncViewController.h"
-#import "NavCogChooseMapViewController.h"
-#import "NavCogChooseLogViewController.h"
-#import "NavCogDataSamplingViewController.h"
-#import "NavCogHelpPageViewController.h"
-#import "NavDownloadingViewController.h"
-#import "NavCogSettingViewController.h"
+#import "HULOPSetting.h"
 
-enum UIType {SpeechForAll, SpeechForStartAndTurnSoundForDistance, SpeechForAllAndSoundForDistance, SpeechForStartSoundForDistanceAndTurn};
+@interface HULOPSettingViewCell : UITableViewCell <UIPickerViewDataSource, UIPickerViewDelegate> {
+    
+    UIAlertView *alertView;
+    UIAlertView *alertView2;
+}
 
-@interface NavCogMainViewController : UIViewController <UIPickerViewDataSource, UIPickerViewDelegate, NavMachineDelegate, NavCogFuncViewControllerDelegate, NavCogChooseMapViewControllerDelegate, NavCogChooseLogViewControllerDelegate>
+- (void) update:(HULOPSetting*) setting;
+
+@property HULOPSetting *setting;
+
+@property (weak, nonatomic) IBOutlet UIPickerView *pickerView;
+@property (weak, nonatomic) IBOutlet UIButton *addButton;
+@property (weak, nonatomic) IBOutlet UISwitch *switchView;
+@property (weak, nonatomic) IBOutlet UISlider *slider;
+@property (weak, nonatomic) IBOutlet UILabel *valueLabel;
+@property (weak, nonatomic) IBOutlet UILabel *title;
+@property (weak, nonatomic) IBOutlet UILabel *subtitle;
+@property (weak, nonatomic) IBOutlet UITextField *textInput;
 
 @end

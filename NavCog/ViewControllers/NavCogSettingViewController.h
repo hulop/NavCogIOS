@@ -20,22 +20,13 @@
  * THE SOFTWARE.
  *
  * Contributors:
- *  Chengxiong Ruan (CMU) - initial API and implementation
+ *  IBM Corporation - initial API and implementation
  *******************************************************************************/
 
 #import <UIKit/UIKit.h>
-#import "TopoMap.h"
-#import "NavMachine.h"
-#import "NavCogFuncViewController.h"
-#import "NavCogChooseMapViewController.h"
-#import "NavCogChooseLogViewController.h"
-#import "NavCogDataSamplingViewController.h"
-#import "NavCogHelpPageViewController.h"
-#import "NavDownloadingViewController.h"
-#import "NavCogSettingViewController.h"
 
-enum UIType {SpeechForAll, SpeechForStartAndTurnSoundForDistance, SpeechForAllAndSoundForDistance, SpeechForStartSoundForDistanceAndTurn};
+@interface NavCogSettingViewController : UIViewController
 
-@interface NavCogMainViewController : UIViewController <UIPickerViewDataSource, UIPickerViewDelegate, NavMachineDelegate, NavCogFuncViewControllerDelegate, NavCogChooseMapViewControllerDelegate, NavCogChooseLogViewControllerDelegate>
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
 
 @end
