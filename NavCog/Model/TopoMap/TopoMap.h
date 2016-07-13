@@ -62,6 +62,7 @@ UIKIT_EXTERN double TopoMapUnit; // base unit is feet (1 = 1 foot = 0.3048 meter
 - (NSString *)initializaWithFile:(NSString *)filePath;
 - (NSArray *)findShortestPathFromNodeWithName:(NSString *)fromName toNodeWithName:(NSString *)toName;
 - (NSArray *)getAllLocationNamesOnMap;
+- (NSArray *)getAllLocationNamesOnMapSorted:(bool)sorted;
 //- (NavLocation *)getCurrentLocationOnMapUsingBeacons:(NSArray *)beacons withInit:(Boolean)init;
 //- (NavLocation *)getLocationInEdges:(NSArray *)edges withBeacons:(NSArray *)beacons withKNNThreshold:(float)knnThreshold withInit:(Boolean)init;
 - (NSArray *)findShortestPathFromCurrentLocation:(NavLocation *)curLocation toNodeWithName:(NSString *)toNodeName;

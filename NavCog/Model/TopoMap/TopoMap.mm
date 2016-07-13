@@ -425,6 +425,16 @@ static const double FEET_IN_METER = 0.3048;
     return allNames;
 }
 
+- (NSArray *)getAllLocationNamesOnMapSorted:(bool) sorted {
+    NSArray *a = [self getAllLocationNamesOnMap];
+    if (sorted) {
+        a = [a sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+            return [(NSString*)obj1 compare:(NSString*)obj2] ;
+        }];
+    }
+    return a;
+}
+
 // search a shortest path
 - (NSArray *)findShortestPathFromNode:(NavNode *)startNode toNodeWithName:(NSString *)toName {
     // get start node and end node of the path

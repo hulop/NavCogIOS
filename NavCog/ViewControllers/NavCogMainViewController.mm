@@ -409,7 +409,7 @@
 // new topo map loaded
 - (void)topoMapLoaded:(TopoMap *)topoMap withMapDataString:(NSString *)dataStr{
     _topoMap = topoMap;
-    NSArray *locations = [_topoMap getAllLocationNamesOnMap];
+    NSArray *locations = [_topoMap getAllLocationNamesOnMapSorted:YES];
     [_allFromLocationName removeAllObjects];
     [_allToLocationName removeAllObjects];
     for (NSString *name in locations) {
