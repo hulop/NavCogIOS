@@ -265,7 +265,8 @@
 
 // State Machine delegate's methods
 - (void)navigationFinished {
-    [_navFuncViewCtrl.view removeFromSuperview];
+    //[_navFuncViewCtrl.view removeFromSuperview];
+    [_navFuncViewCtrl dismissViewControllerAnimated:YES completion:nil];
     [_navFuncViewCtrl runCmdWithString:@"stopNavigation()"];
 }
 
@@ -275,7 +276,8 @@
         [_currentLocationTimeoutTimer invalidate];
     });
     
-    [self.view addSubview:_navFuncViewCtrl.view];
+    [self presentViewController:_navFuncViewCtrl animated:YES completion:nil];
+    //[self.view addSubview:_navFuncViewCtrl.view];
     if (_isWebViewLoaded) {
         _pathNodes = [_navMachine getPathNodes];
         NavNode *startNode = [_pathNodes lastObject];
@@ -326,7 +328,8 @@
 }
 
 - (void)didTriggerStopNavigation {
-    [_navFuncViewCtrl.view removeFromSuperview];
+    //[_navFuncViewCtrl.view removeFromSuperview];
+    [_navFuncViewCtrl dismissViewControllerAnimated:YES completion:nil];
     [_navMachine stopNavigation];
     [_navFuncViewCtrl runCmdWithString:@"stopNavigation()"];
 }

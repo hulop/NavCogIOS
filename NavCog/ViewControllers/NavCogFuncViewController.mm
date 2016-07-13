@@ -41,6 +41,7 @@
     static NavCogFuncViewController *ctrl = nil;
     if (ctrl == nil) {
         ctrl = [[NavCogFuncViewController alloc] init];
+        [ctrl setupUI];
     }
     return ctrl;
 }
@@ -50,7 +51,7 @@
     self.view.frame = [[UIScreen mainScreen] bounds];
     self.view.bounds = [[UIScreen mainScreen] bounds];
     self.view.backgroundColor = [UIColor clearColor];
-    [self setupUI];
+    //[self setupUI];
     [self setupCurrentLocationObserver];
 }
 
@@ -76,6 +77,17 @@
     float sh = [[UIScreen mainScreen] bounds].size.height;
     float bw = sw / 3;
     float bh = sh / 3;
+    
+    
+    UIButton *dummy = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    [dummy addTarget:self action:@selector(playPreviousInstruction) forControlEvents:UIControlEventTouchUpInside];
+    dummy.frame = CGRectMake(0, 0, 1, 1);
+    dummy.bounds = CGRectMake(0, 0, 1, 1);
+    [dummy setTitle:@"" forState:UIControlStateNormal];
+    dummy.tag = BUTTON_DUMMY;
+    [dummy setAccessibilityTraits:UIAccessibilityTraitNone];
+    [self.view addSubview:dummy];
+    
     
     // previous instruction button
     UIButton *preButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];

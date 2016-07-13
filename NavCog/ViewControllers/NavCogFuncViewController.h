@@ -30,7 +30,8 @@
 #import "NavCurrentLocationManager.h"
 
 typedef NS_ENUM(NSUInteger, ButtonTags) {
-    BUTTON_PRE = 100,
+    BUTTON_DUMMY = 100,
+    BUTTON_PRE,
     BUTTON_ACCESS,
     BUTTON_SURROUND
 };

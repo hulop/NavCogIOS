@@ -234,7 +234,13 @@
         
         if (ABS(diff) > 15) { //have to rotate
             _currentState.previousInstruction = [self getTurnStringFromOri:clipAngle(_curOri) toOri:_currentState.ori];
-            [NavNotificationSpeaker speakWithCustomizedSpeed:_currentState.previousInstruction];
+            
+            double delayInSeconds = 1.5;
+            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+            dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+                [NavNotificationSpeaker speakWithCustomizedSpeed:_currentState.previousInstruction];
+            });
+
             _navState = NAV_STATE_TURNING;
         } else { //straight
             _navState = NAV_STATE_WALKING;
