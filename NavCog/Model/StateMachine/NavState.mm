@@ -205,7 +205,7 @@
     }
     float threshold = 5;
     if (edge.len < 10 + 7) {
-        threshold = MAX(0, (edge.len - 7) / 2); // Adjust threshold for very short edge
+        threshold = MAX(1, (edge.len - 7) / 2); // Adjust threshold for very short edge
     }
     if (_type == STATE_TYPE_WALKING) {
         // snap y within edge
@@ -236,7 +236,7 @@
         NSString *distFormat = NSLocalizedString([self isMeter]?@"meterFormat":@"feetFormat", @"Use to express a distance in feet");
         dist += _extraEdgeLength; // dist is distance to the target node
         // if you're walking, check distance to target node
-        if (dist < _preAnnounceDist) {
+        if (dist < _preAnnounceDist + threshold) {
             if (dist > 40.0) { // announce every 30 feet
                 if (dist <= 30 * _longDistAnnounceCount + threshold) {
                     NSString *ann = [NSString stringWithFormat:distFormat,[self isMeter]?[self toMeter:_longDistAnnounceCount * 30]:_longDistAnnounceCount * 30];
