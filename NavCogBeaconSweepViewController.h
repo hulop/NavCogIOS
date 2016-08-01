@@ -26,10 +26,9 @@
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
 
-@interface NavCogBeaconSwepViewController : UIViewController < CLLocationManagerDelegate>
+@interface NavCogBeaconSweepViewController : UIViewController < CLLocationManagerDelegate>
 
 @property (strong, nonatomic) NSString* uuid_string;
-@property (strong, nonatomic) NSString* edgeid_string;
 @property (strong, nonatomic) NSString* major_string;
 
 @property (strong, nonatomic) NSString* wid;
