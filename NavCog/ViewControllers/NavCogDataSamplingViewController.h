@@ -28,4 +28,32 @@
 
 @interface NavCogDataSamplingViewController : UIViewController <UIPickerViewDataSource, UIPickerViewDelegate, CLLocationManagerDelegate>
 
+@property (weak, nonatomic) IBOutlet UIStepper *xStepper;
+@property (weak, nonatomic) IBOutlet UIStepper *yStepper;
+//where I started adding things from .m
+
+enum AutoMode {None, AutoInc, AutoDec};
+
+@property (weak, nonatomic) IBOutlet UISegmentedControl *yAutoModeSeg;
+@property (weak, nonatomic) IBOutlet UISwitch *yAutoLock;
+@property (nonatomic) enum AutoMode yAutoMode;
+@property (weak, nonatomic) IBOutlet UITextView *beaconFilterTextView;
+@property (nonatomic) Boolean sendData;
+@property (weak, nonatomic) IBOutlet UITextField *edgeIDTextField;
+@property (weak, nonatomic) IBOutlet UITextField *majorIDTextField;
+@property (weak, nonatomic) IBOutlet UITextField *uuidTextField;
+
+
+@property (strong, nonatomic) NSSet *beaconMinors;
+@property (strong, nonatomic) NSString *beaconFilterString;
+
+@property (weak, nonatomic) IBOutlet UISwitch *sampleNumLock;
+@property (weak, nonatomic) IBOutlet UIPickerView *sampleNumPicker;
+@property (nonatomic) int targetSmpNum;
+
+//where I stopped
+
+@property (weak, nonatomic) IBOutlet UITextField *yTextField;
+
+
 @end
