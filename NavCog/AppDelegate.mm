@@ -36,6 +36,138 @@
 
 @implementation AppDelegate
 
+- (NSDictionary *)parseQueryString:(NSString *)query {
+    NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithCapacity:6];
+    NSArray *pairs = [query componentsSeparatedByString:@"&"];
+    
+    for (NSString *pair in pairs) {
+        NSArray *elements = [pair componentsSeparatedByString:@"="];
+        NSString *key = [[elements objectAtIndex:0] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        NSString *val = [[elements objectAtIndex:1] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        
+        [dict setObject:val forKey:key];
+    }
+    return dict;
+}
+
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
+    NSLog(@"url recieved: %@", url);
+    NSLog(@"query string: %@", [url query]);
+    NSLog(@"host: %@", [url host]);
+    NSLog(@"url path: %@", [url path]);
+    NSDictionary *dict = [self parseQueryString:[url query]];
+    NSLog(@"query dict: %@", dict);
+    
+    if([[url host] isEqualToString:@"datasampler"]) {
+        [self runSamplerLightWithData:dict];
+    } else if([[url host] isEqualToString:@"beaconchecker"]) {
+        [self runTestBeaconWithData:dict];
+    } else if([[url host] isEqualToString:@"beaconsweeper"]) {
+        [self runScanBeaconsWithData:dict];
+    } else if([[url host] isEqualToString:@"datatester"]) {
+        [self runDataTesterWithData:dict];
+    }
+
+    return YES;
+}
+
+-(void)runSamplerLightWithData:(NSDictionary *)dict {
+    double yvalue = [dict[@"y"] floatValue];
+    
+    NSString *wid = dict[@"wid"];
+    NSString *send = dict[@"send"];
+    NSString *edge_id = dict[@"edge"];
+    double length = [dict[@"length"] floatValue];
+    NSString *major_id =dict[@"major"];
+    int time = [dict[@"time"] intValue];
+    NSString *direction = dict[@"dir"];
+    NSString *beacon_filter = dict[@"beacons"];
+    
+    if ([direction isEqualToString:@"0"]){
+        _rootView.simplifiedDataSamplingViewCtrl.yMode = true;
+    }
+    else{
+        _rootView.simplifiedDataSamplingViewCtrl.yMode = false;
+    }
+    
+    if ([send isEqualToString:@"0"]){
+        _rootView.simplifiedDataSamplingViewCtrl.send = false;
+    }
+    else{
+        _rootView.simplifiedDataSamplingViewCtrl.send = true;
+    }
+    
+    _rootView.simplifiedDataSamplingViewCtrl.wid = wid;
+    _rootView.simplifiedDataSamplingViewCtrl.yvalue = yvalue;
+    _rootView.simplifiedDataSamplingViewCtrl.length = length;
+    _rootView.simplifiedDataSamplingViewCtrl.edgeid_string = edge_id;
+    _rootView.simplifiedDataSamplingViewCtrl.major_string = major_id;
+    _rootView.simplifiedDataSamplingViewCtrl.targetSmpNum = time;
+    
+    _rootView.simplifiedDataSamplingViewCtrl.beaconMinors = [_rootView.simplifiedDataSamplingViewCtrl analysisBeaconFilter: beacon_filter];
+    
+    _rootView.simplifiedDataSamplingViewCtrl.uuid_string = @"F7826DA6-4FA2-4E98-8024-BC5B71E0893E";
+
+    _rootView.fromURL = datasampler;
+    [_rootView.view addSubview:_rootView.simplifiedDataSamplingViewCtrl.view];
+}
+
+-(void)runTestBeaconWithData:(NSDictionary *)dict {
+    NSString *wid = dict[@"wid"];
+    NSString *major_id =dict[@"major"];
+    NSString *minor_id =dict[@"minor"];
+    
+    if([_rootView.beaconCheckViewCtrl isViewLoaded]) {
+        [_rootView.beaconCheckViewCtrl.view removeFromSuperview];
+    }
+    
+    _rootView.beaconCheckViewCtrl.wid = wid;
+    _rootView.beaconCheckViewCtrl.major_string = major_id;
+    _rootView.beaconCheckViewCtrl.minor_string = minor_id;
+    _rootView.beaconCheckViewCtrl.uuid_string = @"F7826DA6-4FA2-4E98-8024-BC5B71E0893E";
+
+    _rootView.fromURL = beaconchecker;
+    [_rootView.view addSubview:_rootView.beaconCheckViewCtrl.view];
+    
+
+
+}
+
+-(void)runDataTesterWithData:(NSDictionary *)dict {
+    double yvalue = [dict[@"y"] floatValue];
+    NSString *wid = dict[@"wid"];
+    NSString *edge_id = dict[@"edge"];
+    NSString *major_id =dict[@"major"];
+    NSString *beacon_filter = dict[@"beacons"];
+    
+    _rootView.dataTesterViewCtrl.wid = wid;
+    
+    _rootView.dataTesterViewCtrl.yvalue = yvalue;
+    
+    _rootView.dataTesterViewCtrl.edgeid_string = edge_id;
+    _rootView.dataTesterViewCtrl.major_string = major_id;
+    
+    _rootView.dataTesterViewCtrl.beaconMinors = [_rootView.dataTesterViewCtrl analysisBeaconFilter: beacon_filter];
+    
+    _rootView.dataTesterViewCtrl.uuid_string = @"F7826DA6-4FA2-4E98-8024-BC5B71E0893E";
+    
+    _rootView.fromURL = datatester;
+    [_rootView.view addSubview:_rootView.dataTesterViewCtrl.view];
+}
+
+-(void)runScanBeaconsWithData:(NSDictionary *)dict {
+    NSString *wid = dict[@"wid"];
+    NSString *major_id =dict[@"major"];
+    NSString *beacon_filter = dict[@"beacons"];
+
+    _rootView.beaconSweepViewCtrl.wid = wid;
+    _rootView.beaconSweepViewCtrl.major_string = major_id;
+    _rootView.beaconSweepViewCtrl.uuid_string = @"F7826DA6-4FA2-4E98-8024-BC5B71E0893E";
+    _rootView.beaconSweepViewCtrl.beaconMinors = [_rootView.beaconSweepViewCtrl analysisBeaconFilter: beacon_filter];
+
+    _rootView.fromURL = beaconsweep;
+    [_rootView.view addSubview:_rootView.beaconSweepViewCtrl.view];
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
