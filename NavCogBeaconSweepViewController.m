@@ -24,10 +24,10 @@
  *  IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-#import "NavCogBeaconSwepViewController.h"
+#import "NavCogBeaconSweepViewController.h"
 
 
-@interface NavCogBeaconSwepViewController ()
+@interface NavCogBeaconSweepViewController ()
 
 @property (weak, nonatomic) IBOutlet UIButton *startButton;
 
@@ -35,11 +35,13 @@
 @property (strong, nonatomic) CLBeaconRegion *beaconRegion;
 @property (strong, nonatomic) NSUUID *uuid;
 
+@property (strong, nonatomic) NSMutableSet *beaconMinors_found;
+
 @property (nonatomic) Boolean isRangingBeacon;
 
 @end
 
-@implementation NavCogBeaconSwepViewController
+@implementation NavCogBeaconSweepViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -47,6 +49,8 @@
     self.view.frame = [UIScreen mainScreen].bounds;
     self.view.bounds = [UIScreen mainScreen].bounds;
     
+    _beaconMinors_found = [[NSMutableSet alloc] init];
+
     [_startButton setTitle:@"Start Scanning" forState:UIControlStateNormal];
 
     _beaconManager = [[CLLocationManager alloc] init];
@@ -81,6 +85,7 @@
         [_startButton setTitle:@"Stop Scanning" forState:UIControlStateNormal];
     } else {
         [self sendData];
+        [_startButton setTitle:@"Start Scanning" forState:UIControlStateNormal];
         [self.view removeFromSuperview];
     }
 }
@@ -95,6 +100,7 @@
             NSString *minorID = [NSString stringWithFormat:@"%d", [beacon.minor intValue]];
             if ([_beaconMinors containsObject:minorID]) {
                 [_beaconMinors removeObject:minorID];
+                [_beaconMinors_found addObject:minorID];
             }
         }
     }
@@ -104,15 +110,21 @@
     NSString *urlString = @"http://hulop.qolt.cs.cmu.edu/sweep/index.php";
     NSMutableURLRequest *request= [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlString]];
     
-    NSString *postString = [[_beaconMinors allObjects] componentsJoinedByString:@","];
-    
-    [request setHTTPMethod:@"POST"];
-    [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"content-type"];
-    
+    NSMutableString *postString = [[NSMutableString alloc] init];
+
+    [postString appendString:@"missing="];
+    [postString appendString:[[_beaconMinors allObjects] componentsJoinedByString:@","]];
+    [postString appendString:@"&present="];
+    [postString appendString:[[_beaconMinors_found allObjects] componentsJoinedByString:@","]];
+
     NSData *postdata = [postString dataUsingEncoding:NSUTF8StringEncoding];
+
+    [request setHTTPMethod:@"POST"];
+    [request setValue:[NSString stringWithFormat:@"%lu", [postdata length]] forHTTPHeaderField:@"Content-Length"];
+    [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
     
     [request setHTTPBody:postdata];
-    [request setValue:[NSString stringWithFormat:@"%lu", [postdata length]] forHTTPHeaderField:@"Content-Length"];
+
     NSData *returnData = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
     NSString *returnString = [[NSString alloc] initWithData:returnData encoding:NSUTF8StringEncoding];
     NSLog(@"%@", returnString);
