@@ -927,9 +927,10 @@
 				INFOPLIST_FILE = NavCog/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.ibm.research.tokyo.NavCog;
+				PRODUCT_BUNDLE_IDENTIFIER = CMU.NavCog;
 				PRODUCT_NAME = NavCog;
 				PROVISIONING_PROFILE = "";
+				STRIP_PNG_TEXT = NO;
 			};
 			name = Debug;
 		};
@@ -950,9 +951,10 @@
 				INFOPLIST_FILE = NavCog/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.ibm.research.tokyo.NavCog;
+				PRODUCT_BUNDLE_IDENTIFIER = CMU.NavCog;
 				PRODUCT_NAME = NavCog;
 				PROVISIONING_PROFILE = "";
+				STRIP_PNG_TEXT = NO;
 			};
 			name = Release;
 		};
