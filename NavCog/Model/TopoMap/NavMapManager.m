@@ -251,9 +251,16 @@ didFinishDownloadingToURL:(NSURL *)location
     [jsonData writeToFile:destPath atomically:YES];
     
     // load topo map
-    TopoMap *topoMap = [[TopoMap alloc] init];
-    NSString *dataStr = [topoMap initializaWithFile:[self getPathInDocumentDirForMapWithName:_loadingMapName]];
-    [_delegate topoMapLoaded:topoMap withMapDataString:dataStr withError:nil];
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        TopoMap *topoMap = [[TopoMap alloc] init];
+        NSString *mapdataFilePath = [self getPathInDocumentDirForMapWithName:_loadingMapName];
+        NSString *dataStr = [topoMap initializaWithFile: mapdataFilePath];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [_delegate topoMapLoaded:topoMap withMapDataString:dataStr withError:nil];
+        });
+    });
+
 }
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
