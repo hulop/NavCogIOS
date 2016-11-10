@@ -39,7 +39,7 @@
 @property (strong, nonatomic) NSUUID *uuid;
 
 @property (nonatomic) float xvalue;
-
+@property (nonatomic) float yvalue;
 
 enum AutoMode {None, AutoInc, AutoDec};
 
@@ -62,6 +62,7 @@ enum AutoMode {None, AutoInc, AutoDec};
     _stopButton.enabled = false;
     
     _xvalue = 0.0;
+    _yvalue = 0.0;
 
     _beaconManager = [[CLLocationManager alloc] init];
     if([_beaconManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {
@@ -203,11 +204,11 @@ enum AutoMode {None, AutoInc, AutoDec};
 - (void) sendData {
     NSMutableString *filename = [[NSMutableString alloc] init];
     [filename appendString:_edgeid_string];
-    [filename appendString:@"-"];
+    [filename appendString:@"_"];
     [filename appendString:_wid];
-    [filename appendString:@"-"];
+    [filename appendString:@"_"];
     [filename appendString:[NSString stringWithFormat:@"%f", _yvalue]];
-    [filename appendString:@"-"];
+    [filename appendString:@"_"];
     [filename appendString:[NSString stringWithFormat:@"%f", _length]];
 
     NSString *fname = @"fingerprint";

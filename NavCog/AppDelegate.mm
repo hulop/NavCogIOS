@@ -72,8 +72,6 @@
 }
 
 -(void)runSamplerLightWithData:(NSDictionary *)dict {
-    double yvalue = [dict[@"y"] floatValue];
-    
     NSString *wid = dict[@"wid"];
     NSString *send = dict[@"send"];
     NSString *edge_id = dict[@"edge"];
@@ -98,7 +96,6 @@
     }
     
     _rootView.simplifiedDataSamplingViewCtrl.wid = wid;
-    _rootView.simplifiedDataSamplingViewCtrl.yvalue = yvalue;
     _rootView.simplifiedDataSamplingViewCtrl.length = length;
     _rootView.simplifiedDataSamplingViewCtrl.edgeid_string = edge_id;
     _rootView.simplifiedDataSamplingViewCtrl.major_string = major_id;
@@ -140,7 +137,12 @@
     NSString *major_id =dict[@"major"];
     NSString *beacon_filter = dict[@"beacons"];
     
+    if([_rootView.dataTesterViewCtrl isViewLoaded]) {
+        [_rootView.dataTesterViewCtrl.view removeFromSuperview];
+    }
+    
     _rootView.dataTesterViewCtrl.wid = wid;
+    _rootView.dataTesterViewCtrl.done = false;
     
     _rootView.dataTesterViewCtrl.yvalue = yvalue;
     

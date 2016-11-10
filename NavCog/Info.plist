@@ -35,7 +35,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>4</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -64,8 +64,14 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Reasons</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>This application monitors your location to determine when you are near the beacons for the app</string>
+	<key>NSMainNibFile</key>
+	<string>LaunchScreen</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Requires photo library access to save data sample files</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>bluetooth-central</string>

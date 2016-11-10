@@ -30,6 +30,7 @@
 @interface NavCogBeaconSweepViewController ()
 
 @property (weak, nonatomic) IBOutlet UIButton *startButton;
+@property (weak, nonatomic) IBOutlet UILabel *statusLabel;
 
 @property (strong, nonatomic) CLLocationManager *beaconManager;
 @property (strong, nonatomic) CLBeaconRegion *beaconRegion;
@@ -51,7 +52,8 @@
     
     _beaconMinors_found = [[NSMutableSet alloc] init];
 
-    [_startButton setTitle:@"Start Scanning" forState:UIControlStateNormal];
+    [_statusLabel setText:@"Status: Not scanning"];
+    [_startButton setTitle:@"Start scanning" forState:UIControlStateNormal];
 
     _beaconManager = [[CLLocationManager alloc] init];
     if([_beaconManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {
@@ -82,11 +84,14 @@
         [_beaconManager startRangingBeaconsInRegion:_beaconRegion];
         _isRangingBeacon = true;
         
-        [_startButton setTitle:@"Stop Scanning" forState:UIControlStateNormal];
+        [_statusLabel setText:@"Status: Scanning"];
+        [_startButton setTitle:@"Stop scanning" forState:UIControlStateNormal];
     } else {
         [self sendData];
-        [_startButton setTitle:@"Start Scanning" forState:UIControlStateNormal];
+        [_statusLabel setText:@"Status: Not scanning"];
+        [_startButton setTitle:@"Start scanning" forState:UIControlStateNormal];
         [self.view removeFromSuperview];
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"fb-messenger://user-thread/720072294762496"]];
     }
 }
 

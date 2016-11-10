@@ -33,6 +33,7 @@
 @property (strong, nonatomic) NSString* major_string;
 
 @property (strong, nonatomic) NSString* wid;
+@property (nonatomic) bool done;
 
 @property (strong, nonatomic) NSSet *beaconMinors;
 

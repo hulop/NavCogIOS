@@ -213,6 +213,7 @@
 		B441C8A01D4FEECF0007BC27 /* NavCogBeaconSweepViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NavCogBeaconSweepViewController.m; path = NavCog/ViewControllers/NavCogBeaconSweepViewController.m; sourceTree = SOURCE_ROOT; };
 		B441C8A11D4FEECF0007BC27 /* NavCogBeaconSweepViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NavCogBeaconSweepViewController.h; path = NavCog/ViewControllers/NavCogBeaconSweepViewController.h; sourceTree = SOURCE_ROOT; };
 		B441C8A21D4FEECF0007BC27 /* NavCogBeaconCheckViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NavCogBeaconCheckViewController.h; path = NavCog/ViewControllers/NavCogBeaconCheckViewController.h; sourceTree = SOURCE_ROOT; };
+		B471D10E1DCBC40D0062C067 /* libFormatterKit.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFormatterKit.a; path = "../../Library/Developer/Xcode/DerivedData/NavCog-aboboivyigulsiabxnpgxyaiwjuq/Build/Products/Debug-iphoneos/FormatterKit/libFormatterKit.a"; sourceTree = "<group>"; };
 		ED4451BE1C1B5FCD00B4AEFA /* NavCurrentLocationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NavCurrentLocationManager.h; path = NavCog/Model/CurrentLocation/NavCurrentLocationManager.h; sourceTree = SOURCE_ROOT; };
 		ED4451BF1C1B5FCD00B4AEFA /* NavCurrentLocationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NavCurrentLocationManager.m; path = NavCog/Model/CurrentLocation/NavCurrentLocationManager.m; sourceTree = SOURCE_ROOT; };
 		ED4451C11C1B61F000B4AEFA /* NavLocation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NavLocation.h; path = NavCog/Model/TopoMap/NavLocation.h; sourceTree = SOURCE_ROOT; };
@@ -240,6 +241,7 @@
 		01FFBA681220535684486EEF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B471D10E1DCBC40D0062C067 /* libFormatterKit.a */,
 				7E908E231C16B9E900CD7F36 /* libz.tbd */,
 				FBCA8AFD1C15A643003B5722 /* MultipeerConnectivity.framework */,
 				7E6002231C07EAA2007A9B2B /* CoreMotion.framework */,
@@ -503,12 +505,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A0E9845F1B73A6DC00DB2040 /* Build configuration list for PBXNativeTarget "NavCog" */;
 			buildPhases = (
-				E00EF4D13469092BB999DC43 /* Check Pods Manifest.lock */,
+				E00EF4D13469092BB999DC43 /* [CP] Check Pods Manifest.lock */,
 				A0E984381B73A6DC00DB2040 /* Sources */,
 				A0E984391B73A6DC00DB2040 /* Frameworks */,
 				A0E9843A1B73A6DC00DB2040 /* Resources */,
-				69D720DE72B7EAEC868E0215 /* Embed Pods Frameworks */,
-				66F87E3213063BF039AEBD60 /* Copy Pods Resources */,
+				69D720DE72B7EAEC868E0215 /* [CP] Embed Pods Frameworks */,
+				66F87E3213063BF039AEBD60 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -530,7 +532,7 @@
 				TargetAttributes = {
 					A0E9843B1B73A6DC00DB2040 = {
 						CreatedOnToolsVersion = 6.4;
-						DevelopmentTeam = 9VUC3R8D65;
+						DevelopmentTeam = B98QB5W4Z4;
 					};
 				};
 			};
@@ -589,14 +591,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		66F87E3213063BF039AEBD60 /* Copy Pods Resources */ = {
+		66F87E3213063BF039AEBD60 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Copy Pods Resources";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -604,14 +606,14 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-NavCog/Pods-NavCog-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		69D720DE72B7EAEC868E0215 /* Embed Pods Frameworks */ = {
+		69D720DE72B7EAEC868E0215 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Embed Pods Frameworks";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -619,14 +621,14 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-NavCog/Pods-NavCog-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E00EF4D13469092BB999DC43 /* Check Pods Manifest.lock */ = {
+		E00EF4D13469092BB999DC43 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Check Pods Manifest.lock";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -825,7 +827,7 @@
 		A0E9845D1B73A6DC00DB2040 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -872,7 +874,7 @@
 		A0E9845E1B73A6DC00DB2040 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -918,6 +920,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COMPRESS_PNG_FILES = NO;
+				DEVELOPMENT_TEAM = B98QB5W4Z4;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SOURCE_ROOT)",
@@ -925,7 +928,7 @@
 				);
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INFOPLIST_FILE = NavCog/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = CMU.NavCog;
 				PRODUCT_NAME = NavCog;
@@ -943,13 +946,14 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COMPRESS_PNG_FILES = NO;
+				DEVELOPMENT_TEAM = B98QB5W4Z4;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SOURCE_ROOT)",
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = NavCog/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = CMU.NavCog;
 				PRODUCT_NAME = NavCog;

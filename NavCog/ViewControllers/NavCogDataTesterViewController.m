@@ -37,7 +37,6 @@
 @property (strong, nonatomic) NSMutableString *strLine;
 
 @property (nonatomic) float xvalue;
-@property (nonatomic) bool done;
 
 @end
 
@@ -66,7 +65,6 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    [_beaconManager stopRangingBeaconsInRegion:_beaconRegion];
 }
 
 - (IBAction)startButtonClicked:(UIButton *)sender {
@@ -115,6 +113,8 @@
     }
     [_strLine appendString:@"\n"];
     [self sendData];
+    [_beaconManager stopRangingBeaconsInRegion:_beaconRegion];
+
     [self.view removeFromSuperview];
 }
 

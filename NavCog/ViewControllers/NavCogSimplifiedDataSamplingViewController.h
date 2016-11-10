@@ -40,7 +40,6 @@
 
 @property (nonatomic) bool send;
 @property (nonatomic) bool yMode;
-@property (nonatomic) float yvalue;
 @property (nonatomic) float length;
 
 - (NSSet *)analysisBeaconFilter:(NSString *)str;
