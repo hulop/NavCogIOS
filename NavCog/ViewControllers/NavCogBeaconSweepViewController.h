@@ -30,6 +30,9 @@
 
 @property (strong, nonatomic) NSString* uuid_string;
 @property (strong, nonatomic) NSString* major_string;
+@property (strong, nonatomic) NSString* edge;
+@property (strong, nonatomic) NSString* start;
+@property (strong, nonatomic) NSString* end;
 
 @property (strong, nonatomic) NSString* wid;
 

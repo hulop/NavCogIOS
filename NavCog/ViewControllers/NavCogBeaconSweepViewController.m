@@ -31,6 +31,8 @@
 
 @property (weak, nonatomic) IBOutlet UIButton *startButton;
 @property (weak, nonatomic) IBOutlet UILabel *statusLabel;
+@property (weak, nonatomic) IBOutlet UIWebView *webView;
+@property (weak, nonatomic) IBOutlet UILabel *instructions;
 
 @property (strong, nonatomic) CLLocationManager *beaconManager;
 @property (strong, nonatomic) CLBeaconRegion *beaconRegion;
@@ -46,13 +48,15 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
-    self.view.frame = [UIScreen mainScreen].bounds;
-    self.view.bounds = [UIScreen mainScreen].bounds;
-    
+    _webView.delegate = self;
+    NSString *urlString = [NSString stringWithFormat:@"http://hulop.qolt.cs.cmu.edu/mapeditor/?advanced&hidden&edge=%@",  _edge];
+    NSURL *pageURL = [NSURL URLWithString:urlString];
+    [_webView loadRequest:[[NSURLRequest alloc] initWithURL:pageURL]];
+
     _beaconMinors_found = [[NSMutableSet alloc] init];
 
-    [_statusLabel setText:@"Status: Not scanning"];
+    [_statusLabel setText:@"Status: Not Scanning"];
+    [_instructions setText:[NSString stringWithFormat:@"Go to node %@ in the map above. Then press the start button below.", _start]];
     [_startButton setTitle:@"Start scanning" forState:UIControlStateNormal];
 
     _beaconManager = [[CLLocationManager alloc] init];
@@ -85,13 +89,15 @@
         _isRangingBeacon = true;
         
         [_statusLabel setText:@"Status: Scanning"];
+        [_instructions setText:[NSString stringWithFormat:@"Now walk to node %@ at the other end of the red path. Once there, press the stop button below.", _end]];
         [_startButton setTitle:@"Stop scanning" forState:UIControlStateNormal];
     } else {
         [self sendData];
-        [_statusLabel setText:@"Status: Not scanning"];
+        [_instructions setText:@"Thanks! Redirecting you back to LuzDeploy."];
+        [_statusLabel setText:@"Status: Uploading"];
         [_startButton setTitle:@"Start scanning" forState:UIControlStateNormal];
         [self.view removeFromSuperview];
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"fb-messenger://user-thread/720072294762496"]];
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"fb-messenger://user-thread/1146606925407192"]];
     }
 }
 
