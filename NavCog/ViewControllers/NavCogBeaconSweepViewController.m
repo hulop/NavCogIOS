@@ -97,7 +97,26 @@
         [_statusLabel setText:@"Status: Uploading"];
         [_startButton setTitle:@"Start scanning" forState:UIControlStateNormal];
         [self.view removeFromSuperview];
+        [self doneWebhook];
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"fb-messenger://user-thread/1146606925407192"]];
+    }
+}
+
+-(void)doneWebhook {
+    NSString *post = [NSString stringWithFormat:@"message=%@&wid=%@",@"done",_wid];
+    NSData *postData = [post dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+    NSString *postLength = [NSString stringWithFormat:@"%lu",(unsigned long)[postData length]];
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
+    [request setURL:[NSURL URLWithString:@"https://luzdeploy-staging.herokuapp.com/webhook"]];
+    [request setHTTPMethod:@"POST"];
+    [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
+    [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+    [request setHTTPBody:postData];
+    NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    if(conn) {
+        NSLog(@"Connection Successful");
+    } else {
+        NSLog(@"Connection could not be made");
     }
 }
 

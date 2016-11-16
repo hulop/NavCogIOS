@@ -532,7 +532,7 @@
 				TargetAttributes = {
 					A0E9843B1B73A6DC00DB2040 = {
 						CreatedOnToolsVersion = 6.4;
-						DevelopmentTeam = 9VUC3R8D65;
+						DevelopmentTeam = B98QB5W4Z4;
 					};
 				};
 			};
@@ -920,7 +920,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COMPRESS_PNG_FILES = NO;
-				DEVELOPMENT_TEAM = 9VUC3R8D65;
+				DEVELOPMENT_TEAM = B98QB5W4Z4;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SOURCE_ROOT)",
@@ -946,7 +946,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COMPRESS_PNG_FILES = NO;
-				DEVELOPMENT_TEAM = 9VUC3R8D65;
+				DEVELOPMENT_TEAM = B98QB5W4Z4;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SOURCE_ROOT)",
