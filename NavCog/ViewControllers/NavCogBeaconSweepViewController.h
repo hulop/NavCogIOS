@@ -28,6 +28,7 @@
 
 @interface NavCogBeaconSweepViewController : UIViewController < CLLocationManagerDelegate>
 
+@property (strong, nonatomic) NSString* next_uri;
 @property (strong, nonatomic) NSString* uuid_string;
 @property (strong, nonatomic) NSString* major_string;
 @property (strong, nonatomic) NSString* edge;

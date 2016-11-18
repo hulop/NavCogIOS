@@ -162,6 +162,7 @@
     NSString *major_id =dict[@"major"];
     NSString *beacon_filter = dict[@"beacons"];
     NSString *edge_id = dict[@"edge"];
+    NSString *next_uri = dict[@"next"];
     NSString *start = dict[@"start"];
     NSString *end = dict[@"end"];
 
@@ -171,6 +172,7 @@
     _rootView.beaconSweepViewCtrl.edge = edge_id;
     _rootView.beaconSweepViewCtrl.start = start;
     _rootView.beaconSweepViewCtrl.end = end;
+    _rootView.beaconSweepViewCtrl.next_uri = next_uri;
     _rootView.beaconSweepViewCtrl.uuid_string = @"F7826DA6-4FA2-4E98-8024-BC5B71E0893E";
     _rootView.beaconSweepViewCtrl.beaconMinors = [_rootView.beaconSweepViewCtrl analysisBeaconFilter: beacon_filter];
 

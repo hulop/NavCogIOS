@@ -98,7 +98,9 @@
         [_startButton setTitle:@"Start scanning" forState:UIControlStateNormal];
         [self.view removeFromSuperview];
         [self doneWebhook];
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"fb-messenger://user-thread/1146606925407192"]];
+        if (_next_uri != nil) {
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:_next_uri]];
+        }
     }
 }
 
