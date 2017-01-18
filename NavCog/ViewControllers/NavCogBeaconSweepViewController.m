@@ -49,16 +49,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     _webView.delegate = self;
-    NSString *urlString = [NSString stringWithFormat:@"http://hulop.qolt.cs.cmu.edu/mapeditor/?advanced&hidden&edge=%@",  _edge];
-    NSURL *pageURL = [NSURL URLWithString:urlString];
-    [_webView loadRequest:[[NSURLRequest alloc] initWithURL:pageURL]];
-
-    _beaconMinors_found = [[NSMutableSet alloc] init];
-
-    [_statusLabel setText:@"Status: Not Scanning"];
-    [_instructions setText:[NSString stringWithFormat:@"Go to node %@ in the map above. Then press the start button below.", _start]];
-    [_startButton setTitle:@"Start scanning" forState:UIControlStateNormal];
-
     _beaconManager = [[CLLocationManager alloc] init];
     if([_beaconManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {
         [_beaconManager requestAlwaysAuthorization];
@@ -71,6 +61,19 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    NSString *urlString = [NSString stringWithFormat:@"http://hulop.qolt.cs.cmu.edu/mapeditor/?advanced&hidden&edge=%@",  _edge];
+    NSURL *pageURL = [NSURL URLWithString:urlString];
+    [_webView loadRequest:[[NSURLRequest alloc] initWithURL:pageURL]];
+    
+    _beaconMinors_found = [[NSMutableSet alloc] init];
+    
+    [_statusLabel setText:@"Status: Not Scanning"];
+    [_instructions setText:[NSString stringWithFormat:@"Go to node %@ in the map above. Then press the start button below.", _start]];
+    [_startButton setTitle:@"Start scanning" forState:UIControlStateNormal];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -92,9 +95,9 @@
         [_instructions setText:[NSString stringWithFormat:@"Now walk to node %@ at the other end of the red path. Once there, press the stop button below.", _end]];
         [_startButton setTitle:@"Stop scanning" forState:UIControlStateNormal];
     } else {
-        [self sendData];
         [_instructions setText:@"Thanks! Redirecting you back to LuzDeploy."];
         [_statusLabel setText:@"Status: Uploading"];
+        [self sendData];
         [_startButton setTitle:@"Start scanning" forState:UIControlStateNormal];
         [self.view removeFromSuperview];
         [self doneWebhook];
