@@ -26,45 +26,35 @@
 
 #import "NavCogDataSamplingViewController.h"
 
-enum AutoMode {None, AutoInc, AutoDec};
 
 @interface NavCogDataSamplingViewController ()
 
 @property (weak, nonatomic) IBOutlet UITextField *xTextField;
-@property (weak, nonatomic) IBOutlet UITextField *yTextField;
-@property (weak, nonatomic) IBOutlet UIStepper *xStepper;
-@property (weak, nonatomic) IBOutlet UIStepper *yStepper;
 @property (weak, nonatomic) IBOutlet UISwitch *xAutoLock;
-@property (weak, nonatomic) IBOutlet UISwitch *yAutoLock;
+
 @property (weak, nonatomic) IBOutlet UISegmentedControl *xAutoModeSeg;
-@property (weak, nonatomic) IBOutlet UISegmentedControl *yAutoModeSeg;
+
 
 @property (weak, nonatomic) IBOutlet UILabel *countDownLabel;
-@property (weak, nonatomic) IBOutlet UISwitch *sampleNumLock;
-@property (weak, nonatomic) IBOutlet UIPickerView *sampleNumPicker;
-@property (weak, nonatomic) IBOutlet UITextView *beaconFilterTextView;
+
 
 @property (weak, nonatomic) IBOutlet UIButton *stopButton;
 @property (weak, nonatomic) IBOutlet UIButton *startButton;
-@property (weak, nonatomic) IBOutlet UITextField *edgeIDTextField;
-@property (weak, nonatomic) IBOutlet UITextField *uuidTextField;
-@property (weak, nonatomic) IBOutlet UITextField *majorIDTextField;
 
 @property (nonatomic) enum AutoMode xAutoMode;
-@property (nonatomic) enum AutoMode yAutoMode;
 
 @property (strong, nonatomic) NSArray *pickerStrs;
-@property (strong, nonatomic) NSSet *beaconMinors;
-@property (strong, nonatomic) NSString *beaconFilterString;
 
 @property (nonatomic) int currentSmpNum;
-@property (nonatomic) int targetSmpNum;
+
 @property (strong, nonatomic) CLLocationManager *beaconManager;
 @property (strong, nonatomic) CLBeaconRegion *beaconRegion;
 @property (strong, nonatomic) NSUUID *uuid;
 
 // writing data to files
 @property (strong, nonatomic) NSFileHandle *dataFile;
+@property (strong, nonatomic) NSMutableString *dataFileName;
+@property (strong, nonatomic) NSString *dataFilePath;
 @property (nonatomic) Boolean isSampling;
 @property (nonatomic) Boolean isRangingBeacon;
 
@@ -83,13 +73,13 @@ enum AutoMode {None, AutoInc, AutoDec};
     _yAutoLock.on = false;
     _xAutoModeSeg.enabled = false;
     _yAutoModeSeg.enabled = false;
-    _pickerStrs = @[@"5",@"10",@"15",@"20",@"25",@"30",@"35",@"40",@"45",@"50",@"55",@"60"];
+    _pickerStrs = @[@"1", @"5",@"10",@"15",@"20",@"25",@"30",@"35",@"40",@"45",@"50",@"55",@"60"];
     _currentSmpNum = 0;
     _targetSmpNum = 30;
     _sampleNumPicker.dataSource = self;
     _sampleNumPicker.delegate = self;
     _sampleNumPicker.userInteractionEnabled = false;
-    [_sampleNumPicker selectRow:5 inComponent:0 animated:false];
+    [_sampleNumPicker selectRow:6 inComponent:0 animated:false];
     _stopButton.enabled = false;
     _beaconFilterString = _beaconFilterTextView.text;
     _beaconManager = [[CLLocationManager alloc] init];
@@ -133,8 +123,10 @@ enum AutoMode {None, AutoInc, AutoDec};
 
 - (IBAction)startButtonClicked:(UIButton *)sender {
     if (!_isRangingBeacon) {
-        _uuid = [[NSUUID alloc] initWithUUIDString:_uuidTextField.text];
-        _beaconRegion = [[CLBeaconRegion alloc] initWithProximityUUID:_uuid major:(_majorIDTextField.text.intValue) identifier:@"cmaccess"];
+        NSString* uuid_string = [NSString stringWithString:_uuidTextField.text];
+        NSString* major_string = [NSString stringWithString:_majorIDTextField.text];
+        _uuid = [[NSUUID alloc] initWithUUIDString:uuid_string];
+        _beaconRegion = [[CLBeaconRegion alloc] initWithProximityUUID:_uuid major:(major_string.intValue) identifier:@"cmaccess"];
         [_beaconManager startRangingBeaconsInRegion:_beaconRegion];
         _isRangingBeacon = true;
     }
@@ -151,14 +143,14 @@ enum AutoMode {None, AutoInc, AutoDec};
         _beaconMinors = [self analysisBeaconFilter:_beaconFilterString];
     }
     
-    NSMutableString *fileName = [[NSMutableString alloc] init];
-    [fileName appendString:@"/edge_"];
-    [fileName appendString:_edgeIDTextField.text];
-    [fileName appendFormat:@"_%.1f_%.1f.txt", _xTextField.text.floatValue, _yTextField.text.floatValue];
+    _dataFileName = [[NSMutableString alloc] init];
+    [_dataFileName appendString:@"/edge_"];
+    [_dataFileName appendString:_edgeIDTextField.text];
+    [_dataFileName appendFormat:@"_%.1f_%.1f.txt", _xTextField.text.floatValue, _yTextField.text.floatValue];
     NSString *documentPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-    NSString *filePath = [documentPath stringByAppendingString:fileName];
-    [[NSFileManager defaultManager] createFileAtPath:filePath contents:nil attributes:nil];
-    _dataFile = [NSFileHandle fileHandleForWritingAtPath:filePath];
+    _dataFilePath = [documentPath stringByAppendingString:_dataFileName];
+    [[NSFileManager defaultManager] createFileAtPath:_dataFilePath contents:nil attributes:nil];
+    _dataFile = [NSFileHandle fileHandleForWritingAtPath:_dataFilePath];
     NSMutableString *strLine = [[NSMutableString alloc] init];
     [strLine appendFormat:@"MinorID of %zd Beacon Used : ", _beaconMinors.count];
     int *beaconMinorIDs = malloc(sizeof(int) * _beaconMinors.count);
@@ -181,10 +173,10 @@ enum AutoMode {None, AutoInc, AutoDec};
     for (int j = 0; j < _beaconMinors.count; j++) {
         [strLine appendFormat:@"%d,", beaconMinorIDs[j]];
     }
-    
     [strLine appendString:@"\n"];
     [_dataFile writeData:[strLine dataUsingEncoding:NSUTF8StringEncoding]];
     _isSampling = true;
+
 }
 
 - (void)locationManager:(CLLocationManager *)manager didRangeBeacons:(NSArray *)beacons inRegion:(CLBeaconRegion *)region {
@@ -230,6 +222,7 @@ enum AutoMode {None, AutoInc, AutoDec};
         }
         [strLine appendString:@"\n"];
         [_dataFile writeData:[strLine dataUsingEncoding:NSUTF8StringEncoding]];
+        
         _currentSmpNum++;
         _countDownLabel.text = [NSString stringWithFormat:@"%d", _targetSmpNum - _currentSmpNum];
         if (_currentSmpNum == _targetSmpNum) {
@@ -253,6 +246,40 @@ enum AutoMode {None, AutoInc, AutoDec};
                 _yStepper.value = _yTextField.text.floatValue - 1;
                 _yTextField.text = [NSString stringWithFormat:@"%.1f", _yStepper.value];
             }
+            
+            if (_sendData ==YES) {
+                NSString *filename = _dataFileName;
+                NSString *fname = @"fingerprint";
+                NSString *mimetype = @"text/plain";
+                NSData *data = [[NSData alloc] initWithContentsOfFile:_dataFilePath];
+                
+                NSString *urlString = @"http://hulop.qolt.cs.cmu.edu/fprint/index.php";
+                NSMutableURLRequest *request= [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlString]];
+                
+                
+                [request setHTTPMethod:@"POST"];
+                [request setValue:@"multipart/form-data" forHTTPHeaderField:@"content-type"];
+                
+                NSString *boundary = @"---------------------------14737809831466499882746641449";
+                NSString *contentType = [NSString stringWithFormat:@"multipart/form-data; boundary=%@",boundary];
+                [request addValue:contentType forHTTPHeaderField: @"Content-Type"];
+                
+                NSMutableData *postdata = [NSMutableData data];
+                [postdata appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+                [postdata appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"; filename=\"%@\"\r\n", fname, filename] dataUsingEncoding:NSUTF8StringEncoding]];
+                [postdata appendData:[[NSString stringWithFormat:@"Content-Type: %@\r\n\r\n", mimetype] dataUsingEncoding:NSUTF8StringEncoding]];
+                [postdata appendData:data];
+                [postdata appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+                [postdata appendData:[[NSString stringWithFormat:@"\r\n--%@--\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+                
+                
+                [request setHTTPBody:postdata];
+                [request setValue:[NSString stringWithFormat:@"%lu", [postdata length]] forHTTPHeaderField:@"Content-Length"];
+                NSData *returnData = [NSURLConnection sendSynchronousRequest:request returningResponse:nil error:nil];
+                NSString *returnString = [[NSString alloc] initWithData:returnData encoding:NSUTF8StringEncoding];
+                NSLog(@"%@", returnString);
+            }
+            
         }
     }
 }

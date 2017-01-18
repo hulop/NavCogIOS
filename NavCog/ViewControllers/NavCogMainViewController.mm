@@ -34,10 +34,10 @@
 @property (strong, nonatomic) UIPickerView *toPicker;
 @property (strong, nonatomic) NavCogFuncViewController *navFuncViewCtrl;
 @property (strong, nonatomic) NavCogChooseLogViewController *navLogViewCtrl;
-@property (strong, nonatomic) NavCogDataSamplingViewController *dataSamplingViewCtrl;
 @property (strong, nonatomic) NavCogHelpPageViewController *helpPageViewCtrl;
 @property (strong, nonatomic) NavDownloadingViewController *waitViewCtrl;
 @property (strong, nonatomic) NavCogSettingViewController *settingPageViewCtrl;
+@property (strong, nonatomic) NavCogDataSamplingViewController *dataSamplingViewCtrl;
 @property (strong, nonatomic) TopoMap *topoMap;
 @property (strong, nonatomic) NSString *mapDataString;
 @property (strong, nonatomic) NavMachine *navMachine;
@@ -64,6 +64,10 @@
     [super viewDidLoad];
     [self setupUI];
     _dataSamplingViewCtrl = [[NavCogDataSamplingViewController alloc] init];
+    _dataTesterViewCtrl = [[NavCogDataTesterViewController alloc] init];
+    _simplifiedDataSamplingViewCtrl = [[NavCogSimplifiedDataSamplingViewController alloc] init];
+    _beaconCheckViewCtrl = [[NavCogBeaconCheckViewController alloc] init];
+    _beaconSweepViewCtrl = [[NavCogBeaconSweepViewController alloc] init];
     _helpPageViewCtrl = [[NavCogHelpPageViewController alloc] init];
     _navFuncViewCtrl = [NavCogFuncViewController sharedNavCogFuntionViewController];
     _navFuncViewCtrl.delegate = self;
@@ -74,6 +78,7 @@
     _isWebViewLoaded = false;
     _allFromLocationName = [[NSMutableArray alloc] init];
     _allToLocationName = [[NSMutableArray alloc] init];
+    _fromURL = defaultscreen;
     _fromNodeName = nil;
     _toNodeName = nil;
     _isSpeechEnabled = true;
@@ -169,7 +174,15 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear: animated];
     [self checkDevMode];
-    if (_fromNodeName == nil || _toNodeName == nil) {
+    if (_fromURL == datasampler) {
+        [self.view addSubview:_simplifiedDataSamplingViewCtrl.view];
+    } else if (_fromURL == beaconchecker) {
+        [self.view addSubview:_beaconCheckViewCtrl.view];
+    } else if (_fromURL == beaconsweep) {
+        [self.view addSubview:_beaconSweepViewCtrl.view];
+    } else if (_fromURL == datatester) {
+        [self.view addSubview:_dataTesterViewCtrl.view];
+    } else if (_fromNodeName == nil || _toNodeName == nil) {
         NavCogChooseMapViewController *mapChooser = [NavCogChooseMapViewController sharedMapChooser];
         [self.view addSubview:mapChooser.view];
     }
@@ -310,6 +323,10 @@
 - (NavMachine*) getNavMachine
 {
     return _navMachine;
+}
+
+- (void)switchToDataSamplingUIFromLink {
+    [self.view addSubview:_dataSamplingViewCtrl.view];
 }
 
 // Function View delegate's methods

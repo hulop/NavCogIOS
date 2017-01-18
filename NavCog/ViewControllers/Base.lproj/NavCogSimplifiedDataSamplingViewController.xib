@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="NavCogSimplifiedDataSamplingViewController">
+            <connections>
+                <outlet property="startButton" destination="oZT-9Z-VJK" id="OMK-5v-1Pp"/>
+                <outlet property="view" destination="iN0-l3-epB" id="UDx-jx-i1h"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Uys-Qe-NZd">
+                    <rect key="frame" x="8" y="19" width="100" height="47"/>
+                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="100" id="vXr-2v-p5C"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                    <state key="normal" title="&lt; Back">
+                        <color key="titleColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="closeDataSamplingView:" destination="-1" eventType="touchUpInside" id="VDV-CP-kab"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oZT-9Z-VJK">
+                    <rect key="frame" x="0.0" y="86" width="600" height="514"/>
+                    <color key="backgroundColor" red="0.85444617146596857" green="0.85444617146596857" blue="0.85444617146596857" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="514" id="QbN-aY-Q0A"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="96"/>
+                    <state key="normal" title="Start"/>
+                    <connections>
+                        <action selector="startButtonClicked:" destination="-1" eventType="touchUpInside" id="lhL-ye-5bw"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="Uys-Qe-NZd" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="19" id="3JD-jW-1bq"/>
+                <constraint firstAttribute="bottom" secondItem="oZT-9Z-VJK" secondAttribute="bottom" id="CPD-oo-cow"/>
+                <constraint firstItem="Uys-Qe-NZd" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="PZs-jC-zCK"/>
+                <constraint firstItem="oZT-9Z-VJK" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="S4T-fq-AjU"/>
+                <constraint firstAttribute="trailing" secondItem="oZT-9Z-VJK" secondAttribute="trailing" id="SEn-J6-bvf"/>
+                <constraint firstItem="oZT-9Z-VJK" firstAttribute="top" secondItem="Uys-Qe-NZd" secondAttribute="bottom" constant="20" id="TCs-c6-grN"/>
+            </constraints>
+            <point key="canvasLocation" x="312" y="206"/>
+        </view>
+    </objects>
+</document>

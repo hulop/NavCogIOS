@@ -30,12 +30,25 @@
 #import "NavCogChooseMapViewController.h"
 #import "NavCogChooseLogViewController.h"
 #import "NavCogDataSamplingViewController.h"
+#import "NavCogSimplifiedDataSamplingViewController.h"
 #import "NavCogHelpPageViewController.h"
 #import "NavDownloadingViewController.h"
 #import "NavCogSettingViewController.h"
+#import "NavCogBeaconSweepViewController.h"
+#import "NavCogBeaconCheckViewController.h"
+#import "NavCogDataTesterViewController.h"
 
 enum UIType {SpeechForAll, SpeechForStartAndTurnSoundForDistance, SpeechForAllAndSoundForDistance, SpeechForStartSoundForDistanceAndTurn};
 
 @interface NavCogMainViewController : UIViewController <UIPickerViewDataSource, UIPickerViewDelegate, NavMachineDelegate, NavCogFuncViewControllerDelegate, NavCogChooseMapViewControllerDelegate, NavCogChooseLogViewControllerDelegate>
+
+@property (nonatomic) enum {datasampler, beaconchecker, beaconsweep, datatester, defaultscreen} fromURL;
+@property (strong, nonatomic) NavCogSimplifiedDataSamplingViewController *simplifiedDataSamplingViewCtrl;
+@property (strong, nonatomic) NavCogBeaconSweepViewController *beaconSweepViewCtrl;
+@property (strong, nonatomic) NavCogBeaconCheckViewController *beaconCheckViewCtrl;
+@property (strong, nonatomic) NavCogDataTesterViewController *dataTesterViewCtrl;
+
+- (void)switchToDataSamplingUIFromLink;
+
 
 @end

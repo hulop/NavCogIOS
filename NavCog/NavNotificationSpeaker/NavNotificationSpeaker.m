@@ -28,7 +28,7 @@
 @import UIKit;
 
 
-#define IS_IOS_9 ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion == 9)
+#define IS_IOS_9 ([[NSProcessInfo processInfo] operatingSystemVersion].majorVersion >= 9)
 
 @interface NavNotificationSpeaker ()
 

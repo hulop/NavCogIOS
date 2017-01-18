@@ -26,34 +26,22 @@
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
 
-@interface NavCogDataSamplingViewController : UIViewController <UIPickerViewDataSource, UIPickerViewDelegate, CLLocationManagerDelegate>
+@interface NavCogSimplifiedDataSamplingViewController : UIViewController < CLLocationManagerDelegate>
 
-@property (weak, nonatomic) IBOutlet UIStepper *xStepper;
-@property (weak, nonatomic) IBOutlet UIStepper *yStepper;
-//where I started adding things from .m
+@property (strong, nonatomic) NSString* uuid_string;
+@property (strong, nonatomic) NSString* edgeid_string;
+@property (strong, nonatomic) NSString* major_string;
 
-enum AutoMode {None, AutoInc, AutoDec};
-
-@property (weak, nonatomic) IBOutlet UISegmentedControl *yAutoModeSeg;
-@property (weak, nonatomic) IBOutlet UISwitch *yAutoLock;
-@property (nonatomic) enum AutoMode yAutoMode;
-@property (weak, nonatomic) IBOutlet UITextView *beaconFilterTextView;
-@property (nonatomic) Boolean sendData;
-@property (weak, nonatomic) IBOutlet UITextField *edgeIDTextField;
-@property (weak, nonatomic) IBOutlet UITextField *majorIDTextField;
-@property (weak, nonatomic) IBOutlet UITextField *uuidTextField;
-
+@property (strong, nonatomic) NSString* wid;
 
 @property (strong, nonatomic) NSSet *beaconMinors;
-@property (strong, nonatomic) NSString *beaconFilterString;
 
-@property (weak, nonatomic) IBOutlet UISwitch *sampleNumLock;
-@property (weak, nonatomic) IBOutlet UIPickerView *sampleNumPicker;
 @property (nonatomic) int targetSmpNum;
 
-//where I stopped
+@property (nonatomic) bool send;
+@property (nonatomic) bool yMode;
+@property (nonatomic) float length;
 
-@property (weak, nonatomic) IBOutlet UITextField *yTextField;
-
+- (NSSet *)analysisBeaconFilter:(NSString *)str;
 
 @end
